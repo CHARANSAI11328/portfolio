@@ -238,9 +238,12 @@ function serveStatic(req, res, filePath) {
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
   const secHeaders = getSecurityHeaders(req);
 
+  const isDynamicAsset = ext === '.html' || ext === '.pdf';
   res.writeHead(200, {
     'Content-Type': contentType,
-    'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=86400',
+    'Cache-Control': isDynamicAsset ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400',
+    'Pragma': isDynamicAsset ? 'no-cache' : undefined,
+    'Expires': isDynamicAsset ? '0' : undefined,
     ...secHeaders,
   });
   fs.createReadStream(filePath).pipe(res);
@@ -954,6 +957,31 @@ const server = http.createServer(async (req, res) => {
     // Admin login
     if (pathname === '/admin/login') {
       return serveStatic(req, res, path.join(PUBLIC_DIR, 'admin-login.html'));
+    }
+
+    // Dedicated Resume Endpoints (instant vector PDF download with legal name & no cache)
+    if (
+      pathname === '/resume' ||
+      pathname === '/cv' ||
+      pathname === '/download-resume' ||
+      pathname === '/Charan_Sai_Resume.pdf' ||
+      pathname === '/KAMARAJUGADDA_CHARAN_SAI_Resume.pdf'
+    ) {
+      const resumeFilePath = path.join(PUBLIC_DIR, 'KAMARAJUGADDA_CHARAN_SAI_Resume.pdf');
+      const fallbackPath = path.join(PUBLIC_DIR, 'Charan_Sai_Resume.pdf');
+      const targetPath = fs.existsSync(resumeFilePath) ? resumeFilePath : fallbackPath;
+      if (fs.existsSync(targetPath)) {
+        const secHeaders = getSecurityHeaders(req);
+        res.writeHead(200, {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'inline; filename="KAMARAJUGADDA_CHARAN_SAI_Resume.pdf"',
+          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          ...secHeaders,
+        });
+        return fs.createReadStream(targetPath).pipe(res);
+      }
     }
 
     // Dedicated serving for persistent uploads directory

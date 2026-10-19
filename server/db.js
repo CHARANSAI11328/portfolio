@@ -94,7 +94,7 @@ const INITIAL_DB = {
     email: "contact@charansai.website",
     phone: "+91 (Verified on inquiry)",
     avatarUrl: "/images/charan_sai_avatar.jpg",
-    resumeUrl: "/Charan_Sai_Resume.pdf",
+    resumeUrl: "/KAMARAJUGADDA_CHARAN_SAI_Resume.pdf?v=20261019",
     availabilityStatus: "available",
     availabilityText: "Available for freelance projects",
     socialLinks: {
