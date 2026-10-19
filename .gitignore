@@ -45,4 +45,4 @@ next-env.d.ts
 # backups & temporary db dumps
 /data/backups/
 *.tmp
-
+scratch/
