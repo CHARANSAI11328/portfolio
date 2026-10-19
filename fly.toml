@@ -1,6 +1,6 @@
 # fly.toml app configuration file generated for Charan Sai Portfolio
 app = 'charan-sai-portfolio'
-primary_region = 'bom'
+primary_region = 'sin'
 
 [build]
   dockerfile = 'Dockerfile'
@@ -24,9 +24,9 @@ primary_region = 'bom'
   timeout = '5s'
   path = '/'
 
-[mounts]
-  source = 'portfolio_data'
-  destination = '/app/data'
+# [mounts]
+#   source = 'portfolio_data'
+#   destination = '/app/data'
 
 [[vm]]
   memory = '512mb'

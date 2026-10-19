@@ -1202,7 +1202,7 @@
 
       <div class="nav-actions">
         <button class="theme-btn" id="themeToggle" title="Toggle Light / Dark" aria-label="Toggle theme">
-          <i data-lucide="moon" style="width: 1rem; height: 1rem;"></i>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 1rem; height: 1rem; color: #4F46E5;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
         </button>
 
         <a href="/admin" class="admin-link" title="Private Admin CMS" aria-label="Admin Dashboard">
@@ -1321,7 +1321,7 @@
         <div class="hero-portal-container">
           <div class="portal-halo"></div>
           <div class="portal-disc">
-            <img src="/images/charan_sai_avatar.jpg" alt="Charan Sai — Independent Developer & Digital Solutions" class="portal-avatar-img" id="heroPortalAvatar" onerror="this.onerror=null; this.src='/images/charan_sai_avatar.jpg';">
+            <img src="/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg" alt="Charan Sai" class="portal-avatar-img" id="heroPortalAvatar" onerror="if(this.src.indexOf('charan_sai_avatar.jpg')===-1){this.src='/images/charan_sai_avatar.jpg';}else{this.style.display='none';const a=document.getElementById('heroAbstractPortal');if(a)a.style.display='flex';}">
             <div class="abstract-portal-art" id="heroAbstractPortal" style="display: none;">
               <div class="holo-energy-rings"></div>
               <div class="holo-core-glow"></div>
@@ -1684,6 +1684,7 @@
         ? '<i data-lucide="sun" style="width: 1rem; height: 1rem; color: #F59E0B;"></i>' 
         : '<i data-lucide="moon" style="width: 1rem; height: 1rem; color: #4F46E5;"></i>';
       themeBtn.setAttribute('aria-label', isDarkInitial ? 'Switch to light theme' : 'Switch to dark theme');
+      if (window.lucide) lucide.createIcons();
 
       themeBtn.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');

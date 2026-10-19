@@ -239,13 +239,16 @@ function serveStatic(req, res, filePath) {
   const secHeaders = getSecurityHeaders(req);
 
   const isDynamicAsset = ext === '.html' || ext === '.pdf';
-  res.writeHead(200, {
+  const headers = {
     'Content-Type': contentType,
     'Cache-Control': isDynamicAsset ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400',
-    'Pragma': isDynamicAsset ? 'no-cache' : undefined,
-    'Expires': isDynamicAsset ? '0' : undefined,
     ...secHeaders,
-  });
+  };
+  if (isDynamicAsset) {
+    headers['Pragma'] = 'no-cache';
+    headers['Expires'] = '0';
+  }
+  res.writeHead(200, headers);
   fs.createReadStream(filePath).pipe(res);
 }
 
