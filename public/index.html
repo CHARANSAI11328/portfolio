@@ -727,6 +727,157 @@
     }
     .p-empty { color: var(--text-dim); font-style: italic; }
 
+    /* Team Section Styles */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.75rem;
+      margin-top: 2.5rem;
+    }
+    .team-card {
+      border-radius: 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      border-color: var(--border-accent);
+    }
+    .team-card-header {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .team-avatar-wrap {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 999px;
+      padding: 2.5px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+      position: relative;
+    }
+    .team-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      object-fit: cover;
+      background: var(--bg-surface);
+      display: block;
+    }
+    .team-meta { flex: 1; min-width: 0; }
+    .team-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-heading);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .team-role {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      margin-top: 0.2rem;
+      line-height: 1.3;
+    }
+    .team-badge-order {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--accent-primary);
+      border: 1px solid rgba(79, 70, 229, 0.2);
+    }
+    .team-bio {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+    .team-skills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    .team-skill-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.08);
+      color: var(--accent-primary);
+      border: 1px solid rgba(99, 102, 241, 0.18);
+    }
+    .dark .team-skill-tag {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    .team-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+    .team-social-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .team-social-btn {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .team-social-btn:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+    .team-view-profile-btn {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+    .team-view-profile-btn:hover {
+      background: rgba(79, 70, 229, 0.08);
+    }
+
     /* Certifications Section */
     .empty-state-box {
       padding: 3rem;
@@ -1193,6 +1344,7 @@
         <li><a href="#about">About</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#projects">Projects</a></li>
+        <li><a href="#team">My Team</a></li>
         <li><a href="#certifications">Certifications</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#events">Events</a></li>
@@ -1234,6 +1386,7 @@
       <a href="#about" class="mobile-nav-item"><i data-lucide="user" style="width: 1rem; height: 1rem;"></i> <span>About</span></a>
       <a href="#skills" class="mobile-nav-item"><i data-lucide="cpu" style="width: 1rem; height: 1rem;"></i> <span>Skills</span></a>
       <a href="#projects" class="mobile-nav-item"><i data-lucide="folder-git-2" style="width: 1rem; height: 1rem;"></i> <span>Projects</span></a>
+      <a href="#team" class="mobile-nav-item"><i data-lucide="users" style="width: 1rem; height: 1rem;"></i> <span>My Team</span></a>
       <a href="#certifications" class="mobile-nav-item"><i data-lucide="award" style="width: 1rem; height: 1rem;"></i> <span>Certifications</span></a>
       <a href="#experience" class="mobile-nav-item"><i data-lucide="briefcase" style="width: 1rem; height: 1rem;"></i> <span>Experience</span></a>
       <a href="#events" class="mobile-nav-item"><i data-lucide="calendar" style="width: 1rem; height: 1rem;"></i> <span>Events</span></a>
@@ -1398,10 +1551,16 @@
           </div>
         </div>
 
-        <a href="#contact" class="btn-primary" style="display: inline-flex;">
-          <span>Get In Touch</span>
-          <i data-lucide="arrow-right" style="width: 1rem; height: 1rem;"></i>
-        </a>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <a href="#contact" class="btn-primary" style="display: inline-flex;">
+            <span>Get In Touch</span>
+            <i data-lucide="arrow-right" style="width: 1rem; height: 1rem;"></i>
+          </a>
+          <a href="#team" class="btn-secondary" style="display: inline-flex; text-decoration: none;">
+            <i data-lucide="users" style="width: 1rem; height: 1rem; color: #4F46E5;"></i>
+            <span>Meet My Team</span>
+          </a>
+        </div>
       </div>
 
       <!-- Right Visual Card with Doodle Crown -->
@@ -1493,6 +1652,26 @@
       </div>
 
       <div class="projects-grid" id="projectsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- My Team Section -->
+  <section id="team" class="reveal-on-scroll">
+    <div class="container">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div class="sec-badge">
+            <i data-lucide="users" style="width: 0.75rem; height: 0.75rem;"></i>
+            <span>Engineering & Design Collective</span>
+          </div>
+          <h2 class="sec-title">Meet <span class="text-gradient">My Team</span></h2>
+          <p class="sec-desc">Multidisciplinary specialists collaborating to architect, build, and deliver scalable enterprise systems and digital experiences.</p>
+        </div>
+      </div>
+
+      <div class="team-grid" id="teamContainer">
         <!-- Rendered dynamically -->
       </div>
     </div>
@@ -2086,13 +2265,24 @@
     }
 
     let allProjects = [];
+    let allTeamMembers = [];
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     // 4. Fetch dynamic data from Database with Cache-Busting
     async function loadPortfolioData() {
       try {
         const fetchOpts = { cache: 'no-store' };
         const ts = Date.now();
-        const [profRes, projRes, skillRes, certRes, expRes, eventRes, servRes, setRes] = await Promise.all([
+        const [profRes, projRes, skillRes, certRes, expRes, eventRes, servRes, teamRes, setRes] = await Promise.all([
           fetch(`/api/profile?t=${ts}`, fetchOpts).then(r => r.json()),
           fetch(`/api/projects?t=${ts}`, fetchOpts).then(r => r.json()),
           fetch(`/api/skills?t=${ts}`, fetchOpts).then(r => r.json()),
@@ -2100,6 +2290,7 @@
           fetch(`/api/experience?t=${ts}`, fetchOpts).then(r => r.json()),
           fetch(`/api/events?t=${ts}`, fetchOpts).then(r => r.json()),
           fetch(`/api/services?t=${ts}`, fetchOpts).then(r => r.json()),
+          fetch(`/api/team?t=${ts}`, fetchOpts).then(r => r.json()),
           fetch(`/api/settings?t=${ts}`, fetchOpts).then(r => r.json()),
         ]);
 
@@ -2284,6 +2475,92 @@
           });
         }
 
+        // Populate Team Members
+        allTeamMembers = teamRes.team || [];
+        const teamContainer = document.getElementById('teamContainer');
+        if (teamContainer) {
+          if (!allTeamMembers || allTeamMembers.length === 0) {
+            teamContainer.innerHTML = `
+              <div class="empty-state-box" style="grid-column: 1 / -1;">
+                <div class="empty-icon"><i data-lucide="users" style="width: 1.75rem; height: 1.75rem;"></i></div>
+                <h3 style="font-size: 1rem; font-weight: 800; color: var(--text-heading);">Our collaborative team is growing.</h3>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.35rem; line-height: 1.5;">
+                  Core team members, software engineers, and design partners will appear here.
+                </p>
+              </div>
+            `;
+          } else {
+            teamContainer.innerHTML = '';
+            allTeamMembers.forEach(member => {
+              const card = document.createElement('div');
+              card.className = 'team-card glow-card glass-panel';
+              card.setAttribute('tabindex', '0');
+              card.setAttribute('role', 'article');
+              card.setAttribute('title', `Click to view ${member.name}'s profile`);
+              card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') openTeamProfileModal(member.id);
+              });
+
+              const avatarUrl = member.avatarUrl || '/images/charan_sai_avatar.jpg';
+              const socials = member.socials || {};
+
+              const skillsHtml = (member.skills && member.skills.length > 0)
+                ? `<div class="team-skills-wrap">
+                    ${member.skills.slice(0, 4).map(s => `<span class="team-skill-tag">${escapeHtml(s)}</span>`).join('')}
+                    ${member.skills.length > 4 ? `<span class="team-skill-tag" style="opacity: 0.75;">+${member.skills.length - 4}</span>` : ''}
+                   </div>`
+                : '';
+
+              const socialButtons = [];
+              if (socials.github) {
+                socialButtons.push(`<a href="${socials.github}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="GitHub Profile" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12.02c0 4.42 2.87 8.18 6.84 9.5.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03.8-.23 1.66-.34 2.5-.34.85 0 1.7.11 2.5.34 1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.4.1 2.65.64.7 1.03 1.6 1.03 2.69 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10.02 10.02 0 0022 12.02C22 6.48 17.52 2 12 2z"/></svg></a>`);
+              }
+              if (socials.linkedin) {
+                socialButtons.push(`<a href="${socials.linkedin}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="LinkedIn Profile" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c.92 0 1.67-.75 1.67-1.67s-.75-1.67-1.67-1.67-1.67.75-1.67 1.67.75 1.67 1.67 1.67M5.07 18.5h2.79v-8.37H5.07v8.37z"/></svg></a>`);
+              }
+              if (socials.email) {
+                socialButtons.push(`<a href="mailto:${socials.email}" class="team-social-btn" title="Send Email" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>`);
+              }
+              if (socials.portfolio) {
+                socialButtons.push(`<a href="${socials.portfolio}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="Personal Website" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></a>`);
+              }
+
+              card.innerHTML = `
+                <div>
+                  <div class="team-card-header">
+                    <div class="team-avatar-wrap">
+                      <img src="${avatarUrl}" class="team-avatar-img" alt="${escapeHtml(member.name)}" onerror="this.onerror=null;this.src='/images/charan_sai_avatar.jpg'">
+                    </div>
+                    <div class="team-meta">
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                        <h3 class="team-name">${escapeHtml(member.name)}</h3>
+                        <span class="team-badge-order">#${member.displayOrder || 1}</span>
+                      </div>
+                      <div class="team-role">${escapeHtml(member.role)}</div>
+                    </div>
+                  </div>
+                  <p class="team-bio">${escapeHtml(member.bio || 'Core engineering and design contributor.')}</p>
+                  ${skillsHtml}
+                </div>
+                <div class="team-footer">
+                  <div class="team-social-icons">
+                    ${socialButtons.join('')}
+                  </div>
+                  <button class="team-view-profile-btn" onclick="openTeamProfileModal('${member.id}')">
+                    <span>View Profile</span>
+                    <i data-lucide="arrow-right" style="width: 0.85rem; height: 0.85rem;"></i>
+                  </button>
+                </div>
+              `;
+              card.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('button')) return;
+                openTeamProfileModal(member.id);
+              });
+              teamContainer.appendChild(card);
+            });
+          }
+        }
+
         // Populate Certifications (Strict Honest Empty State)
         const certsContainer = document.getElementById('certsContainer');
         if (certsContainer) {
@@ -2436,9 +2713,58 @@
       document.getElementById('caseModalOverlay').style.display = 'none';
     }
 
+    // Team Profile Modal Logic
+    function openTeamProfileModal(id) {
+      const member = (allTeamMembers || []).find(m => m.id === id);
+      if (!member) return;
+
+      document.getElementById('teamModalName').textContent = member.name;
+      document.getElementById('teamModalRole').textContent = member.role;
+      document.getElementById('teamModalBio').textContent = member.bio || 'Core engineering contributor specializing in enterprise software architecture and digital products.';
+      document.getElementById('teamModalAvatar').src = member.avatarUrl || '/images/charan_sai_avatar.jpg';
+      document.getElementById('teamModalBadge').textContent = `Team Member #${member.displayOrder || 1}`;
+
+      const skillsEl = document.getElementById('teamModalSkills');
+      if (skillsEl) {
+        skillsEl.innerHTML = (member.skills && member.skills.length > 0)
+          ? member.skills.map(s => `<span class="team-skill-tag" style="font-size: 0.78rem; padding: 0.3rem 0.75rem;">${escapeHtml(s)}</span>`).join('')
+          : '<span style="font-size: 0.75rem; color: var(--text-dim);">No specializations listed</span>';
+      }
+
+      const actionsEl = document.getElementById('teamModalActions');
+      if (actionsEl) {
+        const socials = member.socials || {};
+        const buttons = [];
+        if (socials.email) {
+          buttons.push(`<a href="mailto:${socials.email}" class="btn-primary" style="padding: 0.55rem 1.15rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> <span>Email Member</span></a>`);
+        }
+        if (socials.github) {
+          buttons.push(`<a href="${socials.github}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="padding: 0.55rem 1.15rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12.02c0 4.42 2.87 8.18 6.84 9.5.5.1.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.99 1.03-2.69-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.03.8-.23 1.66-.34 2.5-.34.85 0 1.7.11 2.5.34 1.91-1.3 2.75-1.03 2.75-1.03.55 1.38.2 2.4.1 2.65.64.7 1.03 1.6 1.03 2.69 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.75c0 .27.18.58.69.48A10.02 10.02 0 0022 12.02C22 6.48 17.52 2 12 2z"/></svg> <span>GitHub</span></a>`);
+        }
+        if (socials.linkedin) {
+          buttons.push(`<a href="${socials.linkedin}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="padding: 0.55rem 1.15rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c.92 0 1.67-.75 1.67-1.67s-.75-1.67-1.67-1.67-1.67.75-1.67 1.67.75 1.67 1.67 1.67M5.07 18.5h2.79v-8.37H5.07v8.37z"/></svg> <span>LinkedIn</span></a>`);
+        }
+        if (socials.portfolio) {
+          buttons.push(`<a href="${socials.portfolio}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="padding: 0.55rem 1.15rem; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> <span>Website</span></a>`);
+        }
+        actionsEl.innerHTML = buttons.length > 0 ? buttons.join('') : '<span style="font-size: 0.75rem; color: var(--text-dim); font-style: italic;">No external profiles linked</span>';
+      }
+
+      document.getElementById('teamProfileModalOverlay').style.display = 'flex';
+      lucide.createIcons();
+    }
+
+    function closeTeamProfileModal() {
+      const modal = document.getElementById('teamProfileModalOverlay');
+      if (modal) modal.style.display = 'none';
+    }
+
     // Keyboard support for modal
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeCaseModal();
+      if (e.key === 'Escape') {
+        closeCaseModal();
+        closeTeamProfileModal();
+      }
     });
 
     // 5. Functional Contact Form Submission with Real Validation
@@ -2543,6 +2869,42 @@
 
       <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;" id="modalActions">
         <!-- Live & Repo Links -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Profile Interactive Modal -->
+  <div class="case-modal-overlay" id="teamProfileModalOverlay" onclick="if(event.target === this) closeTeamProfileModal()">
+    <div class="case-modal-card" style="max-width: 560px;">
+      <button class="case-modal-close" onclick="closeTeamProfileModal()" title="Close Modal">
+        <i data-lucide="x" style="width: 1.15rem; height: 1.15rem;"></i>
+      </button>
+
+      <div style="display: flex; gap: 1.25rem; align-items: center; margin-bottom: 1.25rem;">
+        <div class="team-avatar-wrap" style="width: 5.25rem; height: 5.25rem;">
+          <img id="teamModalAvatar" src="/images/charan_sai_avatar.jpg" class="team-avatar-img" alt="Team Profile" onerror="this.onerror=null;this.src='/images/charan_sai_avatar.jpg'">
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="sec-badge" id="teamModalBadge" style="margin-bottom: 0;">Core Team</span>
+          </div>
+          <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--text-heading); margin: 0;" id="teamModalName">Member Name</h2>
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--accent-primary); margin-top: 0.25rem;" id="teamModalRole">Specialization Role</div>
+        </div>
+      </div>
+
+      <div style="padding: 1.25rem; border-radius: 1rem; background: rgba(0,0,0,0.03); margin-bottom: 1.25rem;" class="dark:bg-white/5">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-heading); margin-bottom: 0.35rem;">About & Core Focus</div>
+        <p style="font-size: 0.82rem; color: var(--text-main); line-height: 1.6;" id="teamModalBio">Detailed biography...</p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-heading); margin-bottom: 0.5rem;">Core Technologies & Proficiencies</div>
+        <div class="team-skills-wrap" id="teamModalSkills"></div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;" id="teamModalActions">
+        <!-- Direct links -->
       </div>
     </div>
   </div>

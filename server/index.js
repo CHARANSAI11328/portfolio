@@ -859,6 +859,103 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    // Team Members GET, POST, PUT, DELETE
+    if (pathname === '/api/team') {
+      const db = getDatabase();
+      db.team = db.team || [];
+      if (method === 'GET') {
+        const sorted = [...db.team].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+        return sendJson(res, 200, { team: sorted });
+      }
+      if (method === 'POST') {
+        const admin = getAuthAdmin(req);
+        if (!admin) return sendJson(res, 401, { error: 'Unauthorized. Admin credentials required.' });
+        const body = await parseJsonBody(req);
+        if (!body.name || !body.role) {
+          return sendJson(res, 400, { error: 'Member name and role are required' });
+        }
+        let skills = [];
+        if (Array.isArray(body.skills)) {
+          skills = body.skills;
+        } else if (typeof body.skills === 'string') {
+          skills = body.skills.split(',').map((s) => s.trim()).filter(Boolean);
+        }
+        const github = body.github?.trim() || body.socials?.github?.trim() || '';
+        const linkedin = body.linkedin?.trim() || body.socials?.linkedin?.trim() || '';
+        const email = body.email?.trim() || body.socials?.email?.trim() || '';
+        const portfolio = body.portfolio?.trim() || body.socials?.portfolio?.trim() || '';
+        const newMember = {
+          id: `team-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          name: body.name.trim(),
+          role: body.role.trim(),
+          bio: body.bio?.trim() || '',
+          avatarUrl: body.avatarUrl?.trim() || '',
+          skills,
+          github,
+          linkedin,
+          email,
+          portfolio,
+          socials: { github, linkedin, email, portfolio },
+          displayOrder: parseInt(body.displayOrder, 10) || db.team.length + 1,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        db.team.push(newMember);
+        saveDatabase(db);
+        logActivity('CREATE', 'Team', `Added team member: ${newMember.name} (${newMember.role})`);
+        return sendJson(res, 201, { success: true, member: newMember });
+      }
+    }
+
+    if (pathname.startsWith('/api/team/')) {
+      const id = pathname.replace('/api/team/', '');
+      const db = getDatabase();
+      const admin = getAuthAdmin(req);
+      if (!admin) return sendJson(res, 401, { error: 'Unauthorized. Admin credentials required.' });
+      db.team = db.team || [];
+      const idx = db.team.findIndex((m) => m.id === id);
+      if (idx === -1) return sendJson(res, 404, { error: 'Team member not found' });
+      if (method === 'PUT') {
+        const updates = await parseJsonBody(req);
+        let skills = db.team[idx].skills;
+        if (Array.isArray(updates.skills)) {
+          skills = updates.skills;
+        } else if (typeof updates.skills === 'string') {
+          skills = updates.skills.split(',').map((s) => s.trim()).filter(Boolean);
+        }
+        const github = (updates.github !== undefined ? updates.github : updates.socials?.github !== undefined ? updates.socials.github : db.team[idx].github) || '';
+        const linkedin = (updates.linkedin !== undefined ? updates.linkedin : updates.socials?.linkedin !== undefined ? updates.socials.linkedin : db.team[idx].linkedin) || '';
+        const email = (updates.email !== undefined ? updates.email : updates.socials?.email !== undefined ? updates.socials.email : db.team[idx].email) || '';
+        const portfolio = (updates.portfolio !== undefined ? updates.portfolio : updates.socials?.portfolio !== undefined ? updates.socials.portfolio : db.team[idx].portfolio) || '';
+        db.team[idx] = {
+          ...db.team[idx],
+          ...updates,
+          skills,
+          github: String(github).trim(),
+          linkedin: String(linkedin).trim(),
+          email: String(email).trim(),
+          portfolio: String(portfolio).trim(),
+          socials: {
+            github: String(github).trim(),
+            linkedin: String(linkedin).trim(),
+            email: String(email).trim(),
+            portfolio: String(portfolio).trim(),
+          },
+          id,
+          updatedAt: new Date().toISOString(),
+        };
+        saveDatabase(db);
+        logActivity('UPDATE', 'Team', `Updated team member: ${db.team[idx].name}`);
+        return sendJson(res, 200, { success: true, member: db.team[idx] });
+      }
+      if (method === 'DELETE') {
+        const del = db.team.splice(idx, 1)[0];
+        saveDatabase(db);
+        logActivity('DELETE', 'Team', `Removed team member: ${del.name}`);
+        return sendJson(res, 200, { success: true, message: 'Deleted' });
+      }
+    }
+
     // Contact Submissions (Public POST, Admin GET, Admin PATCH, Admin DELETE)
     if (pathname === '/api/contact') {
       const db = getDatabase();

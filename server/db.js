@@ -269,6 +269,21 @@ const INITIAL_DB = {
       displayOrder: 4,
     },
   ],
+  team: [
+    {
+      id: 'team-charan-lead',
+      name: 'Charan Sai',
+      role: 'Lead Architect & Full-Stack Engineer',
+      bio: 'Systems design, full-stack web architectures, secure APIs, and client solution delivery.',
+      avatarUrl: '/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg',
+      skills: ['Next.js', 'React', 'Node.js', 'Java', 'PostgreSQL'],
+      github: 'https://github.com/CHARANSAI11328',
+      linkedin: 'https://linkedin.com',
+      email: 'saikamarajugadda21@gmail.com',
+      portfolio: 'https://charansai.website',
+      displayOrder: 1,
+    },
+  ],
   inquiries: [],
   settings: {
     themePreference: 'light',
@@ -280,6 +295,7 @@ const INITIAL_DB = {
       about: true,
       skills: true,
       projects: true,
+      team: true,
       certifications: true,
       experience: true,
       events: true,
@@ -334,6 +350,10 @@ function getDatabase() {
           needsSave = true;
         }
       });
+    }
+    if (!Array.isArray(db.team)) {
+      db.team = INITIAL_DB.team;
+      needsSave = true;
     }
     if (needsSave) {
       saveDatabase(db);

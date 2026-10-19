@@ -5,9 +5,9 @@
       "email": "admin@charansai.website",
       "name": "Charan Sai",
       "role": "superadmin",
-      "passwordHash": "dc71c16770c2339c3ec9f337653f8cc3:f62d32da1394639f1b5c205a9650781edb93d8a93e6e94d979baf1981c6e772ea53a4890bf9c1add172bd30cf512615ede2961caad203685ae72aae7ab3efdd5",
+      "passwordHash": "eacf671095fcf23646f493198ec7b7a0:9d347813767b5619014b7099d530bb0b8697ade85525f72406ac5a0df6b1383da1b2e72b5e34bb352872ce241a69d6a903cfd754ea3521a678a610e2e697b2f3",
       "createdAt": "2026-10-19T05:59:11.258Z",
-      "tokenVersion": 9,
+      "tokenVersion": 10,
       "passwordChangedAt": "2026-10-19T11:08:19.410Z"
     }
   ],
@@ -361,6 +361,83 @@
       "displayOrder": 4
     }
   ],
+  "team": [
+    {
+      "id": "team-charan-lead",
+      "name": "Charan Sai",
+      "role": "Lead Architect & Full-Stack Engineer",
+      "bio": "Systems design, full-stack web architectures, secure APIs, and client solution delivery.",
+      "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
+      "skills": [
+        "Next.js",
+        "React",
+        "Node.js",
+        "Java",
+        "PostgreSQL"
+      ],
+      "github": "https://github.com/CHARANSAI11328",
+      "linkedin": "https://linkedin.com",
+      "email": "saikamarajugadda21@gmail.com",
+      "portfolio": "https://charansai.website",
+      "socials": {
+        "github": "https://github.com/CHARANSAI11328",
+        "linkedin": "https://linkedin.com",
+        "email": "saikamarajugadda21@gmail.com",
+        "portfolio": "https://charansai.website"
+      },
+      "displayOrder": 1
+    },
+    {
+      "id": "team-frontend-collab",
+      "name": "Frontend & UI/UX Specialist",
+      "role": "Creative Frontend Engineer",
+      "bio": "Crafting responsive user interfaces, fluid animations, accessible components, and modern design systems.",
+      "avatarUrl": "",
+      "skills": [
+        "React",
+        "Tailwind CSS",
+        "Figma",
+        "UI/UX",
+        "TypeScript"
+      ],
+      "github": "https://github.com",
+      "linkedin": "https://linkedin.com",
+      "email": "contact@charansai.website",
+      "portfolio": "",
+      "socials": {
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "email": "contact@charansai.website",
+        "portfolio": ""
+      },
+      "displayOrder": 2
+    },
+    {
+      "id": "team-data-collab",
+      "name": "Data & Backend Specialist",
+      "role": "Cloud & Data Engineer",
+      "bio": "Data pipelines, relational schema modeling, cloud deployment automation, and backend optimization.",
+      "avatarUrl": "",
+      "skills": [
+        "Python",
+        "PostgreSQL",
+        "Neon DB",
+        "Docker",
+        "REST APIs"
+      ],
+      "github": "https://github.com",
+      "linkedin": "https://linkedin.com",
+      "email": "contact@charansai.website",
+      "portfolio": "",
+      "socials": {
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "email": "contact@charansai.website",
+        "portfolio": ""
+      },
+      "displayOrder": 3
+    }
+  ],
   "inquiries": [],
   "settings": {
     "themePreference": "light",
@@ -372,6 +449,7 @@
       "about": true,
       "skills": true,
       "projects": true,
+      "team": true,
       "certifications": true,
       "experience": true,
       "events": true,
@@ -380,6 +458,34 @@
     }
   },
   "activityLogs": [
+    {
+      "id": "log-1792419749990-6uhr",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-19T14:22:29.990Z"
+    },
+    {
+      "id": "log-1792419221802-ce0f",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: QA & Test Architect",
+      "timestamp": "2026-10-19T14:13:41.802Z"
+    },
+    {
+      "id": "log-1792419221727-o449",
+      "action": "UPDATE",
+      "entity": "Team",
+      "details": "Updated team member: QA & Test Architect",
+      "timestamp": "2026-10-19T14:13:41.727Z"
+    },
+    {
+      "id": "log-1792419221646-t08w",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: QA & Reliability Specialist (Automated QA Engineer)",
+      "timestamp": "2026-10-19T14:13:41.646Z"
+    },
     {
       "id": "log-1792408178770-7fxs",
       "action": "LOGIN",

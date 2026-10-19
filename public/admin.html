@@ -449,6 +449,11 @@
           <span>Services</span>
           <span class="nav-badge" id="badgeServices">0</span>
         </button>
+        <button class="nav-btn" data-tab="team" onclick="switchTab('team')">
+          <i data-lucide="users"></i>
+          <span>Team</span>
+          <span class="nav-badge" id="badgeTeam">0</span>
+        </button>
         <button class="nav-btn" data-tab="inquiries" onclick="switchTab('inquiries')">
           <i data-lucide="message-square"></i>
           <span>Inquiries</span>
@@ -535,6 +540,16 @@
             </div>
             <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">
               <i data-lucide="calendar"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div>
+              <div class="metric-label">Team Members</div>
+              <div class="metric-val" id="countTeam">0</div>
+            </div>
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+              <i data-lucide="users"></i>
             </div>
           </div>
         </div>
@@ -803,6 +818,20 @@
           <button class="btn-save" onclick="openServiceModal()">+ Add Service</button>
         </div>
         <div id="servicesAdminContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 8B. TEAM VIEW -->
+      <div id="tab-team" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">My Team & Collaborators</h2>
+            <p class="panel-desc">Manage core team members, specializations, skill tags, and social profiles</p>
+          </div>
+          <button class="btn-save" onclick="openTeamModal()">+ Add Team Member</button>
+        </div>
+        <div id="teamAdminContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
           <!-- Populated dynamically -->
         </div>
       </div>
@@ -1136,6 +1165,79 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD / EDIT TEAM MEMBER -->
+  <div id="teamModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 580px;">
+      <h3 class="modal-title" id="teamModalTitle">Add Team Member</h3>
+      <form id="teamModalForm">
+        <input type="hidden" id="tmId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-row">
+            <label>Full Name *</label>
+            <input type="text" id="tmName" required class="form-input" placeholder="e.g. Alex Johnson">
+          </div>
+          <div class="form-row">
+            <label>Role / Specialization *</label>
+            <input type="text" id="tmRole" required class="form-input" placeholder="e.g. Frontend Engineer & UI Designer">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Short Bio / Focus</label>
+          <textarea id="tmBio" rows="2" class="form-input" placeholder="Specializes in interactive UI/UX, responsive layouts, and modern web systems..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <label>Avatar Photo URL or Upload</label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="tmAvatarUrl" class="form-input" placeholder="/images/charan_sai_avatar.jpg or /uploads/..." style="flex: 1;">
+            <input type="file" id="tmAvatarFile" accept="image/png, image/jpeg, image/webp" style="display: none;">
+            <button type="button" class="btn-cancel" onclick="document.getElementById('tmAvatarFile').click()" style="padding: 0.6rem 0.8rem; font-size: 0.75rem;">
+              Upload
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Skills & Technologies (Comma-separated)</label>
+          <input type="text" id="tmSkills" class="form-input" placeholder="e.g. React, Next.js, Figma, Tailwind CSS">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-row">
+            <label>GitHub Profile URL</label>
+            <input type="url" id="tmGithub" class="form-input" placeholder="https://github.com/...">
+          </div>
+          <div class="form-row">
+            <label>LinkedIn URL</label>
+            <input type="url" id="tmLinkedin" class="form-input" placeholder="https://linkedin.com/in/...">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-row">
+            <label>Email Address</label>
+            <input type="email" id="tmEmail" class="form-input" placeholder="member@example.com">
+          </div>
+          <div class="form-row">
+            <label>Portfolio / Personal Website</label>
+            <input type="url" id="tmPortfolio" class="form-input" placeholder="https://...">
+          </div>
+        </div>
+
+        <div class="form-row" style="max-width: 140px;">
+          <label>Display Order</label>
+          <input type="number" id="tmDisplayOrder" class="form-input" value="1" min="1">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeTeamModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     lucide.createIcons();
 
@@ -1147,9 +1249,20 @@
       events: [],
       skills: [],
       services: [],
+      team: [],
       inquiries: [],
       settings: null,
     };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     function showToast(msg, isError = false) {
       const toast = document.getElementById('toast');
@@ -1178,7 +1291,7 @@
     async function loadAllData() {
       try {
         const bust = `?t=${Date.now()}`;
-        const [prof, proj, cert, exp, eventRes, skill, serv, inq, sett] = await Promise.all([
+        const [prof, proj, cert, exp, eventRes, skill, serv, teamRes, inq, sett] = await Promise.all([
           fetch(`/api/profile${bust}`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`/api/projects${bust}`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`/api/certifications${bust}`, { cache: 'no-store' }).then(r => r.json()),
@@ -1186,6 +1299,7 @@
           fetch(`/api/events${bust}`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`/api/skills${bust}`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`/api/services${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/team${bust}`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`/api/contact${bust}`, { cache: 'no-store' }).then(r => r.json()),
           fetch(`/api/settings${bust}`, { cache: 'no-store' }).then(r => r.json()),
         ]);
@@ -1197,6 +1311,7 @@
         cmsData.events = eventRes.events || [];
         cmsData.skills = skill.skills || [];
         cmsData.services = serv.services || [];
+        cmsData.team = teamRes.team || [];
         cmsData.inquiries = inq.inquiries || [];
         cmsData.settings = sett.settings || {};
 
@@ -1207,6 +1322,7 @@
         renderEventsList();
         renderSkillsList();
         renderServicesList();
+        renderTeamAdmin();
         renderInquiriesList();
         populateProfileForm();
         populateSettingsForm();
@@ -1232,6 +1348,11 @@
 
       document.getElementById('badgeSkills').textContent = cmsData.skills.length;
       document.getElementById('badgeServices').textContent = cmsData.services.length;
+
+      const countTeamEl = document.getElementById('countTeam');
+      if (countTeamEl) countTeamEl.textContent = cmsData.team ? cmsData.team.length : 0;
+      const badgeTeamEl = document.getElementById('badgeTeam');
+      if (badgeTeamEl) badgeTeamEl.textContent = cmsData.team ? cmsData.team.length : 0;
 
       const unreadCount = cmsData.inquiries.filter(i => i.status === 'unread').length;
       document.getElementById('badgeInq').textContent = unreadCount;
@@ -1440,6 +1561,74 @@
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
             <button onclick="editService('${serv.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
             <button onclick="deleteService('${serv.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+      lucide.createIcons();
+    }
+
+    function renderTeamAdmin() {
+      const container = document.getElementById('teamAdminContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!cmsData.team || cmsData.team.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; background: #0F1626; border: 1px dashed rgba(255,255,255,0.1); border-radius: 1rem;">
+            <i data-lucide="users" style="width: 2rem; height: 2rem; color: #64748B; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">No team members added yet</div>
+            <div style="font-size: 0.7rem; color: #94A3B8; margin-top: 0.25rem;">Click "+ Add Team Member" above to add team collaborators to your portfolio.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      cmsData.team.forEach(member => {
+        const el = document.createElement('div');
+        el.className = 'panel';
+        el.style.display = 'flex';
+        el.style.flexDirection = 'column';
+        el.style.justifyContent = 'space-between';
+
+        const skillsHtml = (member.skills && member.skills.length > 0)
+          ? `<div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.75rem 0;">
+              ${member.skills.map(s => `<span style="font-size: 0.65rem; background: rgba(99,102,241,0.12); color: #A5B4FC; border: 1px solid rgba(99,102,241,0.25); border-radius: 999px; padding: 0.15rem 0.5rem; font-weight: 600;">${escapeHtml(s)}</span>`).join('')}
+             </div>`
+          : '';
+
+        const socials = member.socials || {};
+        const socialsList = [];
+        if (socials.github) socialsList.push(`<a href="${socials.github}" target="_blank" rel="noopener noreferrer" style="color: #94A3B8; font-size: 0.75rem; text-decoration: none;" title="GitHub">GitHub ↗</a>`);
+        if (socials.linkedin) socialsList.push(`<a href="${socials.linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60A5FA; font-size: 0.75rem; text-decoration: none;" title="LinkedIn">LinkedIn ↗</a>`);
+        if (socials.email) socialsList.push(`<a href="mailto:${socials.email}" style="color: #34D399; font-size: 0.75rem; text-decoration: none;" title="Email">Email ↗</a>`);
+        if (socials.portfolio) socialsList.push(`<a href="${socials.portfolio}" target="_blank" rel="noopener noreferrer" style="color: #F472B6; font-size: 0.75rem; text-decoration: none;" title="Website">Portfolio ↗</a>`);
+
+        const socialsHtml = socialsList.length > 0
+          ? `<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 0.5rem; font-size: 0.72rem;">${socialsList.join('')}</div>`
+          : '';
+
+        const avatarSrc = member.avatarUrl || '/images/charan_sai_avatar.jpg';
+
+        el.innerHTML = `
+          <div>
+            <div style="display: flex; gap: 0.85rem; align-items: center; margin-bottom: 0.75rem;">
+              <img src="${avatarSrc}" alt="${escapeHtml(member.name)}" onerror="this.onerror=null;this.src='/images/charan_sai_avatar.jpg'" style="width: 3.25rem; height: 3.25rem; border-radius: 999px; object-fit: cover; border: 2px solid rgba(99,102,241,0.3); background: #1E293B;">
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <h4 style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(member.name)}</h4>
+                  <span style="font-size: 0.65rem; color: #64748B; background: rgba(255,255,255,0.05); padding: 0.1rem 0.4rem; border-radius: 4px;">#${member.displayOrder || 1}</span>
+                </div>
+                <div style="font-size: 0.72rem; color: #818CF8; font-weight: 600; margin-top: 0.15rem;">${escapeHtml(member.role)}</div>
+              </div>
+            </div>
+            ${member.bio ? `<p style="font-size: 0.75rem; color: #94A3B8; line-height: 1.5; margin: 0.5rem 0;">${escapeHtml(member.bio)}</p>` : ''}
+            ${skillsHtml}
+            ${socialsHtml}
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.65rem; margin-top: 0.85rem;">
+            <button onclick="editTeam('${member.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+            <button onclick="deleteTeam('${member.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
           </div>
         `;
         container.appendChild(el);
@@ -1695,6 +1884,46 @@
       document.getElementById('serviceModal').style.display = 'flex';
     }
     function closeServiceModal() { document.getElementById('serviceModal').style.display = 'none'; }
+
+    // Team Modal Controls
+    function openTeamModal() {
+      document.getElementById('tmId').value = '';
+      document.getElementById('tmName').value = '';
+      document.getElementById('tmRole').value = '';
+      document.getElementById('tmBio').value = '';
+      document.getElementById('tmAvatarUrl').value = '';
+      document.getElementById('tmSkills').value = '';
+      document.getElementById('tmGithub').value = '';
+      document.getElementById('tmLinkedin').value = '';
+      document.getElementById('tmEmail').value = '';
+      document.getElementById('tmPortfolio').value = '';
+      document.getElementById('tmDisplayOrder').value = (cmsData.team ? cmsData.team.length + 1 : 1);
+      document.getElementById('teamModalTitle').textContent = 'Add Team Member';
+      document.getElementById('teamModal').style.display = 'flex';
+    }
+
+    function editTeam(id) {
+      const member = (cmsData.team || []).find(item => item.id === id);
+      if (!member) return;
+      document.getElementById('tmId').value = member.id;
+      document.getElementById('tmName').value = member.name || '';
+      document.getElementById('tmRole').value = member.role || '';
+      document.getElementById('tmBio').value = member.bio || '';
+      document.getElementById('tmAvatarUrl').value = member.avatarUrl || '';
+      document.getElementById('tmSkills').value = (member.skills || []).join(', ');
+      const socials = member.socials || {};
+      document.getElementById('tmGithub').value = socials.github || '';
+      document.getElementById('tmLinkedin').value = socials.linkedin || '';
+      document.getElementById('tmEmail').value = socials.email || '';
+      document.getElementById('tmPortfolio').value = socials.portfolio || '';
+      document.getElementById('tmDisplayOrder').value = member.displayOrder || 1;
+      document.getElementById('teamModalTitle').textContent = 'Edit Team Member';
+      document.getElementById('teamModal').style.display = 'flex';
+    }
+
+    function closeTeamModal() {
+      document.getElementById('teamModal').style.display = 'none';
+    }
 
     // --- FORM SUBMIT HANDLERS ---
     // Project Form Submit
@@ -1979,6 +2208,102 @@
       } catch {
         showToast('Error deleting service', true);
       }
+    }
+
+    // Team Form Submit
+    document.getElementById('teamModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('tmId').value;
+      const rawSkills = document.getElementById('tmSkills').value;
+      const payload = {
+        name: document.getElementById('tmName').value.trim(),
+        role: document.getElementById('tmRole').value.trim(),
+        bio: document.getElementById('tmBio').value.trim(),
+        avatarUrl: document.getElementById('tmAvatarUrl').value.trim(),
+        skills: rawSkills.split(',').map(s => s.trim()).filter(Boolean),
+        socials: {
+          github: document.getElementById('tmGithub').value.trim(),
+          linkedin: document.getElementById('tmLinkedin').value.trim(),
+          email: document.getElementById('tmEmail').value.trim(),
+          portfolio: document.getElementById('tmPortfolio').value.trim(),
+        },
+        displayOrder: parseInt(document.getElementById('tmDisplayOrder').value, 10) || 1,
+      };
+
+      const url = id ? `/api/team/${id}` : '/api/team';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeTeamModal();
+          showToast(id ? 'Team member updated!' : 'Team member added!');
+          await loadAllData();
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          showToast(errData.error || 'Failed to save team member', true);
+        }
+      } catch {
+        showToast('Network error saving team member', true);
+      }
+    });
+
+    async function deleteTeam(id) {
+      if (!confirm('Are you sure you want to remove this team member?')) return;
+      try {
+        const res = await fetch(`/api/team/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Team member removed');
+          await loadAllData();
+        } else {
+          showToast('Failed to delete team member', true);
+        }
+      } catch {
+        showToast('Error deleting team member', true);
+      }
+    }
+
+    // Team Avatar File Upload Handler
+    const tmAvatarFileInput = document.getElementById('tmAvatarFile');
+    if (tmAvatarFileInput) {
+      tmAvatarFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        try {
+          const reader = new FileReader();
+          reader.onload = async () => {
+            try {
+              const res = await fetch('/api/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  filename: file.name,
+                  data: reader.result,
+                }),
+              });
+              const data = await res.json().catch(() => ({}));
+              if (res.ok && data.url) {
+                document.getElementById('tmAvatarUrl').value = data.url;
+                showToast('Team photo uploaded!');
+              } else {
+                showToast(data.error || 'Upload failed', true);
+              }
+            } catch {
+              showToast('Network error during upload', true);
+            } finally {
+              tmAvatarFileInput.value = '';
+            }
+          };
+          reader.readAsDataURL(file);
+        } catch {
+          showToast('Failed to read image file', true);
+          tmAvatarFileInput.value = '';
+        }
+      });
     }
 
     // Inquiry Actions
