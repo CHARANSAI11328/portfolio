@@ -115,34 +115,45 @@ function buildAuthCookie(req, token, isLogout = false) {
   return `charan_admin_session=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 3600}${secureFlag}`;
 }
 
-// Helper to verify request admin auth with strict tokenVersion session invalidation
+// Helper to verify request admin auth (supports Authorization Bearer header and session cookie)
 function getAuthAdmin(req) {
-  const cookies = parseCookies(req);
-  let token = cookies['charan_admin_session'];
-  if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
-    token = req.headers.authorization.slice(7);
-  }
-  if (!token) return null;
-  const payload = verifyToken(token);
-  if (!payload || !payload.id) return null;
   const db = getDatabase();
-  const admin = db.admins.find((a) => a.id === payload.id);
-  if (!admin) return null;
+  const candidates = [];
 
-  // Strict session invalidation check
-  if (typeof admin.tokenVersion === 'number' && payload.tokenVersion !== admin.tokenVersion) {
-    return null; // Session has been revoked!
+  // 1. Prioritize Authorization: Bearer header
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    const candidate = req.headers.authorization.slice(7).trim();
+    if (candidate && candidate !== 'null' && candidate !== 'undefined') {
+      candidates.push(candidate);
+    }
   }
-  return admin;
+
+  // 2. Also check session cookie
+  const cookies = parseCookies(req);
+  if (cookies['charan_admin_session']) {
+    candidates.push(cookies['charan_admin_session']);
+  }
+
+  if (candidates.length === 0) return null;
+
+  for (const token of candidates) {
+    const payload = verifyToken(token);
+    if (payload && (payload.id || payload.email)) {
+      const admin = (db.admins || []).find((a) => a.id === payload.id || a.email === payload.email);
+      if (admin) return admin;
+    }
+  }
+
+  return null;
 }
 
-// Helper to parse JSON body with stream destruction on overflow
+// Helper to parse JSON body with stream destruction on overflow (15MB limit)
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', (chunk) => {
       body += chunk;
-      if (body.length > 5 * 1024 * 1024) {
+      if (body.length > 15 * 1024 * 1024) {
         req.destroy();
         reject(new Error('Request entity too large'));
       }
@@ -238,10 +249,10 @@ function serveStatic(req, res, filePath) {
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
   const secHeaders = getSecurityHeaders(req);
 
-  const isDynamicAsset = ext === '.html' || ext === '.pdf';
+  const isDynamicAsset = ext === '.html' || ext === '.pdf' || ext === '.json';
   const headers = {
     'Content-Type': contentType,
-    'Cache-Control': isDynamicAsset ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400',
+    'Cache-Control': isDynamicAsset ? 'no-cache, no-store, must-revalidate, max-age=0' : 'public, max-age=86400',
     ...secHeaders,
   };
   if (isDynamicAsset) {
@@ -333,10 +344,19 @@ const server = http.createServer(async (req, res) => {
       if (!admin) {
         return sendJson(res, 401, { authenticated: false, admin: null });
       }
+      const token = createToken({
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
+        tokenVersion: admin.tokenVersion || 1,
+      });
+      const cookieHeader = buildAuthCookie(req, token);
       return sendJson(res, 200, {
         authenticated: true,
+        token,
         admin: { id: admin.id, email: admin.email, name: admin.name, role: admin.role },
-      });
+      }, { 'Set-Cookie': cookieHeader });
     }
 
     // Auth Change Password (Protected, Rate-Limited, Session-Revoking)
@@ -452,15 +472,19 @@ const server = http.createServer(async (req, res) => {
       const base64Data = match[2];
       const buffer = Buffer.from(base64Data, 'base64');
 
-      // Check max size: 5MB
-      if (buffer.length > 5 * 1024 * 1024) {
-        return sendJson(res, 400, { error: 'File size exceeds maximum 5MB limit' });
+      // Check max size: 10MB
+      if (buffer.length > 10 * 1024 * 1024) {
+        return sendJson(res, 400, { error: 'File size exceeds maximum 10MB limit' });
       }
 
       // Strict allowed raster formats only (SVG strictly disallowed to prevent XSS)
       const allowedExts = {
         'image/jpeg': '.jpg',
+        'image/jpg': '.jpg',
+        'image/pjpeg': '.jpg',
+        'image/jfif': '.jpg',
         'image/png': '.png',
+        'image/x-png': '.png',
         'image/webp': '.webp',
       };
 
@@ -471,13 +495,13 @@ const server = http.createServer(async (req, res) => {
       // Magic bytes signature verification
       function isValidRasterImage(buf, mime) {
         if (!buf || buf.length < 12) return false;
-        if (mime === 'image/png') {
+        if (mime.includes('png')) {
           return buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4E && buf[3] === 0x47;
         }
-        if (mime === 'image/jpeg') {
+        if (mime.includes('jpeg') || mime.includes('jpg') || mime.includes('pjpeg') || mime.includes('jfif')) {
           return buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF;
         }
-        if (mime === 'image/webp') {
+        if (mime.includes('webp')) {
           const isRiff = buf.toString('ascii', 0, 4) === 'RIFF';
           const isWebp = buf.toString('ascii', 8, 12) === 'WEBP';
           return isRiff && isWebp;

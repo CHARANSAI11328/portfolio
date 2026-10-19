@@ -254,6 +254,11 @@
           throw new Error(data.error || 'Authentication failed');
         }
 
+        if (data.token) {
+          localStorage.setItem('charan_admin_token', data.token);
+          sessionStorage.setItem('charan_admin_token', data.token);
+        }
+
         window.location.href = '/admin';
       } catch (err) {
         errorText.textContent = err.message;

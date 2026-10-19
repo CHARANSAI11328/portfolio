@@ -436,6 +436,31 @@
         "portfolio": ""
       },
       "displayOrder": 3
+    },
+    {
+      "id": "team-1792422218911-rsni",
+      "name": "Sarah Connor",
+      "role": "Cybersecurity Specialist",
+      "bio": "Securing web applications and enterprise cloud infrastructure.",
+      "avatarUrl": "/uploads/test_avatar_1792422218848_7d74ab54.png",
+      "skills": [
+        "Cybersecurity",
+        "Cloudflare",
+        "Penetration Testing"
+      ],
+      "github": "https://github.com/sarahconnor",
+      "linkedin": "https://linkedin.com/in/sarahconnor",
+      "email": "sarah@example.com",
+      "portfolio": "",
+      "socials": {
+        "github": "https://github.com/sarahconnor",
+        "linkedin": "https://linkedin.com/in/sarahconnor",
+        "email": "sarah@example.com",
+        "portfolio": ""
+      },
+      "displayOrder": 2,
+      "createdAt": "2026-10-19T15:03:38.911Z",
+      "updatedAt": "2026-10-19T15:03:38.911Z"
     }
   ],
   "inquiries": [],
@@ -458,6 +483,76 @@
     }
   },
   "activityLogs": [
+    {
+      "id": "log-1792422229262-pxlh",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Cookie Dev",
+      "timestamp": "2026-10-19T15:03:49.262Z"
+    },
+    {
+      "id": "log-1792422229189-ctmn",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Cookie Dev (Backend Architect)",
+      "timestamp": "2026-10-19T15:03:49.189Z"
+    },
+    {
+      "id": "log-1792422229114-35vn",
+      "action": "UPLOAD",
+      "entity": "File",
+      "details": "Admin uploaded asset: test_cookie_avatar_1792422229093_0a5df96a.jpg",
+      "timestamp": "2026-10-19T15:03:49.114Z"
+    },
+    {
+      "id": "log-1792422229050-xf55",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-19T15:03:49.050Z"
+    },
+    {
+      "id": "log-1792422218944-qlym",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Sarah Connor (Cybersecurity Specialist)",
+      "timestamp": "2026-10-19T15:03:38.944Z"
+    },
+    {
+      "id": "log-1792422218869-7pey",
+      "action": "UPLOAD",
+      "entity": "File",
+      "details": "Admin uploaded asset: test_avatar_1792422218848_7d74ab54.png",
+      "timestamp": "2026-10-19T15:03:38.869Z"
+    },
+    {
+      "id": "log-1792422218805-gqvr",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-19T15:03:38.805Z"
+    },
+    {
+      "id": "log-1792421366411-i3o8",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Test Bearer (Designer)",
+      "timestamp": "2026-10-19T14:49:26.411Z"
+    },
+    {
+      "id": "log-1792421366332-myz2",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Test Member (Engineer)",
+      "timestamp": "2026-10-19T14:49:26.332Z"
+    },
+    {
+      "id": "log-1792421366253-25fo",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-19T14:49:26.253Z"
+    },
     {
       "id": "log-1792419749990-6uhr",
       "action": "LOGIN",
@@ -737,41 +832,6 @@
       "entity": "Contact",
       "details": "New message from John Doe (john@example.com)",
       "timestamp": "2026-10-19T09:58:11.230Z"
-    },
-    {
-      "id": "log-1792400227374-rxw5",
-      "action": "UPDATE",
-      "entity": "Settings",
-      "details": "Updated appearance & SEO settings",
-      "timestamp": "2026-10-19T08:57:07.374Z"
-    },
-    {
-      "id": "log-1792398311241-wjj3",
-      "action": "UPDATE",
-      "entity": "Profile",
-      "details": "Updated personal profile details",
-      "timestamp": "2026-10-19T08:25:11.241Z"
-    },
-    {
-      "id": "log-1792398208500-nfya",
-      "action": "CREATE",
-      "entity": "Skill",
-      "details": "Added skill: HTML",
-      "timestamp": "2026-10-19T08:23:28.500Z"
-    },
-    {
-      "id": "log-1792398179909-y0p3",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T08:22:59.909Z"
-    },
-    {
-      "id": "log-1",
-      "action": "INIT",
-      "entity": "System",
-      "details": "Initialized portfolio CMS database with authentic Charan Sai records",
-      "timestamp": "2026-10-19T05:59:11.259Z"
     }
   ]
 }
