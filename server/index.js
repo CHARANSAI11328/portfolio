@@ -584,9 +584,17 @@ const server = http.createServer(async (req, res) => {
       const publicUrl = `/uploads/${filename}`;
       logActivity('UPLOAD', 'File', `Admin uploaded asset: ${filename}`);
 
+      // Persist asset to Neon PostgreSQL cloud database
+      try {
+        await neon.saveUploadedAsset(filename, mimeType, base64Data);
+      } catch (neonErr) {
+        console.warn('[NEON] Could not sync uploaded asset to Neon:', neonErr.message);
+      }
+
       return sendJson(res, 200, {
         success: true,
         url: publicUrl,
+        dataUrl: rawData,
         filename,
       });
     }
@@ -1172,9 +1180,11 @@ const server = http.createServer(async (req, res) => {
         const linkedin = (updates.linkedin !== undefined ? updates.linkedin : updates.socials?.linkedin !== undefined ? updates.socials.linkedin : db.team[idx].linkedin) || '';
         const email = (updates.email !== undefined ? updates.email : updates.socials?.email !== undefined ? updates.socials.email : db.team[idx].email) || '';
         const portfolio = (updates.portfolio !== undefined ? updates.portfolio : updates.socials?.portfolio !== undefined ? updates.socials.portfolio : db.team[idx].portfolio) || '';
+        const avatarUrl = (updates.avatarUrl !== undefined ? updates.avatarUrl : db.team[idx].avatarUrl) || '';
         db.team[idx] = {
           ...db.team[idx],
           ...updates,
+          avatarUrl: String(avatarUrl).trim(),
           skills,
           github: String(github).trim(),
           linkedin: String(linkedin).trim(),
@@ -1389,12 +1399,39 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    // Dedicated serving for persistent uploads directory
+    // Dedicated serving for persistent uploads directory (with Neon PostgreSQL cloud persistence fallback)
     if (pathname.startsWith('/uploads/')) {
-      const rel = pathname.slice('/uploads/'.length);
+      let rel = pathname.slice('/uploads/'.length);
+      try {
+        rel = decodeURIComponent(rel);
+      } catch {}
       const safeUploadPath = path.normalize(path.join(UPLOADS_DIR, rel));
       if (safeUploadPath.startsWith(UPLOADS_DIR) && fs.existsSync(safeUploadPath) && !fs.statSync(safeUploadPath).isDirectory()) {
         return serveStatic(req, res, safeUploadPath);
+      }
+
+      // Neon Cloud persistence fallback: restore asset from database if container disk was wiped or redeployed
+      try {
+        const filename = path.basename(rel);
+        const asset = await neon.getUploadedAsset(filename);
+        if (asset && asset.data_base64) {
+          const assetBuf = Buffer.from(asset.data_base64, 'base64');
+          // Write to disk cache for fast future serving
+          try {
+            fs.writeFileSync(safeUploadPath, assetBuf);
+          } catch {}
+          const contentType = asset.mime_type || MIME_TYPES[path.extname(filename).toLowerCase()] || 'image/jpeg';
+          const secHeaders = getSecurityHeaders(req);
+          res.writeHead(200, {
+            'Content-Type': contentType,
+            'Content-Length': assetBuf.length,
+            'Cache-Control': 'public, max-age=86400',
+            ...secHeaders,
+          });
+          return res.end(assetBuf);
+        }
+      } catch (dbErr) {
+        console.warn('[STORAGE] Error retrieving asset from Neon:', dbErr.message);
       }
     }
 

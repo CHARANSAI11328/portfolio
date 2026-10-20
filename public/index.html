@@ -2429,6 +2429,29 @@
         .replace(/'/g, '&#39;');
     }
 
+    function getInitials(name) {
+      if (!name) return 'TM';
+      const parts = String(name).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function getInitialsAvatarSvg(name) {
+      const initials = getInitials(name);
+      const colors = [
+        ['#6366F1', '#8B5CF6'],
+        ['#EC4899', '#8B5CF6'],
+        ['#3B82F6', '#06B6D4'],
+        ['#F59E0B', '#EF4444'],
+        ['#10B981', '#3B82F6'],
+      ];
+      let hash = 0;
+      for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      const pair = colors[Math.abs(hash) % colors.length];
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><defs><linearGradient id="gi_${Math.abs(hash)}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${pair[0]}"/><stop offset="100%" stop-color="${pair[1]}"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#gi_${Math.abs(hash)})"/><text x="50%" y="54%" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="52" fill="#FFFFFF" dominant-baseline="middle" text-anchor="middle">${initials}</text></svg>`;
+      return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    }
+
     // 4. Fetch dynamic data from Database with Cache-Busting
     async function loadPortfolioData() {
       try {
@@ -2680,7 +2703,9 @@
                 if (e.key === 'Enter') openTeamProfileModal(member.id);
               });
 
-              const avatarUrl = member.avatarUrl || '/images/charan_sai_avatar.jpg';
+              const avatarUrl = (member.avatarUrl && member.avatarUrl.trim().length > 0)
+                ? member.avatarUrl.trim()
+                : getInitialsAvatarSvg(member.name);
               const socials = member.socials || {};
 
               const skillsHtml = (member.skills && member.skills.length > 0)
@@ -2711,11 +2736,12 @@
                 socialButtons.push(`<a href="${socials.portfolio}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="Personal Website" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></a>`);
               }
 
+              const safeJsName = (member.name || 'Team Member').replace(/['\\]/g, '\\$&');
               card.innerHTML = `
                 <div>
                   <div class="team-card-header">
                     <div class="team-avatar-wrap">
-                      <img src="${avatarUrl}" class="team-avatar-img" alt="${escapeHtml(member.name)}" onerror="this.onerror=null;this.src='/images/charan_sai_avatar.jpg'">
+                      <img src="${avatarUrl}" class="team-avatar-img" alt="${escapeHtml(member.name)}" onerror="this.onerror=null;this.src=getInitialsAvatarSvg('${safeJsName}');">
                     </div>
                     <div class="team-meta">
                       <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
@@ -2738,6 +2764,13 @@
                   </button>
                 </div>
               `;
+              const avatarImg = card.querySelector('.team-avatar-img');
+              if (avatarImg) {
+                avatarImg.onerror = function() {
+                  this.onerror = null;
+                  this.src = getInitialsAvatarSvg(member.name);
+                };
+              }
               card.addEventListener('click', (e) => {
                 if (e.target.closest('a') || e.target.closest('button')) return;
                 openTeamProfileModal(member.id);
@@ -2937,7 +2970,17 @@
       document.getElementById('teamModalName').textContent = member.name;
       document.getElementById('teamModalRole').textContent = member.role;
       document.getElementById('teamModalBio').textContent = member.bio || 'Core engineering contributor specializing in enterprise software architecture and digital products.';
-      document.getElementById('teamModalAvatar').src = member.avatarUrl || '/images/charan_sai_avatar.jpg';
+      const modalAvatar = document.getElementById('teamModalAvatar');
+      const modalAvatarUrl = (member.avatarUrl && member.avatarUrl.trim().length > 0)
+        ? member.avatarUrl.trim()
+        : getInitialsAvatarSvg(member.name);
+      if (modalAvatar) {
+        modalAvatar.src = modalAvatarUrl;
+        modalAvatar.onerror = function() {
+          this.onerror = null;
+          this.src = getInitialsAvatarSvg(member.name);
+        };
+      }
       document.getElementById('teamModalBadge').textContent = `Team Member #${member.displayOrder || 1}`;
 
       const skillsEl = document.getElementById('teamModalSkills');

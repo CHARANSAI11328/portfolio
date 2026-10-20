@@ -7,6 +7,7 @@ import Projects from '@/components/Projects';
 import Certifications from '@/components/Certifications';
 import Experience from '@/components/Experience';
 import Events from '@/components/Events';
+import Team from '@/components/Team';
 import Services from '@/components/Services';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
@@ -31,6 +32,7 @@ export default async function HomePage() {
     .filter((e) => e.published)
     .sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
+  const team = (db.team || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   const services = (db.services || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   const visibility = db.settings?.sectionVisibility || {
     about: true,
@@ -39,6 +41,7 @@ export default async function HomePage() {
     certifications: true,
     experience: true,
     events: true,
+    team: true,
     services: true,
     contact: true,
   };
@@ -54,6 +57,8 @@ export default async function HomePage() {
       {visibility.skills && <Skills skills={skills} />}
 
       {visibility.projects && <Projects projects={publishedProjects} />}
+
+      {(visibility.team ?? true) && <Team team={team} />}
 
       {visibility.certifications && <Certifications certifications={publishedCerts} />}
 

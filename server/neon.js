@@ -220,6 +220,16 @@ async function initNeon(initialData = null) {
       );
     `);
 
+    // 11. Persistent uploaded assets table (survives container redeployments and cloud ephemeral storage)
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS uploaded_assets (
+        filename VARCHAR(255) PRIMARY KEY,
+        mime_type VARCHAR(100) NOT NULL,
+        data_base64 TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
     isConnected = true;
     console.log('[NEON] Connected successfully to Neon PostgreSQL database.');
 
@@ -1269,6 +1279,46 @@ async function query(sqlText, params = []) {
   return await sql.query(sqlText, params);
 }
 
+/**
+ * Persist uploaded asset base64 data to Neon PostgreSQL
+ */
+async function saveUploadedAsset(filename, mimeType, dataBase64) {
+  const sql = getClient();
+  if (!sql || !filename || !dataBase64) return false;
+  try {
+    await sql.query(
+      `INSERT INTO uploaded_assets (filename, mime_type, data_base64, created_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (filename) DO UPDATE SET
+         mime_type = EXCLUDED.mime_type,
+         data_base64 = EXCLUDED.data_base64,
+         created_at = NOW();`,
+      [filename, mimeType || 'image/jpeg', dataBase64]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] Failed to save uploaded asset:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Retrieve uploaded asset by filename from Neon PostgreSQL
+ */
+async function getUploadedAsset(filename) {
+  const sql = getClient();
+  if (!sql || !filename) return null;
+  try {
+    const rows = await sql.query('SELECT filename, mime_type, data_base64 FROM uploaded_assets WHERE filename = $1 LIMIT 1;', [filename]);
+    if (rows && rows.length > 0) {
+      return rows[0];
+    }
+  } catch (err) {
+    console.warn('[NEON] Failed to fetch uploaded asset from cloud:', err.message);
+  }
+  return null;
+}
+
 module.exports = {
   getClient,
   initNeon,
@@ -1293,6 +1343,8 @@ module.exports = {
   insertInquiry,
   updateInquiry,
   deleteInquiry,
+  saveUploadedAsset,
+  getUploadedAsset,
   formatCertification,
   formatTeamMember,
   formatProject,
@@ -1305,3 +1357,4 @@ module.exports = {
   query,
   isNeonConnected: () => isConnected,
 };
+

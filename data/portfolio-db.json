@@ -28,7 +28,34 @@
       "portfolio": "https://charansai.website",
       "displayOrder": 1,
       "createdAt": "2026-10-20T10:34:44.327Z",
-      "updatedAt": "2026-10-20T14:00:09.313Z"
+      "updatedAt": "2026-10-20T16:16:47.102Z"
+    },
+    {
+      "id": "team-1792500786845-9opp",
+      "name": "P. Bhavani",
+      "role": "TEAM LEADER",
+      "bio": "Engineering lead directing full-stack development, architectural design, and digital delivery.",
+      "avatarUrl": "",
+      "skills": [
+        "Leadership",
+        "Full-Stack Development",
+        "System Architecture",
+        "React",
+        "Team Mentorship"
+      ],
+      "socials": {
+        "github": "",
+        "linkedin": "",
+        "email": "",
+        "portfolio": ""
+      },
+      "github": "",
+      "linkedin": "",
+      "email": "",
+      "portfolio": "",
+      "displayOrder": 2,
+      "createdAt": "2026-10-20T16:15:32.888Z",
+      "updatedAt": "2026-10-20T16:31:32.652Z"
     }
   ],
   "admins": [
@@ -235,7 +262,7 @@
       "published": true,
       "displayOrder": 1,
       "createdAt": "2026-10-20T11:01:33.080Z",
-      "updatedAt": "2026-10-20T14:00:02.842Z"
+      "updatedAt": "2026-10-20T16:16:41.560Z"
     },
     {
       "id": "proj-projex",
@@ -258,7 +285,7 @@
       "published": true,
       "displayOrder": 2,
       "createdAt": "2026-10-20T11:01:33.325Z",
-      "updatedAt": "2026-10-20T14:00:03.095Z"
+      "updatedAt": "2026-10-20T16:16:41.808Z"
     },
     {
       "id": "proj-mameka-mahodayam",
@@ -281,7 +308,7 @@
       "published": true,
       "displayOrder": 3,
       "createdAt": "2026-10-20T11:01:33.578Z",
-      "updatedAt": "2026-10-20T14:00:03.352Z"
+      "updatedAt": "2026-10-20T16:16:42.063Z"
     },
     {
       "id": "proj-business-websites",
@@ -304,7 +331,7 @@
       "published": true,
       "displayOrder": 4,
       "createdAt": "2026-10-20T11:01:33.821Z",
-      "updatedAt": "2026-10-20T14:00:03.599Z"
+      "updatedAt": "2026-10-20T16:16:42.310Z"
     }
   ],
   "services": [
@@ -415,6 +442,41 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1792513892954-2x5h",
+      "action": "UPDATE",
+      "entity": "Team",
+      "details": "Updated team member: P. Bhavani",
+      "timestamp": "2026-10-20T16:31:32.954Z"
+    },
+    {
+      "id": "log-1792513890041-z590",
+      "action": "UPLOAD",
+      "entity": "File",
+      "details": "Admin uploaded asset: test_team_avatar_1792513890016_e92dc55c.png",
+      "timestamp": "2026-10-20T16:31:30.041Z"
+    },
+    {
+      "id": "log-1792513170677-0uja",
+      "action": "UPDATE",
+      "entity": "Team",
+      "details": "Updated team member: P. Bhavani",
+      "timestamp": "2026-10-20T16:19:30.677Z"
+    },
+    {
+      "id": "log-1792513169279-tmtq",
+      "action": "UPLOAD",
+      "entity": "File",
+      "details": "Admin uploaded asset: test_team_avatar_1792513169254_d76ef298.png",
+      "timestamp": "2026-10-20T16:19:29.279Z"
+    },
+    {
+      "id": "log-1792512994497-3ers",
+      "action": "UPLOAD",
+      "entity": "File",
+      "details": "Admin uploaded asset: test_team_avatar_1792512994476_3c494e6c.png",
+      "timestamp": "2026-10-20T16:16:34.497Z"
+    },
     {
       "id": "log-1792504881866-s1ko",
       "action": "DELETE",
@@ -729,41 +791,6 @@
       "entity": "File",
       "details": "Admin uploaded asset: test_cookie_avatar_1792422229093_0a5df96a.jpg",
       "timestamp": "2026-10-19T15:03:49.114Z"
-    },
-    {
-      "id": "log-1792422229050-xf55",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T15:03:49.050Z"
-    },
-    {
-      "id": "log-1792422218944-qlym",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Sarah Connor (Cybersecurity Specialist)",
-      "timestamp": "2026-10-19T15:03:38.944Z"
-    },
-    {
-      "id": "log-1792422218869-7pey",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: test_avatar_1792422218848_7d74ab54.png",
-      "timestamp": "2026-10-19T15:03:38.869Z"
-    },
-    {
-      "id": "log-1792422218805-gqvr",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T15:03:38.805Z"
-    },
-    {
-      "id": "log-1792421366411-i3o8",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Test Bearer (Designer)",
-      "timestamp": "2026-10-19T14:49:26.411Z"
     }
   ],
   "certifications": []
