@@ -1,11 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const neon = require('./neon');
 
 const DATA_DIR = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
   : path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'portfolio-db.json');
+
+let memoryDb = null;
 
 // Password hashing using Node.js built-in crypto PBKDF2
 function hashPassword(password, salt = null) {
@@ -342,6 +345,10 @@ function ensureDataDir() {
 }
 
 function getDatabase() {
+  if (memoryDb) {
+    return memoryDb;
+  }
+
   ensureDataDir();
   if (!fs.existsSync(DB_FILE)) {
     const localDefaultDb = path.join(__dirname, '..', 'data', 'portfolio-db.json');
@@ -356,9 +363,11 @@ function getDatabase() {
   }
 
   if (!fs.existsSync(DB_FILE)) {
+    memoryDb = INITIAL_DB;
     saveDatabase(INITIAL_DB);
     return INITIAL_DB;
   }
+
   try {
     const content = fs.readFileSync(DB_FILE, 'utf-8');
     const db = JSON.parse(content);
@@ -376,18 +385,21 @@ function getDatabase() {
       db.team = INITIAL_DB.team;
       needsSave = true;
     }
+    memoryDb = db;
     if (needsSave) {
       saveDatabase(db);
     }
     return db;
   } catch (err) {
     console.error('Error reading DB, repairing with initial state...', err);
+    memoryDb = INITIAL_DB;
     saveDatabase(INITIAL_DB);
     return INITIAL_DB;
   }
 }
 
 function saveDatabase(db) {
+  memoryDb = db;
   ensureDataDir();
   const json = JSON.stringify(db, null, 2);
   const tempPath = `${DB_FILE}.tmp`;
@@ -402,6 +414,34 @@ function saveDatabase(db) {
   } catch {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
+
+  // Asynchronously replicate to Neon PostgreSQL
+  neon.saveNeonState(db).catch((err) => {
+    console.warn('[NEON] Async save error:', err.message);
+  });
+}
+
+/**
+ * Initialize Neon PostgreSQL and hydrate in-memory state with live cloud data.
+ */
+async function initNeonDatabase() {
+  const currentLocal = getDatabase();
+  const connected = await neon.initNeon(currentLocal);
+  if (connected) {
+    const remoteState = await neon.fetchNeonState();
+    if (remoteState && typeof remoteState === 'object' && Array.isArray(remoteState.admins)) {
+      memoryDb = remoteState;
+      // Persist hydrated state to local cache
+      const json = JSON.stringify(remoteState, null, 2);
+      try {
+        fs.writeFileSync(DB_FILE, json, 'utf-8');
+        console.log('[NEON] Local cache synchronized with Neon PostgreSQL cloud state.');
+      } catch (err) {
+        console.warn('[NEON] Warning writing local cache:', err.message);
+      }
+    }
+  }
+  return connected;
 }
 
 function logActivity(action, entity, details) {
@@ -420,6 +460,9 @@ function logActivity(action, entity, details) {
 module.exports = {
   getDatabase,
   saveDatabase,
+  initNeonDatabase,
+  isNeonConnected: neon.isNeonConnected,
+  queryNeon: neon.query,
   logActivity,
   hashPassword,
   verifyPassword,

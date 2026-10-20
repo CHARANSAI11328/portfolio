@@ -6,6 +6,9 @@ const crypto = require('crypto');
 const {
   getDatabase,
   saveDatabase,
+  initNeonDatabase,
+  isNeonConnected,
+  queryNeon,
   logActivity,
   hashPassword,
   verifyPassword,
@@ -348,6 +351,26 @@ const server = http.createServer(async (req, res) => {
       }
       const cookieHeader = buildAuthCookie(req, '', true);
       return sendJson(res, 200, { success: true, message: 'Logged out successfully' }, { 'Set-Cookie': cookieHeader });
+    }
+
+    // Database & Neon PostgreSQL Status
+    if (pathname === '/api/db/status' && method === 'GET') {
+      const db = getDatabase();
+      return sendJson(res, 200, {
+        database: 'Neon PostgreSQL',
+        connected: isNeonConnected(),
+        branch: process.env.NEON_BRANCH || 'production',
+        counts: {
+          admins: (db.admins || []).length,
+          projects: (db.projects || []).length,
+          skills: (db.skills || []).length,
+          team: (db.team || []).length,
+          certifications: (db.certifications || []).length,
+          services: (db.services || []).length,
+          experiences: (db.experiences || []).length,
+        },
+        timestamp: new Date().toISOString(),
+      });
     }
 
     // Auth Me
@@ -1193,7 +1216,7 @@ server.on('error', (err) => {
   }
 });
 
-server.listen(currentPort, HOST, () => {
+server.listen(currentPort, HOST, async () => {
   console.log(`\n=======================================================`);
   console.log(`  Charan Sai Portfolio Server is RUNNING!`);
   console.log(`  Environment:      ${process.env.NODE_ENV || 'development'}`);
@@ -1202,6 +1225,19 @@ server.listen(currentPort, HOST, () => {
   console.log(`  Storage UPLOADS:  ${UPLOADS_DIR}`);
   console.log(`  Website URL:      http://localhost:${currentPort}`);
   console.log(`  Admin Dashboard:  http://localhost:${currentPort}/admin`);
+
+  try {
+    const neonOk = await initNeonDatabase();
+    if (neonOk) {
+      console.log(`  Database:         Neon PostgreSQL [LIVE CONNECTED]`);
+      console.log(`  Neon Branch:      ${process.env.NEON_BRANCH || 'production'}`);
+    } else {
+      console.log(`  Database:         Local Filesystem (Neon not configured)`);
+    }
+  } catch (err) {
+    console.error(`  Database Error:   ${err.message}`);
+  }
+
   console.log(`=======================================================\n`);
 });
 

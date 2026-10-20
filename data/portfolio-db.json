@@ -1,39 +1,183 @@
 {
+  "team": [
+    {
+      "id": "team-charan-lead",
+      "bio": "Systems design, full-stack web architectures, secure APIs, and client solution delivery.",
+      "name": "Charan Sai",
+      "role": "Lead Architect & Full-Stack Engineer",
+      "email": "saikamarajugadda21@gmail.com",
+      "github": "https://github.com/CHARANSAI11328",
+      "skills": [
+        "Next.js",
+        "React",
+        "Node.js",
+        "Java",
+        "PostgreSQL"
+      ],
+      "socials": {
+        "x": "https://x.com/C6H11O5D",
+        "email": "saikamarajugadda21@gmail.com",
+        "github": "https://github.com/CHARANSAI11328",
+        "twitter": "https://x.com/C6H11O5D",
+        "leetcode": "https://leetcode.com/u/89IIBeaoVG/",
+        "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
+        "portfolio": "https://charansai.website"
+      },
+      "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
+      "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
+      "portfolio": "https://charansai.website",
+      "displayOrder": 1
+    }
+  ],
   "admins": [
     {
       "id": "admin-charan-01",
-      "email": "admin@charansai.website",
       "name": "Charan Sai",
       "role": "superadmin",
-      "passwordHash": "salt_charan_2026:3b9357518faa4ed0654bc100a46f83e8acbc6bc3d686d94646127928366ab28c83040b1ed9b821991df6c230bcb70478e052dab1b97f0dcb23703c5724c0c450",
+      "email": "admin@charansai.website",
       "createdAt": "2026-10-19T05:59:11.258Z",
+      "passwordHash": "salt_charan_2026:3b9357518faa4ed0654bc100a46f83e8acbc6bc3d686d94646127928366ab28c83040b1ed9b821991df6c230bcb70478e052dab1b97f0dcb23703c5724c0c450",
       "tokenVersion": 12,
       "passwordChangedAt": "2026-10-20T07:48:13.314Z"
     }
   ],
+  "events": [],
+  "skills": [
+    {
+      "id": "sk-1",
+      "icon": "Code",
+      "name": "React",
+      "category": "Frontend",
+      "featured": true,
+      "displayOrder": 1
+    },
+    {
+      "id": "sk-2",
+      "icon": "Layers",
+      "name": "Next.js",
+      "category": "Frontend",
+      "featured": true,
+      "displayOrder": 2
+    },
+    {
+      "id": "sk-3",
+      "icon": "Code",
+      "name": "JavaScript",
+      "category": "Languages",
+      "featured": true,
+      "displayOrder": 3
+    },
+    {
+      "id": "sk-4",
+      "icon": "FileCode",
+      "name": "TypeScript",
+      "category": "Languages",
+      "featured": true,
+      "displayOrder": 4
+    },
+    {
+      "id": "sk-5",
+      "icon": "Globe",
+      "name": "HTML5 & CSS3",
+      "category": "Frontend",
+      "featured": true,
+      "displayOrder": 5
+    },
+    {
+      "id": "sk-6",
+      "icon": "Palette",
+      "name": "Tailwind CSS",
+      "category": "Frontend",
+      "featured": true,
+      "displayOrder": 6
+    },
+    {
+      "id": "sk-7",
+      "icon": "Smartphone",
+      "name": "Flutter & Dart",
+      "category": "Frontend",
+      "featured": true,
+      "displayOrder": 7
+    },
+    {
+      "id": "sk-8",
+      "icon": "Coffee",
+      "name": "Java",
+      "category": "Languages",
+      "featured": true,
+      "displayOrder": 8
+    },
+    {
+      "id": "sk-9",
+      "icon": "Terminal",
+      "name": "Python",
+      "category": "Languages",
+      "featured": true,
+      "displayOrder": 9
+    },
+    {
+      "id": "sk-10",
+      "icon": "Database",
+      "name": "PostgreSQL",
+      "category": "Backend & Data",
+      "featured": true,
+      "displayOrder": 10
+    },
+    {
+      "id": "sk-11",
+      "icon": "Server",
+      "name": "Neon",
+      "category": "Backend & Data",
+      "featured": true,
+      "displayOrder": 11
+    },
+    {
+      "id": "sk-12",
+      "icon": "Flame",
+      "name": "Firebase",
+      "category": "Backend & Data",
+      "featured": true,
+      "displayOrder": 12
+    },
+    {
+      "id": "sk-13",
+      "icon": "GitBranch",
+      "name": "Git & GitHub",
+      "category": "Tools & Platforms",
+      "featured": true,
+      "displayOrder": 13
+    },
+    {
+      "id": "sk-14",
+      "icon": "Cloud",
+      "name": "Netlify & Render",
+      "category": "Tools & Platforms",
+      "featured": true,
+      "displayOrder": 14
+    },
+    {
+      "id": "sk-15",
+      "icon": "Cpu",
+      "name": "AI-Assisted Dev",
+      "category": "Tools & Platforms",
+      "featured": true,
+      "displayOrder": 15
+    },
+    {
+      "id": "sk-1792398208463",
+      "icon": "Code",
+      "name": "HTML",
+      "category": "Languages",
+      "featured": true,
+      "displayOrder": 16
+    }
+  ],
   "profile": {
     "id": "profile-charan-sai",
-    "name": "Charan Sai",
-    "title": "Independent Developer & Digital Solutions",
     "bio": "Passionate developer crafting modern, scalable, and user-friendly digital experiences. Specializing in high-performance web applications, desktop systems, and responsive digital solutions tailored for real-world impact.",
-    "heroHeading": "Building Next-Gen Digital Solutions",
-    "heroDesc": "I build modern, fast and user-friendly web applications that turn ideas into reality. Passionate about technology, design and creating digital experiences that matter.",
-    "location": "Bapatla, Andhra Pradesh, India",
+    "name": "Charan Sai",
     "email": "saikamarajugadda21@gmail.com",
     "phone": "+91 (Verified on inquiry)",
-    "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
-    "resumeUrl": "/KAMARAJUGADDA_CHARAN_SAI_Resume.pdf?v=20261019",
-    "availabilityStatus": "available",
-    "availabilityText": "Available for freelance projects",
-    "socialLinks": {
-      "github": "https://github.com/CHARANSAI11328",
-      "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
-      "twitter": "https://x.com/C6H11O5D",
-      "x": "https://x.com/C6H11O5D",
-      "leetcode": "https://leetcode.com/u/89IIBeaoVG/",
-      "email": "mailto:contact@charansai.website",
-      "website": "https://charansai.website"
-    },
     "stats": [
       {
         "label": "Core Projects",
@@ -48,270 +192,124 @@
         "value": "100%"
       }
     ],
-    "updatedAt": "2026-10-19T10:14:03.636Z"
+    "title": "Independent Developer & Digital Solutions",
+    "heroDesc": "I build modern, fast and user-friendly web applications that turn ideas into reality. Passionate about technology, design and creating digital experiences that matter.",
+    "location": "Bapatla, Andhra Pradesh, India",
+    "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
+    "resumeUrl": "/KAMARAJUGADDA_CHARAN_SAI_Resume.pdf?v=20261019",
+    "updatedAt": "2026-10-19T10:14:03.636Z",
+    "heroHeading": "Building Next-Gen Digital Solutions",
+    "socialLinks": {
+      "x": "https://x.com/C6H11O5D",
+      "email": "mailto:contact@charansai.website",
+      "github": "https://github.com/CHARANSAI11328",
+      "twitter": "https://x.com/C6H11O5D",
+      "website": "https://charansai.website",
+      "leetcode": "https://leetcode.com/u/89IIBeaoVG/",
+      "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/"
+    },
+    "availabilityText": "Available for freelance projects",
+    "availabilityStatus": "available"
   },
   "projects": [
     {
       "id": "proj-lettergen-pro",
-      "title": "LETTERGEN PRO",
       "slug": "lettergen-pro",
-      "shortDesc": "A Java Swing desktop letter-generation application with related website and PDF functionality and a PostgreSQL/Neon-backed data component.",
-      "caseStudy": "Comprehensive desktop letter drafting automation suite built in Java Swing with vector PDF output generation, template management, and relational database synchronization with PostgreSQL on Neon.",
+      "title": "LETTERGEN PRO",
+      "status": "Completed",
+      "liveUrl": "",
+      "repoUrl": "",
       "category": "Desktop & Systems",
+      "featured": true,
+      "caseStudy": "Comprehensive desktop letter drafting automation suite built in Java Swing with vector PDF output generation, template management, and relational database synchronization with PostgreSQL on Neon.",
+      "createdAt": "2026-10-19T05:59:11.259Z",
+      "published": true,
+      "shortDesc": "A Java Swing desktop letter-generation application with related website and PDF functionality and a PostgreSQL/Neon-backed data component.",
+      "updatedAt": "2026-10-19T05:59:11.259Z",
+      "displayOrder": 1,
       "technologies": [
         "Java",
         "Swing",
         "PostgreSQL",
         "Neon",
         "PDF Automation"
-      ],
-      "status": "Completed",
-      "liveUrl": "",
-      "repoUrl": "",
-      "featured": true,
-      "published": true,
-      "displayOrder": 1,
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "updatedAt": "2026-10-19T05:59:11.259Z"
+      ]
     },
     {
       "id": "proj-projex",
-      "title": "PROJEX",
       "slug": "projex",
-      "shortDesc": "An engineering-student-focused learning and career-readiness platform involving learning roadmaps, skills, assessments, guided projects, and progress tracking.",
-      "caseStudy": "Built to empower engineering students with structured skill pathways, interactive curriculum roadmaps, verified skill assessments, hands-on guided project milestones, and real-time progress analytics.",
+      "title": "PROJEX",
+      "status": "Active Development",
+      "liveUrl": "",
+      "repoUrl": "",
       "category": "Web Applications",
+      "featured": true,
+      "caseStudy": "Built to empower engineering students with structured skill pathways, interactive curriculum roadmaps, verified skill assessments, hands-on guided project milestones, and real-time progress analytics.",
+      "createdAt": "2026-10-19T05:59:11.259Z",
+      "published": true,
+      "shortDesc": "An engineering-student-focused learning and career-readiness platform involving learning roadmaps, skills, assessments, guided projects, and progress tracking.",
+      "updatedAt": "2026-10-19T05:59:11.259Z",
+      "displayOrder": 2,
       "technologies": [
         "Next.js",
         "React",
         "TypeScript",
         "PostgreSQL",
         "Tailwind CSS"
-      ],
-      "status": "Active Development",
-      "liveUrl": "",
-      "repoUrl": "",
-      "featured": true,
-      "published": true,
-      "displayOrder": 2,
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "updatedAt": "2026-10-19T05:59:11.259Z"
+      ]
     },
     {
       "id": "proj-mameka-mahodayam",
-      "title": "MAMEKA MAHODAYAM",
       "slug": "mameka-mahodayam",
-      "shortDesc": "A digital newspaper platform featuring Telugu content, article presentation, archive management, and a developing publishing workflow.",
-      "caseStudy": "Modern regional journalism web portal tailored for seamless Telugu vernacular typography, digital e-paper edition viewing, responsive article reading, and dynamic editorial publishing workflows.",
+      "title": "MAMEKA MAHODAYAM",
+      "status": "In Progress",
+      "liveUrl": "https://project-mm-1.onrender.com",
+      "repoUrl": "",
       "category": "Digital Publishing",
+      "featured": true,
+      "caseStudy": "Modern regional journalism web portal tailored for seamless Telugu vernacular typography, digital e-paper edition viewing, responsive article reading, and dynamic editorial publishing workflows.",
+      "createdAt": "2026-10-19T05:59:11.259Z",
+      "published": true,
+      "shortDesc": "A digital newspaper platform featuring Telugu content, article presentation, archive management, and a developing publishing workflow.",
+      "updatedAt": "2026-10-19T05:59:11.259Z",
+      "displayOrder": 3,
       "technologies": [
         "Next.js",
         "JavaScript",
         "Render",
         "Digital Publishing",
         "CSS3"
-      ],
-      "status": "In Progress",
-      "liveUrl": "https://project-mm-1.onrender.com",
-      "repoUrl": "",
-      "featured": true,
-      "published": true,
-      "displayOrder": 3,
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "updatedAt": "2026-10-19T05:59:11.259Z"
+      ]
     },
     {
       "id": "proj-business-websites",
-      "title": "BUSINESS WEBSITES & DIGITAL SOLUTIONS",
       "slug": "business-websites",
-      "shortDesc": "Scalable business website architectures, client landing portals, and responsive corporate platforms built for commercial conversion.",
-      "caseStudy": "Designing and engineering tailored web solutions for businesses seeking high conversion, rapid page load times, SEO optimization, and brand presentation across diverse client industries.",
+      "title": "BUSINESS WEBSITES & DIGITAL SOLUTIONS",
+      "status": "Active Development",
+      "liveUrl": "",
+      "repoUrl": "",
       "category": "Business Solutions",
+      "featured": true,
+      "caseStudy": "Designing and engineering tailored web solutions for businesses seeking high conversion, rapid page load times, SEO optimization, and brand presentation across diverse client industries.",
+      "createdAt": "2026-10-19T05:59:11.259Z",
+      "published": true,
+      "shortDesc": "Scalable business website architectures, client landing portals, and responsive corporate platforms built for commercial conversion.",
+      "updatedAt": "2026-10-19T05:59:11.259Z",
+      "displayOrder": 4,
       "technologies": [
         "React",
         "Next.js",
         "Tailwind CSS",
         "Framer Motion",
         "SEO"
-      ],
-      "status": "Active Development",
-      "liveUrl": "",
-      "repoUrl": "",
-      "featured": true,
-      "published": true,
-      "displayOrder": 4,
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "updatedAt": "2026-10-19T05:59:11.259Z"
+      ]
     }
   ],
-  "skills": [
-    {
-      "id": "sk-1",
-      "name": "React",
-      "category": "Frontend",
-      "icon": "Code",
-      "featured": true,
-      "displayOrder": 1
-    },
-    {
-      "id": "sk-2",
-      "name": "Next.js",
-      "category": "Frontend",
-      "icon": "Layers",
-      "featured": true,
-      "displayOrder": 2
-    },
-    {
-      "id": "sk-3",
-      "name": "JavaScript",
-      "category": "Languages",
-      "icon": "Code",
-      "featured": true,
-      "displayOrder": 3
-    },
-    {
-      "id": "sk-4",
-      "name": "TypeScript",
-      "category": "Languages",
-      "icon": "FileCode",
-      "featured": true,
-      "displayOrder": 4
-    },
-    {
-      "id": "sk-5",
-      "name": "HTML5 & CSS3",
-      "category": "Frontend",
-      "icon": "Globe",
-      "featured": true,
-      "displayOrder": 5
-    },
-    {
-      "id": "sk-6",
-      "name": "Tailwind CSS",
-      "category": "Frontend",
-      "icon": "Palette",
-      "featured": true,
-      "displayOrder": 6
-    },
-    {
-      "id": "sk-7",
-      "name": "Flutter & Dart",
-      "category": "Frontend",
-      "icon": "Smartphone",
-      "featured": true,
-      "displayOrder": 7
-    },
-    {
-      "id": "sk-8",
-      "name": "Java",
-      "category": "Languages",
-      "icon": "Coffee",
-      "featured": true,
-      "displayOrder": 8
-    },
-    {
-      "id": "sk-9",
-      "name": "Python",
-      "category": "Languages",
-      "icon": "Terminal",
-      "featured": true,
-      "displayOrder": 9
-    },
-    {
-      "id": "sk-10",
-      "name": "PostgreSQL",
-      "category": "Backend & Data",
-      "icon": "Database",
-      "featured": true,
-      "displayOrder": 10
-    },
-    {
-      "id": "sk-11",
-      "name": "Neon",
-      "category": "Backend & Data",
-      "icon": "Server",
-      "featured": true,
-      "displayOrder": 11
-    },
-    {
-      "id": "sk-12",
-      "name": "Firebase",
-      "category": "Backend & Data",
-      "icon": "Flame",
-      "featured": true,
-      "displayOrder": 12
-    },
-    {
-      "id": "sk-13",
-      "name": "Git & GitHub",
-      "category": "Tools & Platforms",
-      "icon": "GitBranch",
-      "featured": true,
-      "displayOrder": 13
-    },
-    {
-      "id": "sk-14",
-      "name": "Netlify & Render",
-      "category": "Tools & Platforms",
-      "icon": "Cloud",
-      "featured": true,
-      "displayOrder": 14
-    },
-    {
-      "id": "sk-15",
-      "name": "AI-Assisted Dev",
-      "category": "Tools & Platforms",
-      "icon": "Cpu",
-      "featured": true,
-      "displayOrder": 15
-    },
-    {
-      "id": "sk-1792398208463",
-      "name": "HTML",
-      "category": "Languages",
-      "icon": "Code",
-      "featured": true,
-      "displayOrder": 16
-    }
-  ],
-  "certifications": [],
-  "experiences": [
-    {
-      "id": "exp-btech",
-      "role": "B.Tech in Computer Science and Engineering — Data Science",
-      "company": "St. Ann's College of Engineering & Technology",
-      "location": "Chirala, Andhra Pradesh, India",
-      "period": "2022 — Present",
-      "description": "Specializing in computer science fundamentals, data analytics, software development, algorithms, and engineering project lifecycles.",
-      "highlights": [
-        "Core focus on Data Science, Data Structures, Database Systems & Full-Stack Engineering",
-        "Actively developing production-grade software projects and platforms for students and businesses"
-      ],
-      "type": "education",
-      "displayOrder": 1
-    },
-    {
-      "id": "exp-dev",
-      "role": "Independent Developer & Digital Solutions",
-      "company": "Freelance & Independent Projects",
-      "location": "India",
-      "period": "2023 — Present",
-      "description": "Engineering responsive web applications, Java desktop automation software, regional news platforms, and business websites for clients and open-source initiatives.",
-      "highlights": [
-        "Designed and deployed responsive Next.js and React web portals",
-        "Built LETTERGEN PRO Java desktop utility and Mameka Mahodayam Telugu news publishing platform"
-      ],
-      "type": "work",
-      "displayOrder": 2
-    }
-  ],
-  "events": [],
   "services": [
     {
       "id": "serv-web-app",
-      "title": "Web Application Development",
-      "description": "Custom, full-stack dynamic web applications built with Next.js, React, and robust database architectures.",
       "icon": "Layout",
+      "title": "Web Application Development",
       "category": "Development",
       "features": [
         "Modern React & Next.js",
@@ -319,13 +317,13 @@
         "Secure Authentication",
         "Responsive UI/UX"
       ],
+      "description": "Custom, full-stack dynamic web applications built with Next.js, React, and robust database architectures.",
       "displayOrder": 1
     },
     {
       "id": "serv-biz-sites",
-      "title": "Business Websites & Redesigns",
-      "description": "Fast, high-converting digital storefronts and landing pages optimized for search engines, brand impact, and speed.",
       "icon": "Globe",
+      "title": "Business Websites & Redesigns",
       "category": "Design & Web",
       "features": [
         "Bespoke Aesthetic",
@@ -333,13 +331,13 @@
         "SEO Optimization",
         "Lightning Performance"
       ],
+      "description": "Fast, high-converting digital storefronts and landing pages optimized for search engines, brand impact, and speed.",
       "displayOrder": 2
     },
     {
       "id": "serv-desktop",
-      "title": "Software & Desktop Utilities",
-      "description": "Specialized desktop software, automated document/PDF generation, and relational data management in Java.",
       "icon": "Monitor",
+      "title": "Software & Desktop Utilities",
       "category": "Software Engineering",
       "features": [
         "Java Swing & Modern UI",
@@ -347,13 +345,13 @@
         "Relational DB Sync",
         "Offline Reliability"
       ],
+      "description": "Specialized desktop software, automated document/PDF generation, and relational data management in Java.",
       "displayOrder": 3
     },
     {
       "id": "serv-ai",
-      "title": "AI-Assisted Digital Solutions",
-      "description": "Integrating modern AI capabilities, intelligent data automation, and workflow acceleration into products.",
       "icon": "Sparkles",
+      "title": "AI-Assisted Digital Solutions",
       "category": "AI & Data",
       "features": [
         "Intelligent Workflows",
@@ -361,59 +359,158 @@
         "Data Processing",
         "Rapid Prototyping"
       ],
+      "description": "Integrating modern AI capabilities, intelligent data automation, and workflow acceleration into products.",
       "displayOrder": 4
     }
   ],
-  "team": [
-    {
-      "id": "team-charan-lead",
-      "name": "Charan Sai",
-      "role": "Lead Architect & Full-Stack Engineer",
-      "bio": "Systems design, full-stack web architectures, secure APIs, and client solution delivery.",
-      "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
-      "skills": [
-        "Next.js",
-        "React",
-        "Node.js",
-        "Java",
-        "PostgreSQL"
-      ],
-      "github": "https://github.com/CHARANSAI11328",
-      "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
-      "email": "saikamarajugadda21@gmail.com",
-      "portfolio": "https://charansai.website",
-      "socials": {
-        "github": "https://github.com/CHARANSAI11328",
-        "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
-        "twitter": "https://x.com/C6H11O5D",
-        "x": "https://x.com/C6H11O5D",
-        "leetcode": "https://leetcode.com/u/89IIBeaoVG/",
-        "email": "saikamarajugadda21@gmail.com",
-        "portfolio": "https://charansai.website"
-      },
-      "displayOrder": 1
-    }
-  ],
-  "inquiries": [],
   "settings": {
-    "themePreference": "light",
-    "seoTitle": "Charan Sai — Independent Developer & Digital Solutions",
-    "seoDescription": "Personal portfolio and freelance digital solutions by Charan Sai. Exploring modern web applications, Java desktop systems, and interactive digital experiences.",
     "keywords": "Charan Sai, Full Stack Developer, Data Science, Next.js, React, Java, Flutter, Bapatla, India",
+    "seoTitle": "Charan Sai — Independent Developer & Digital Solutions",
     "bannerText": "More Than Just a Portfolio — It's a Journey of Ideas, Code and Creativity",
+    "seoDescription": "Personal portfolio and freelance digital solutions by Charan Sai. Exploring modern web applications, Java desktop systems, and interactive digital experiences.",
+    "themePreference": "light",
     "sectionVisibility": {
-      "about": true,
-      "skills": true,
-      "projects": true,
       "team": true,
-      "certifications": true,
-      "experience": true,
+      "about": true,
       "events": true,
+      "skills": true,
+      "contact": true,
+      "projects": true,
       "services": true,
-      "contact": true
+      "experience": true,
+      "certifications": true
     }
   },
+  "inquiries": [],
+  "experiences": [
+    {
+      "id": "exp-btech",
+      "role": "B.Tech in Computer Science and Engineering — Data Science",
+      "type": "education",
+      "period": "2022 — Present",
+      "company": "St. Ann's College of Engineering & Technology",
+      "location": "Chirala, Andhra Pradesh, India",
+      "highlights": [
+        "Core focus on Data Science, Data Structures, Database Systems & Full-Stack Engineering",
+        "Actively developing production-grade software projects and platforms for students and businesses"
+      ],
+      "description": "Specializing in computer science fundamentals, data analytics, software development, algorithms, and engineering project lifecycles.",
+      "displayOrder": 1
+    },
+    {
+      "id": "exp-dev",
+      "role": "Independent Developer & Digital Solutions",
+      "type": "work",
+      "period": "2023 — Present",
+      "company": "Freelance & Independent Projects",
+      "location": "India",
+      "highlights": [
+        "Designed and deployed responsive Next.js and React web portals",
+        "Built LETTERGEN PRO Java desktop utility and Mameka Mahodayam Telugu news publishing platform"
+      ],
+      "description": "Engineering responsive web applications, Java desktop automation software, regional news platforms, and business websites for clients and open-source initiatives.",
+      "displayOrder": 2
+    }
+  ],
   "activityLogs": [
+    {
+      "id": "log-1792493143646-5dxl",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Dr. Neon Database Architect",
+      "timestamp": "2026-10-20T10:45:43.646Z"
+    },
+    {
+      "id": "log-1792493142042-bq7t",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
+      "timestamp": "2026-10-20T10:45:42.042Z"
+    },
+    {
+      "id": "log-1792493141974-idcn",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T10:45:41.974Z"
+    },
+    {
+      "id": "log-1792493093716-mwws",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Dr. Neon Database Architect",
+      "timestamp": "2026-10-20T10:44:53.716Z"
+    },
+    {
+      "id": "log-1792493091173-mz5r",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
+      "timestamp": "2026-10-20T10:44:51.173Z"
+    },
+    {
+      "id": "log-1792493091100-y0ov",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T10:44:51.100Z"
+    },
+    {
+      "id": "log-1792493064284-lu7d",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Dr. Neon Database Architect",
+      "timestamp": "2026-10-20T10:44:24.284Z"
+    },
+    {
+      "id": "log-1792493061762-2mu7",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
+      "timestamp": "2026-10-20T10:44:21.762Z"
+    },
+    {
+      "id": "log-1792493061690-hjm8",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T10:44:21.690Z"
+    },
+    {
+      "id": "log-1792493036784-3cnu",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Dr. Neon Database Architect",
+      "timestamp": "2026-10-20T10:43:56.784Z"
+    },
+    {
+      "id": "log-1792493034198-xih3",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
+      "timestamp": "2026-10-20T10:43:54.198Z"
+    },
+    {
+      "id": "log-1792493033462-apco",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T10:43:53.462Z"
+    },
+    {
+      "id": "log-1792492855110-7x81",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
+      "timestamp": "2026-10-20T10:40:55.110Z"
+    },
+    {
+      "id": "log-1792492854901-vctl",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T10:40:54.901Z"
+    },
     {
       "id": "log-1792485167876-jkov",
       "action": "LOGIN",
@@ -665,104 +762,7 @@
       "entity": "Admin",
       "details": "Admin password changed successfully and all existing sessions revoked",
       "timestamp": "2026-10-19T10:49:17.145Z"
-    },
-    {
-      "id": "log-1792406956863-enci",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:49:16.863Z"
-    },
-    {
-      "id": "log-1792406956747-e5se",
-      "action": "LOGOUT",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website logged out (session revoked)",
-      "timestamp": "2026-10-19T10:49:16.747Z"
-    },
-    {
-      "id": "log-1792406956668-5emw",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:49:16.668Z"
-    },
-    {
-      "id": "log-1792406911495-qqai",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:48:31.495Z"
-    },
-    {
-      "id": "log-1792406900424-h66j",
-      "action": "SECURITY",
-      "entity": "Admin",
-      "details": "Admin password changed successfully and all existing sessions revoked",
-      "timestamp": "2026-10-19T10:48:20.424Z"
-    },
-    {
-      "id": "log-1792406900212-58kl",
-      "action": "SECURITY",
-      "entity": "Admin",
-      "details": "Admin password changed successfully and all existing sessions revoked",
-      "timestamp": "2026-10-19T10:48:20.212Z"
-    },
-    {
-      "id": "log-1792406899936-893s",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:48:19.936Z"
-    },
-    {
-      "id": "log-1792406899824-pp3k",
-      "action": "LOGOUT",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website logged out (session revoked)",
-      "timestamp": "2026-10-19T10:48:19.824Z"
-    },
-    {
-      "id": "log-1792406899743-6q1x",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:48:19.743Z"
-    },
-    {
-      "id": "log-1792406825760-scr3",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:47:05.760Z"
-    },
-    {
-      "id": "log-1792406825640-kqn4",
-      "action": "LOGOUT",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website logged out (session revoked)",
-      "timestamp": "2026-10-19T10:47:05.640Z"
-    },
-    {
-      "id": "log-1792406825551-cg9d",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:47:05.551Z"
-    },
-    {
-      "id": "log-1792405953533-21zj",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: test_qa_1792405953512.png",
-      "timestamp": "2026-10-19T10:32:33.533Z"
-    },
-    {
-      "id": "log-1792405953468-wofq",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:32:33.468Z"
     }
-  ]
+  ],
+  "certifications": []
 }

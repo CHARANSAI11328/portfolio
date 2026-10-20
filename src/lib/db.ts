@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import { neon } from '@neondatabase/serverless';
 import {
   PortfolioDatabase,
   ProfileData,
@@ -307,6 +308,12 @@ export function getDatabase(): PortfolioDatabase {
   }
 }
 
+export function getNeonClient() {
+  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
+  if (!dbUrl) return null;
+  return neon(dbUrl);
+}
+
 export function saveDatabase(db: PortfolioDatabase): void {
   ensureDataDir();
   const json = JSON.stringify(db, null, 2);
@@ -322,6 +329,20 @@ export function saveDatabase(db: PortfolioDatabase): void {
   } catch {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
+
+  // Replicate to Neon PostgreSQL asynchronously
+  try {
+    const sql = getNeonClient();
+    if (sql) {
+      sql.query(
+        `INSERT INTO portfolio_state (id, data, updated_at)
+         VALUES ('current', $1::jsonb, NOW())
+         ON CONFLICT (id) DO UPDATE
+         SET data = EXCLUDED.data, updated_at = NOW();`,
+        [json]
+      ).catch(() => {});
+    }
+  } catch {}
 }
 
 export function logActivity(action: string, entity: string, details: string): void {
