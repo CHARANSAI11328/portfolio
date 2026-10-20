@@ -27,6 +27,27 @@
       "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
       "portfolio": "https://charansai.website",
       "displayOrder": 1
+    },
+    {
+      "id": "team-1792500786845-9opp",
+      "name": "P. Bhavani",
+      "role": "TEAM LEADER",
+      "bio": "Core engineering and design contributor.",
+      "avatarUrl": "",
+      "skills": [],
+      "github": "",
+      "linkedin": "",
+      "email": "",
+      "portfolio": "",
+      "socials": {
+        "github": "",
+        "linkedin": "",
+        "email": "",
+        "portfolio": ""
+      },
+      "displayOrder": 2,
+      "createdAt": "2026-10-20T12:53:06.845Z",
+      "updatedAt": "2026-10-20T12:53:06.845Z"
     }
   ],
   "admins": [
@@ -414,6 +435,20 @@
   ],
   "activityLogs": [
     {
+      "id": "log-1792500786879-trf6",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: P. Bhavani (TEAM LEADER)",
+      "timestamp": "2026-10-20T12:53:06.879Z"
+    },
+    {
+      "id": "log-1792500786800-m7b1",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T12:53:06.800Z"
+    },
+    {
       "id": "log-1792494234883-8vu3",
       "action": "UPDATE",
       "entity": "Profile",
@@ -748,20 +783,6 @@
       "entity": "File",
       "details": "Admin uploaded asset: test_qa_1792406966567_d6655938.png",
       "timestamp": "2026-10-19T10:49:26.587Z"
-    },
-    {
-      "id": "log-1792406966525-3i48",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:49:26.525Z"
-    },
-    {
-      "id": "log-1792406957427-la2x",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: safe_test_raster_1792406957407_7766de54.png",
-      "timestamp": "2026-10-19T10:49:17.427Z"
     }
   ],
   "certifications": []

@@ -330,17 +330,14 @@ export function saveDatabase(db: PortfolioDatabase): void {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
 
-  // Replicate to Neon PostgreSQL asynchronously
+  // Replicate to Neon PostgreSQL asynchronously (atomic state + all relational tables)
   try {
-    const sql = getNeonClient();
-    if (sql) {
-      sql.query(
-        `INSERT INTO portfolio_state (id, data, updated_at)
-         VALUES ('current', $1::jsonb, NOW())
-         ON CONFLICT (id) DO UPDATE
-         SET data = EXCLUDED.data, updated_at = NOW();`,
-        [json]
-      ).catch(() => {});
+    const neonPath = path.join(process.cwd(), 'server', 'neon.js');
+    if (fs.existsSync(neonPath)) {
+      const neon = require(neonPath);
+      if (neon && typeof neon.saveNeonState === 'function') {
+        neon.saveNeonState(db).catch(() => {});
+      }
     }
   } catch {}
 }

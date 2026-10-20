@@ -223,9 +223,13 @@ async function initNeon(initialData = null) {
     isConnected = true;
     console.log('[NEON] Connected successfully to Neon PostgreSQL database.');
 
-    // Seed or sync all relational tables from initialData if needed
-    if (initialData) {
+    // Only seed from initialData if Neon cloud is empty; otherwise preserve cloud state
+    const existingCloudState = await fetchNeonState();
+    if (!existingCloudState && initialData) {
       await saveNeonState(initialData);
+    } else if (existingCloudState) {
+      // Sync relational tables with the authoritative cloud state
+      await saveNeonState(existingCloudState);
     }
 
     return true;
