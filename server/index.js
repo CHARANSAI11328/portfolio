@@ -363,44 +363,21 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { success: true, message: 'Logged out successfully' }, { 'Set-Cookie': cookieHeader });
     }
 
-    // Database & Neon PostgreSQL Status
+    // Database Status (Completely Disconnected / Clean Static Mode)
     if (pathname === '/api/db/status' && method === 'GET') {
-      let counts = {};
-      try {
-        const [adm, prj, skl, tm, crt, srv, exp] = await Promise.all([
-          neon.query('SELECT COUNT(*) AS c FROM admins;'),
-          neon.query('SELECT COUNT(*) AS c FROM projects;'),
-          neon.query('SELECT COUNT(*) AS c FROM skills;'),
-          neon.query('SELECT COUNT(*) AS c FROM team_members;'),
-          neon.query('SELECT COUNT(*) AS c FROM certifications;'),
-          neon.query('SELECT COUNT(*) AS c FROM services;'),
-          neon.query('SELECT COUNT(*) AS c FROM experiences;'),
-        ]);
-        counts = {
-          admins: parseInt(adm[0]?.c || 0, 10),
-          projects: parseInt(prj[0]?.c || 0, 10),
-          skills: parseInt(skl[0]?.c || 0, 10),
-          team: parseInt(tm[0]?.c || 0, 10),
-          certifications: parseInt(crt[0]?.c || 0, 10),
-          services: parseInt(srv[0]?.c || 0, 10),
-          experiences: parseInt(exp[0]?.c || 0, 10),
-        };
-      } catch (err) {
-        const db = getDatabase();
-        counts = {
-          admins: (db.admins || []).length,
-          projects: (db.projects || []).length,
-          skills: (db.skills || []).length,
-          team: (db.team || []).length,
-          certifications: (db.certifications || []).length,
-          services: (db.services || []).length,
-          experiences: (db.experiences || []).length,
-        };
-      }
+      const db = getDatabase();
+      const counts = {
+        admins: (db.admins || []).length,
+        projects: (db.projects || []).length,
+        skills: (db.skills || []).length,
+        team: (db.team || []).length,
+        certifications: (db.certifications || []).length,
+        services: (db.services || []).length,
+        experiences: (db.experiences || []).length,
+      };
       return sendJson(res, 200, {
-        database: 'Neon PostgreSQL',
-        connected: isNeonConnected(),
-        branch: process.env.NEON_BRANCH || 'production',
+        database: 'Disconnected (Clean Static Mode)',
+        connected: false,
         counts,
         timestamp: new Date().toISOString(),
       });
@@ -1579,18 +1556,7 @@ async function startServer() {
   console.log(`  Host & Port:      ${HOST}:${currentPort}`);
   console.log(`  Storage DATA_DIR: ${path.join(__dirname, '..', 'data')}`);
   console.log(`  Storage UPLOADS:  ${UPLOADS_DIR}`);
-
-  try {
-    const neonOk = await initNeonDatabase();
-    if (neonOk) {
-      console.log(`  Database:         Neon PostgreSQL [LIVE CONNECTED]`);
-      console.log(`  Neon Branch:      ${process.env.NEON_BRANCH || 'production'}`);
-    } else {
-      console.log(`  Database:         Local Filesystem (Neon not configured)`);
-    }
-  } catch (err) {
-    console.error(`  Database Error:   ${err.message}`);
-  }
+  console.log(`  Database:         Disconnected (Clean Static Mode)`);
 
   server.listen(currentPort, HOST, () => {
     console.log(`  Charan Sai Portfolio Server is RUNNING!`);

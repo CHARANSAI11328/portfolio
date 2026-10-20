@@ -414,34 +414,10 @@ function saveDatabase(db) {
   } catch {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
-
-  // Asynchronously replicate atomic state to Neon PostgreSQL
-  neon.updatePortfolioState(db).catch((err) => {
-    console.warn('[NEON] Async state update error:', err.message);
-  });
 }
 
-/**
- * Initialize Neon PostgreSQL and hydrate in-memory state with live cloud data.
- */
 async function initNeonDatabase() {
-  const currentLocal = getDatabase();
-  const connected = await neon.initNeon(currentLocal);
-  if (connected) {
-    const remoteState = await neon.fetchNeonState();
-    if (remoteState && typeof remoteState === 'object' && Array.isArray(remoteState.admins)) {
-      memoryDb = remoteState;
-      // Persist hydrated state to local cache
-      const json = JSON.stringify(remoteState, null, 2);
-      try {
-        fs.writeFileSync(DB_FILE, json, 'utf-8');
-        console.log('[NEON] Local cache synchronized with Neon PostgreSQL cloud state.');
-      } catch (err) {
-        console.warn('[NEON] Warning writing local cache:', err.message);
-      }
-    }
-  }
-  return connected;
+  return false;
 }
 
 function logActivity(action, entity, details) {
@@ -461,8 +437,8 @@ module.exports = {
   getDatabase,
   saveDatabase,
   initNeonDatabase,
-  isNeonConnected: neon.isNeonConnected,
-  queryNeon: neon.query,
+  isNeonConnected: () => false,
+  queryNeon: async () => [],
   logActivity,
   hashPassword,
   verifyPassword,
