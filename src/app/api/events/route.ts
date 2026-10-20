@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 import { EventItem } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
   const db = getDatabase();
   const admin = await verifyApiAuth(request);
+  const n = getNeon();
+
+  if (n) {
+    try {
+      const rows = await n.query(`SELECT * FROM events ORDER BY display_order ASC, id ASC;`);
+      let liveEvents = rows.map(n.formatEvent);
+      db.events = liveEvents;
+      if (!admin) liveEvents = liveEvents.filter((e: any) => e.published);
+      return NextResponse.json({ events: liveEvents, isAdmin: !!admin }, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
+    } catch {}
+  }
 
   let events = db.events || [];
   if (!admin) {
@@ -13,7 +26,9 @@ export async function GET(request: NextRequest) {
   }
 
   events.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-  return NextResponse.json({ events, isAdmin: !!admin });
+  return NextResponse.json({ events, isAdmin: !!admin }, {
+    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -46,6 +61,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.events.push(newEvent);
+    await upsertNeonRecord('events', newEvent);
     saveDatabase(db);
     logActivity('CREATE', 'Event', `Recorded event: ${newEvent.title}`);
 

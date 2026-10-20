@@ -395,6 +395,8 @@ async function saveNeonState(data) {
       }
       if (projectIds.length > 0) {
         await sql.query(`DELETE FROM projects WHERE id NOT IN (${projectIds.map((_, i) => `$${i + 1}`).join(', ')});`, projectIds);
+      } else {
+        await sql.query(`DELETE FROM projects;`);
       }
     }
 
@@ -420,6 +422,8 @@ async function saveNeonState(data) {
       }
       if (skillIds.length > 0) {
         await sql.query(`DELETE FROM skills WHERE id NOT IN (${skillIds.map((_, i) => `$${i + 1}`).join(', ')});`, skillIds);
+      } else {
+        await sql.query(`DELETE FROM skills;`);
       }
     }
 
@@ -457,6 +461,8 @@ async function saveNeonState(data) {
       }
       if (teamIds.length > 0) {
         await sql.query(`DELETE FROM team_members WHERE id NOT IN (${teamIds.map((_, i) => `$${i + 1}`).join(', ')});`, teamIds);
+      } else {
+        await sql.query(`DELETE FROM team_members;`);
       }
     }
 
@@ -533,6 +539,8 @@ async function saveNeonState(data) {
       }
       if (expIds.length > 0) {
         await sql.query(`DELETE FROM experiences WHERE id NOT IN (${expIds.map((_, i) => `$${i + 1}`).join(', ')});`, expIds);
+      } else {
+        await sql.query(`DELETE FROM experiences;`);
       }
     }
 
@@ -567,6 +575,8 @@ async function saveNeonState(data) {
       }
       if (servIds.length > 0) {
         await sql.query(`DELETE FROM services WHERE id NOT IN (${servIds.map((_, i) => `$${i + 1}`).join(', ')});`, servIds);
+      } else {
+        await sql.query(`DELETE FROM services;`);
       }
     }
 
@@ -610,8 +620,10 @@ async function saveNeonState(data) {
 
     // 10. Sync Inquiries Table
     if (Array.isArray(data.inquiries)) {
+      const inqIds = [];
       for (const inq of data.inquiries) {
         if (!inq.id) continue;
+        inqIds.push(inq.id);
         await sql.query(
           `
           INSERT INTO inquiries (id, name, email, subject, message, status, created_at)
@@ -629,6 +641,11 @@ async function saveNeonState(data) {
             inq.createdAt || new Date().toISOString(),
           ]
         );
+      }
+      if (inqIds.length > 0) {
+        await sql.query(`DELETE FROM inquiries WHERE id NOT IN (${inqIds.map((_, i) => `$${i + 1}`).join(', ')});`, inqIds);
+      } else {
+        await sql.query(`DELETE FROM inquiries;`);
       }
     }
 
@@ -747,7 +764,22 @@ async function upsertProject(pr) {
 async function deleteProject(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM projects WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM projects WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{projects}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'projects', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -771,7 +803,22 @@ async function upsertSkill(sk) {
 async function deleteSkill(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM skills WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM skills WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{skills}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'skills', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -807,7 +854,22 @@ async function upsertTeamMember(m) {
 async function deleteTeamMember(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM team_members WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM team_members WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{team}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'team', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -842,7 +904,22 @@ async function upsertCertification(c) {
 async function deleteCertification(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM certifications WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM certifications WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{certifications}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'certifications', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -879,7 +956,22 @@ async function upsertExperience(e) {
 async function deleteExperience(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM experiences WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM experiences WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{experiences}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'experiences', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -912,7 +1004,22 @@ async function upsertService(s) {
 async function deleteService(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM services WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM services WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{services}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'services', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -947,7 +1054,22 @@ async function upsertEvent(ev) {
 async function deleteEvent(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM events WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM events WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{events}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'events', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 
@@ -983,7 +1105,22 @@ async function updateInquiry(id, updates) {
 async function deleteInquiry(id) {
   const sql = getClient();
   if (!sql || !id) return false;
-  await sql.query(`DELETE FROM inquiries WHERE id = $1;`, [id]);
+  await Promise.all([
+    sql.query(`DELETE FROM inquiries WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{inquiries}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'inquiries', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
   return true;
 }
 

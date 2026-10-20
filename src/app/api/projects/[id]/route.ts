@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function GET(
@@ -51,6 +51,7 @@ export async function PUT(
     };
 
     db.projects[index] = updatedProject;
+    await upsertNeonRecord('projects', updatedProject);
     saveDatabase(db);
     logActivity('UPDATE', 'Project', `Updated project: ${updatedProject.title}`);
 
@@ -79,6 +80,7 @@ export async function DELETE(
   }
 
   db.projects = db.projects.filter((p) => p.id !== id);
+  await deleteNeonRecord('projects', id);
   saveDatabase(db);
   logActivity('DELETE', 'Project', `Deleted project: ${project.title}`);
 

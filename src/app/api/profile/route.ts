@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function GET() {
   const db = getDatabase();
+  const n = getNeon();
+  if (n) {
+    try {
+      const rows = await n.query(`SELECT * FROM profile WHERE id = 'profile-charan-sai' LIMIT 1;`);
+      if (rows && rows.length > 0) {
+        const liveProfile = n.formatProfile(rows[0]);
+        db.profile = liveProfile;
+        return NextResponse.json({ profile: liveProfile });
+      }
+    } catch {}
+  }
   return NextResponse.json({ profile: db.profile });
 }
 
@@ -23,6 +34,7 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
+    await upsertNeonRecord('profile', db.profile);
     saveDatabase(db);
     logActivity('UPDATE', 'Profile', 'Updated personal profile details');
 

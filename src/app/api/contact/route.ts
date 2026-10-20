@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 import { InquiryItem } from '@/lib/types';
 
@@ -10,6 +10,18 @@ export async function GET(request: NextRequest) {
   }
 
   const db = getDatabase();
+  const n = getNeon();
+  if (n) {
+    try {
+      const rows = await n.query(`SELECT * FROM inquiries ORDER BY created_at DESC;`);
+      if (rows && rows.length > 0) {
+        const liveInquiries = rows.map(n.formatInquiry);
+        db.inquiries = liveInquiries;
+        return NextResponse.json({ inquiries: liveInquiries });
+      }
+    } catch {}
+  }
+
   const inquiries = (db.inquiries || []).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -43,6 +55,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.inquiries = [newInquiry, ...(db.inquiries || [])];
+    await upsertNeonRecord('inquiries', newInquiry);
     saveDatabase(db);
     logActivity('INQUIRY', 'Contact', `New project inquiry received from ${newInquiry.name} (${newInquiry.email})`);
 

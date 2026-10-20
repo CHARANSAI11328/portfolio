@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function PUT(
@@ -52,6 +52,7 @@ export async function PUT(
       updatedAt: new Date().toISOString(),
     };
 
+    await upsertNeonRecord('team', db.team[idx]);
     saveDatabase(db);
     logActivity('UPDATE', 'Team', `Updated team member: ${db.team[idx].name}`);
 
@@ -82,6 +83,7 @@ export async function DELETE(
     }
 
     const del = db.team.splice(idx, 1)[0];
+    await deleteNeonRecord('team', id);
     saveDatabase(db);
     logActivity('DELETE', 'Team', `Removed team member: ${del.name}`);
 

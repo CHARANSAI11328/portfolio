@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function PUT(
@@ -22,6 +22,7 @@ export async function PUT(
   try {
     const updates = await request.json();
     db.certifications[index] = { ...db.certifications[index], ...updates, id };
+    await upsertNeonRecord('certifications', db.certifications[index]);
     saveDatabase(db);
     logActivity('UPDATE', 'Certification', `Updated certification: ${db.certifications[index].title}`);
 
@@ -50,6 +51,7 @@ export async function DELETE(
   }
 
   db.certifications = db.certifications.filter((c) => c.id !== id);
+  await deleteNeonRecord('certifications', id);
   saveDatabase(db);
   logActivity('DELETE', 'Certification', `Deleted certification: ${cert.title}`);
 

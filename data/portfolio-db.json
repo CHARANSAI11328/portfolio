@@ -28,28 +28,7 @@
       "portfolio": "https://charansai.website",
       "displayOrder": 1,
       "createdAt": "2026-10-20T10:34:44.327Z",
-      "updatedAt": "2026-10-20T13:28:59.704Z"
-    },
-    {
-      "id": "team-1792500786845-9opp",
-      "name": "P. Bhavani",
-      "role": "TEAM LEADER",
-      "bio": "Core engineering and design contributor.",
-      "avatarUrl": "",
-      "skills": [],
-      "socials": {
-        "email": "",
-        "github": "",
-        "linkedin": "",
-        "portfolio": ""
-      },
-      "github": "",
-      "linkedin": "",
-      "email": "",
-      "portfolio": "",
-      "displayOrder": 2,
-      "createdAt": "2026-10-20T12:53:15.543Z",
-      "updatedAt": "2026-10-20T13:28:59.951Z"
+      "updatedAt": "2026-10-20T14:00:09.313Z"
     }
   ],
   "admins": [
@@ -256,7 +235,7 @@
       "published": true,
       "displayOrder": 1,
       "createdAt": "2026-10-20T11:01:33.080Z",
-      "updatedAt": "2026-10-20T13:28:52.338Z"
+      "updatedAt": "2026-10-20T14:00:02.842Z"
     },
     {
       "id": "proj-projex",
@@ -279,7 +258,7 @@
       "published": true,
       "displayOrder": 2,
       "createdAt": "2026-10-20T11:01:33.325Z",
-      "updatedAt": "2026-10-20T13:28:52.588Z"
+      "updatedAt": "2026-10-20T14:00:03.095Z"
     },
     {
       "id": "proj-mameka-mahodayam",
@@ -302,7 +281,7 @@
       "published": true,
       "displayOrder": 3,
       "createdAt": "2026-10-20T11:01:33.578Z",
-      "updatedAt": "2026-10-20T13:28:52.839Z"
+      "updatedAt": "2026-10-20T14:00:03.352Z"
     },
     {
       "id": "proj-business-websites",
@@ -325,7 +304,7 @@
       "published": true,
       "displayOrder": 4,
       "createdAt": "2026-10-20T11:01:33.821Z",
-      "updatedAt": "2026-10-20T13:28:53.094Z"
+      "updatedAt": "2026-10-20T14:00:03.599Z"
     }
   ],
   "services": [
@@ -436,6 +415,41 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1792504881866-s1ko",
+      "action": "DELETE",
+      "entity": "Certification",
+      "details": "Deleted cert: PostgreSQL Cloud Certification",
+      "timestamp": "2026-10-20T14:01:21.866Z"
+    },
+    {
+      "id": "log-1792504881273-mohp",
+      "action": "CREATE",
+      "entity": "Certification",
+      "details": "Added certification: PostgreSQL Cloud Certification",
+      "timestamp": "2026-10-20T14:01:21.273Z"
+    },
+    {
+      "id": "log-1792504879654-mdq3",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Test Sync Specialist",
+      "timestamp": "2026-10-20T14:01:19.654Z"
+    },
+    {
+      "id": "log-1792504878205-u3sx",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Test Sync Specialist (Database Engineer)",
+      "timestamp": "2026-10-20T14:01:18.205Z"
+    },
+    {
+      "id": "log-1792504877324-62r6",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T14:01:17.324Z"
+    },
     {
       "id": "log-1792502969763-hv8s",
       "action": "DELETE",
@@ -750,41 +764,6 @@
       "entity": "Team",
       "details": "Added team member: Test Bearer (Designer)",
       "timestamp": "2026-10-19T14:49:26.411Z"
-    },
-    {
-      "id": "log-1792421366332-myz2",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Test Member (Engineer)",
-      "timestamp": "2026-10-19T14:49:26.332Z"
-    },
-    {
-      "id": "log-1792421366253-25fo",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T14:49:26.253Z"
-    },
-    {
-      "id": "log-1792419749990-6uhr",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T14:22:29.990Z"
-    },
-    {
-      "id": "log-1792419221802-ce0f",
-      "action": "DELETE",
-      "entity": "Team",
-      "details": "Removed team member: QA & Test Architect",
-      "timestamp": "2026-10-19T14:13:41.802Z"
-    },
-    {
-      "id": "log-1792419221727-o449",
-      "action": "UPDATE",
-      "entity": "Team",
-      "details": "Updated team member: QA & Test Architect",
-      "timestamp": "2026-10-19T14:13:41.727Z"
     }
   ],
   "certifications": []

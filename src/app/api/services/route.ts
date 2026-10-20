@@ -1,12 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 import { ServiceItem } from '@/lib/types';
 
 export async function GET() {
   const db = getDatabase();
+  const n = getNeon();
+  if (n) {
+    try {
+      const rows = await n.query(`SELECT * FROM services ORDER BY display_order ASC, id ASC;`);
+      if (rows && rows.length > 0) {
+        const liveServices = rows.map(n.formatService);
+        db.services = liveServices;
+        return NextResponse.json({ services: liveServices }, {
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+        });
+      }
+    } catch {}
+  }
   const services = (db.services || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-  return NextResponse.json({ services });
+  return NextResponse.json({ services }, {
+    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -35,6 +50,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.services.push(newService);
+    await upsertNeonRecord('services', newService);
     saveDatabase(db);
     logActivity('CREATE', 'Service', `Created service: ${newService.title}`);
 

@@ -1,12 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 import { SkillItem } from '@/lib/types';
 
 export async function GET() {
   const db = getDatabase();
+  const n = getNeon();
+  if (n) {
+    try {
+      const rows = await n.query(`SELECT * FROM skills ORDER BY display_order ASC, id ASC;`);
+      if (rows && rows.length > 0) {
+        const liveSkills = rows.map(n.formatSkill);
+        db.skills = liveSkills;
+        return NextResponse.json({ skills: liveSkills }, {
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+        });
+      }
+    } catch {}
+  }
   const skills = (db.skills || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-  return NextResponse.json({ skills });
+  return NextResponse.json({ skills }, {
+    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -35,6 +50,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.skills.push(newSkill);
+    await upsertNeonRecord('skills', newSkill);
     saveDatabase(db);
     logActivity('CREATE', 'Skill', `Added skill: ${newSkill.name} (${newSkill.category})`);
 

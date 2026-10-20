@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function PATCH(
@@ -23,6 +23,10 @@ export async function PATCH(
     const { status } = await request.json();
     if (status) {
       inquiry.status = status;
+      const n = getNeon();
+      if (n && typeof n.updateInquiry === 'function') {
+        await n.updateInquiry(id, { status }).catch(() => {});
+      }
       saveDatabase(db);
       logActivity('UPDATE', 'Inquiry', `Marked inquiry from ${inquiry.name} as ${status}`);
     }
@@ -52,6 +56,7 @@ export async function DELETE(
   }
 
   db.inquiries = db.inquiries.filter((i) => i.id !== id);
+  await deleteNeonRecord('inquiries', id);
   saveDatabase(db);
   logActivity('DELETE', 'Inquiry', `Deleted inquiry from ${inquiry.name}`);
 

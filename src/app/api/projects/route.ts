@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 import { ProjectItem } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
   const db = getDatabase();
   const admin = await verifyApiAuth(request);
+  const n = getNeon();
 
-  // If admin is logged in, return all projects including drafts
-  // If public visitor, return only published projects sorted by displayOrder
+  if (n) {
+    try {
+      const rows = await n.query(`SELECT * FROM projects ORDER BY display_order ASC, id ASC;`);
+      let liveProjects = rows.map(n.formatProject);
+      db.projects = liveProjects;
+      if (!admin) liveProjects = liveProjects.filter((p: any) => p.published);
+      return NextResponse.json({ projects: liveProjects, isAdmin: !!admin }, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
+    } catch {}
+  }
+
   const isPublic = !admin;
   let projects = db.projects || [];
 
@@ -18,7 +29,9 @@ export async function GET(request: NextRequest) {
 
   projects.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
-  return NextResponse.json({ projects, isAdmin: !!admin });
+  return NextResponse.json({ projects, isAdmin: !!admin }, {
+    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -74,6 +87,7 @@ export async function POST(request: NextRequest) {
     };
 
     db.projects.push(newProject);
+    await upsertNeonRecord('projects', newProject);
     saveDatabase(db);
     logActivity('CREATE', 'Project', `Created project: ${newProject.title} (${newProject.published ? 'Published' : 'Draft'})`);
 
