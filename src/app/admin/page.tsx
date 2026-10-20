@@ -104,11 +104,24 @@ export default function AdminDashboardPage() {
     item: Partial<EventItem>;
   }>({ open: false, isEdit: false, item: {} });
 
+  const authFetch = (url: string, init: RequestInit = {}) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('charan_admin_token') : null;
+    const headers = new Headers(init.headers || {});
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return fetch(url, {
+      ...init,
+      headers,
+      credentials: 'include',
+    });
+  };
+
   // 1. Verify Authentication
   useEffect(() => {
     async function checkAuth() {
       try {
-        const res = await fetch('/api/auth/me');
+        const res = await authFetch('/api/auth/me');
         if (!res.ok) {
           router.push('/admin/login');
           return;
@@ -143,15 +156,15 @@ export default function AdminDashboardPage() {
         inqRes,
         settRes,
       ] = await Promise.all([
-        fetch('/api/profile'),
-        fetch('/api/projects'),
-        fetch('/api/skills'),
-        fetch('/api/certifications'),
-        fetch('/api/experience'),
-        fetch('/api/events'),
-        fetch('/api/services'),
-        fetch('/api/contact'),
-        fetch('/api/settings'),
+        authFetch('/api/profile'),
+        authFetch('/api/projects'),
+        authFetch('/api/skills'),
+        authFetch('/api/certifications'),
+        authFetch('/api/experience'),
+        authFetch('/api/events'),
+        authFetch('/api/services'),
+        authFetch('/api/contact'),
+        authFetch('/api/settings'),
       ]);
 
       const profData = await profRes.json();
@@ -184,7 +197,7 @@ export default function AdminDashboardPage() {
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await authFetch('/api/auth/logout', { method: 'POST' });
     router.push('/admin/login');
   };
 
@@ -196,7 +209,7 @@ export default function AdminDashboardPage() {
     if (!profile) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/profile', {
+      const res = await authFetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profile),
@@ -226,7 +239,7 @@ export default function AdminDashboardPage() {
       const url = isEdit ? `/api/projects/${item.id}` : '/api/projects';
       const method = isEdit ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(item),
@@ -246,7 +259,7 @@ export default function AdminDashboardPage() {
   const handleDeleteProject = async (id: string, title: string) => {
     if (!confirm(`Are you sure you want to permanently delete "${title}"?`)) return;
     try {
-      const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`/api/projects/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete project');
       notify('success', `Project "${title}" deleted.`);
       loadAllData();
@@ -258,7 +271,7 @@ export default function AdminDashboardPage() {
   const handleToggleProjectPublish = async (project: ProjectItem) => {
     try {
       const nextStatus = !project.published;
-      const res = await fetch(`/api/projects/${project.id}`, {
+      const res = await authFetch(`/api/projects/${project.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ published: nextStatus }),
@@ -287,7 +300,7 @@ export default function AdminDashboardPage() {
       const url = isEdit ? `/api/certifications/${item.id}` : '/api/certifications';
       const method = isEdit ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(item),
@@ -307,7 +320,7 @@ export default function AdminDashboardPage() {
   const handleDeleteCert = async (id: string, title: string) => {
     if (!confirm(`Delete certification "${title}"?`)) return;
     try {
-      const res = await fetch(`/api/certifications/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`/api/certifications/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       notify('success', 'Certification deleted');
       loadAllData();
@@ -324,7 +337,7 @@ export default function AdminDashboardPage() {
     if (!settings) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/settings', {
+      const res = await authFetch('/api/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),

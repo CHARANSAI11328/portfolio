@@ -197,7 +197,7 @@
     "location": "Bapatla, Andhra Pradesh, India",
     "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
     "resumeUrl": "/KAMARAJUGADDA_CHARAN_SAI_Resume.pdf?v=20261019",
-    "updatedAt": "2026-10-19T10:14:03.636Z",
+    "updatedAt": "2026-10-20T11:03:54.851Z",
     "heroHeading": "Building Next-Gen Digital Solutions",
     "socialLinks": {
       "x": "https://x.com/C6H11O5D",
@@ -413,6 +413,20 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1792494234883-8vu3",
+      "action": "UPDATE",
+      "entity": "Profile",
+      "details": "Updated personal profile details",
+      "timestamp": "2026-10-20T11:03:54.883Z"
+    },
+    {
+      "id": "log-1792494234440-4oek",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T11:03:54.440Z"
+    },
     {
       "id": "log-1792493143646-5dxl",
       "action": "DELETE",
@@ -748,20 +762,6 @@
       "entity": "File",
       "details": "Admin uploaded asset: safe_test_raster_1792406957407_7766de54.png",
       "timestamp": "2026-10-19T10:49:17.427Z"
-    },
-    {
-      "id": "log-1792406957359-2q7k",
-      "action": "SECURITY",
-      "entity": "Admin",
-      "details": "Admin password changed successfully and all existing sessions revoked",
-      "timestamp": "2026-10-19T10:49:17.359Z"
-    },
-    {
-      "id": "log-1792406957145-rx70",
-      "action": "SECURITY",
-      "entity": "Admin",
-      "details": "Admin password changed successfully and all existing sessions revoked",
-      "timestamp": "2026-10-19T10:49:17.145Z"
     }
   ],
   "certifications": []
