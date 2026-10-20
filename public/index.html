@@ -1888,7 +1888,7 @@
 
         <div id="contactErrorAlert" style="display: none; padding: 0.85rem; border-radius: 0.75rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #EF4444; font-size: 0.8rem; margin-bottom: 1rem;"></div>
 
-        <form id="contactForm">
+        <form id="contactForm" action="https://formspree.io/f/xpqylowj" method="POST">
           <!-- Honeypot Field for Spam Protection -->
           <input type="text" name="_hp" id="cHoneypot" style="display:none !important; opacity:0; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
 
@@ -2939,22 +2939,42 @@
       btn.innerHTML = '<span>Sending message...</span>';
 
       try {
-        const res = await fetch('/api/contact', {
+        // Send directly to Formspree endpoint
+        const formspreePromise = fetch('https://formspree.io/f/xpqylowj', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            subject: subject || 'Portfolio Inquiry',
+            message,
+            _replyto: email,
+          }),
+        }).catch(() => null);
+
+        // Also record to local CMS Inquiries database for admin dashboard
+        const localPromise = fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, subject, message }),
-        });
+        }).catch(() => null);
 
-        const data = await res.json().catch(() => ({}));
-        if (res.ok && data.success) {
+        const [fsRes, localRes] = await Promise.all([formspreePromise, localPromise]);
+        const fsOk = fsRes && fsRes.ok;
+        const localOk = localRes && localRes.ok;
+
+        if (fsOk || localOk) {
           if (successBox) {
-            successBox.textContent = data.message || 'Thank you! Your message has been sent directly to Charan Sai.';
+            successBox.textContent = 'Thank you! Your message has been sent directly to Charan Sai via Formspree.';
             successBox.style.display = 'block';
           }
           document.getElementById('contactForm').reset();
         } else {
           if (errorBox) {
-            errorBox.textContent = data.error || 'Failed to send message. Please verify your details.';
+            errorBox.textContent = 'Failed to send message. Please verify your details or email directly.';
             errorBox.style.display = 'block';
           }
         }

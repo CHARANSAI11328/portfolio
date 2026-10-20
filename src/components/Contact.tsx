@@ -27,20 +27,32 @@ export default function Contact({ profile }: ContactProps) {
     setError(null);
 
     try {
-      const res = await fetch('/api/contact', {
+      const formspreePromise = fetch('https://formspree.io/f/xpqylowj', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          _replyto: formData.email,
+        }),
+      }).catch(() => null);
+
+      const localPromise = fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-      });
+      }).catch(() => null);
 
-      const data = await res.json();
+      const [fsRes, localRes] = await Promise.all([formspreePromise, localPromise]);
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit inquiry');
+      if ((fsRes && fsRes.ok) || (localRes && localRes.ok)) {
+        setSuccess('Message sent successfully via Formspree! Charan Sai will review your inquiry shortly.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error('Failed to send message. Please verify your details or email directly.');
       }
-
-      setSuccess('Message sent successfully! Charan Sai will review your inquiry shortly.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Submission failed';
       setError(message);

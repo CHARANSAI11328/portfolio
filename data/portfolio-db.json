@@ -5,10 +5,10 @@
       "email": "admin@charansai.website",
       "name": "Charan Sai",
       "role": "superadmin",
-      "passwordHash": "eacf671095fcf23646f493198ec7b7a0:9d347813767b5619014b7099d530bb0b8697ade85525f72406ac5a0df6b1383da1b2e72b5e34bb352872ce241a69d6a903cfd754ea3521a678a610e2e697b2f3",
+      "passwordHash": "salt_charan_2026:3b9357518faa4ed0654bc100a46f83e8acbc6bc3d686d94646127928366ab28c83040b1ed9b821991df6c230bcb70478e052dab1b97f0dcb23703c5724c0c450",
       "createdAt": "2026-10-19T05:59:11.258Z",
-      "tokenVersion": 10,
-      "passwordChangedAt": "2026-10-19T11:08:19.410Z"
+      "tokenVersion": 12,
+      "passwordChangedAt": "2026-10-20T07:48:13.314Z"
     }
   ],
   "profile": {
@@ -386,81 +386,6 @@
         "portfolio": "https://charansai.website"
       },
       "displayOrder": 1
-    },
-    {
-      "id": "team-frontend-collab",
-      "name": "Frontend & UI/UX Specialist",
-      "role": "Creative Frontend Engineer",
-      "bio": "Crafting responsive user interfaces, fluid animations, accessible components, and modern design systems.",
-      "avatarUrl": "",
-      "skills": [
-        "React",
-        "Tailwind CSS",
-        "Figma",
-        "UI/UX",
-        "TypeScript"
-      ],
-      "github": "https://github.com",
-      "linkedin": "https://linkedin.com",
-      "email": "contact@charansai.website",
-      "portfolio": "",
-      "socials": {
-        "github": "https://github.com",
-        "linkedin": "https://linkedin.com",
-        "email": "contact@charansai.website",
-        "portfolio": ""
-      },
-      "displayOrder": 2
-    },
-    {
-      "id": "team-data-collab",
-      "name": "Data & Backend Specialist",
-      "role": "Cloud & Data Engineer",
-      "bio": "Data pipelines, relational schema modeling, cloud deployment automation, and backend optimization.",
-      "avatarUrl": "",
-      "skills": [
-        "Python",
-        "PostgreSQL",
-        "Neon DB",
-        "Docker",
-        "REST APIs"
-      ],
-      "github": "https://github.com",
-      "linkedin": "https://linkedin.com",
-      "email": "contact@charansai.website",
-      "portfolio": "",
-      "socials": {
-        "github": "https://github.com",
-        "linkedin": "https://linkedin.com",
-        "email": "contact@charansai.website",
-        "portfolio": ""
-      },
-      "displayOrder": 3
-    },
-    {
-      "id": "team-1792422218911-rsni",
-      "name": "Sarah Connor",
-      "role": "Cybersecurity Specialist",
-      "bio": "Securing web applications and enterprise cloud infrastructure.",
-      "avatarUrl": "/uploads/test_avatar_1792422218848_7d74ab54.png",
-      "skills": [
-        "Cybersecurity",
-        "Cloudflare",
-        "Penetration Testing"
-      ],
-      "github": "https://github.com/sarahconnor",
-      "linkedin": "https://linkedin.com/in/sarahconnor",
-      "email": "sarah@example.com",
-      "portfolio": "",
-      "socials": {
-        "github": "https://github.com/sarahconnor",
-        "linkedin": "https://linkedin.com/in/sarahconnor",
-        "email": "sarah@example.com",
-        "portfolio": ""
-      },
-      "displayOrder": 2,
-      "createdAt": "2026-10-19T15:03:38.911Z",
-      "updatedAt": "2026-10-19T15:03:38.911Z"
     }
   ],
   "inquiries": [],
@@ -483,6 +408,111 @@
     }
   },
   "activityLogs": [
+    {
+      "id": "log-1792485167876-jkov",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T08:32:47.876Z"
+    },
+    {
+      "id": "log-1792485153504-oymi",
+      "action": "LOGOUT",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website logged out (session revoked)",
+      "timestamp": "2026-10-20T08:32:33.505Z"
+    },
+    {
+      "id": "log-1792482974573-jzm4",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:56:14.573Z"
+    },
+    {
+      "id": "log-1792482676522-wqe0",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:51:16.522Z"
+    },
+    {
+      "id": "log-1792482669805-j1aj",
+      "action": "LOGOUT",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website logged out (session revoked)",
+      "timestamp": "2026-10-20T07:51:09.805Z"
+    },
+    {
+      "id": "log-1792482639762-gm8o",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:50:39.762Z"
+    },
+    {
+      "id": "log-1792482639720-runj",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:50:39.720Z"
+    },
+    {
+      "id": "log-1792482639671-2ass",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:50:39.671Z"
+    },
+    {
+      "id": "log-1792482619935-g1t7",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:50:19.935Z"
+    },
+    {
+      "id": "log-1792481610888-dl6q",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from Test Client (client@example.com)",
+      "timestamp": "2026-10-20T07:33:30.888Z"
+    },
+    {
+      "id": "log-1792481610804-ic70",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Ravi Kumar",
+      "timestamp": "2026-10-20T07:33:30.804Z"
+    },
+    {
+      "id": "log-1792481610720-vt0i",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Ravi Kumar (Full-Stack Developer)",
+      "timestamp": "2026-10-20T07:33:30.720Z"
+    },
+    {
+      "id": "log-1792481610634-nm4u",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:33:30.634Z"
+    },
+    {
+      "id": "log-1792481610591-qh57",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:33:30.591Z"
+    },
+    {
+      "id": "log-1792481605381-assd",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T07:33:25.381Z"
+    },
     {
       "id": "log-1792422229262-pxlh",
       "action": "DELETE",
@@ -727,111 +757,6 @@
       "entity": "Admin",
       "details": "Admin admin@charansai.website signed in",
       "timestamp": "2026-10-19T10:32:33.468Z"
-    },
-    {
-      "id": "log-1792405828393-9ups",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: test_qa_1792405828371.png",
-      "timestamp": "2026-10-19T10:30:28.393Z"
-    },
-    {
-      "id": "log-1792405828328-q43f",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:30:28.328Z"
-    },
-    {
-      "id": "log-1792405221476-uxma",
-      "action": "DELETE",
-      "entity": "Inquiry",
-      "details": "Deleted inquiry from: John Doe",
-      "timestamp": "2026-10-19T10:20:21.476Z"
-    },
-    {
-      "id": "log-1792405202128-pebx",
-      "action": "DELETE",
-      "entity": "Project",
-      "details": "Deleted project: hi",
-      "timestamp": "2026-10-19T10:20:02.129Z"
-    },
-    {
-      "id": "log-1792405150973-ryoh",
-      "action": "CREATE",
-      "entity": "Project",
-      "details": "Added project: hi",
-      "timestamp": "2026-10-19T10:19:10.973Z"
-    },
-    {
-      "id": "log-1792404843672-iiux",
-      "action": "UPDATE",
-      "entity": "Profile",
-      "details": "Updated personal profile details",
-      "timestamp": "2026-10-19T10:14:03.672Z"
-    },
-    {
-      "id": "log-1792404838803-xxtt",
-      "action": "UPDATE",
-      "entity": "Profile",
-      "details": "Updated personal profile details",
-      "timestamp": "2026-10-19T10:13:58.803Z"
-    },
-    {
-      "id": "log-1792404836068-9p71",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
-      "timestamp": "2026-10-19T10:13:56.068Z"
-    },
-    {
-      "id": "log-1792404163477-4od3",
-      "action": "INQUIRY",
-      "entity": "Contact",
-      "details": "New message from Jane Smith (jane@example.com)",
-      "timestamp": "2026-10-19T10:02:43.477Z"
-    },
-    {
-      "id": "log-1792404163403-2gti",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: test_pixel_1792404163381.png",
-      "timestamp": "2026-10-19T10:02:43.403Z"
-    },
-    {
-      "id": "log-1792404163332-gydw",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:02:43.332Z"
-    },
-    {
-      "id": "log-1792403990842-4w1z",
-      "action": "INQUIRY",
-      "entity": "Contact",
-      "details": "New message from Jane Smith (jane@example.com)",
-      "timestamp": "2026-10-19T09:59:50.842Z"
-    },
-    {
-      "id": "log-1792403990728-3w4z",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T09:59:50.728Z"
-    },
-    {
-      "id": "log-1792403929895-pfz4",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T09:58:49.895Z"
-    },
-    {
-      "id": "log-1792403891230-37mp",
-      "action": "INQUIRY",
-      "entity": "Contact",
-      "details": "New message from John Doe (john@example.com)",
-      "timestamp": "2026-10-19T09:58:11.230Z"
     }
   ]
 }

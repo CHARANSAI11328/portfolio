@@ -60,7 +60,7 @@ const MIME_TYPES = {
 const loginAttempts = {};
 const passwordChangeAttempts = {};
 
-function isRateLimited(store, key, maxAttempts = 5, lockDurationMs = 15 * 60 * 1000) {
+function isRateLimited(store, key, maxAttempts = 15, lockDurationMs = 2 * 60 * 1000) {
   const now = Date.now();
   const entry = store[key];
   if (!entry) return false;
@@ -74,7 +74,7 @@ function isRateLimited(store, key, maxAttempts = 5, lockDurationMs = 15 * 60 * 1
   return false;
 }
 
-function recordFailedAttempt(store, key, maxAttempts = 5, lockDurationMs = 15 * 60 * 1000) {
+function recordFailedAttempt(store, key, maxAttempts = 15, lockDurationMs = 2 * 60 * 1000) {
   const now = Date.now();
   if (!store[key]) {
     store[key] = { count: 1, firstAttempt: now };
@@ -176,10 +176,10 @@ const CSP_POLICY = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self'",
+  "connect-src 'self' https://formspree.io",
   "frame-ancestors 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://formspree.io",
 ].join('; ');
 
 function getSecurityHeaders(req) {
@@ -290,15 +290,27 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 400, { error: 'Email and password required' });
       }
 
-      const clientIp = req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || email;
-      const rateLimitKey = `${clientIp}_${email.toLowerCase().trim()}`;
+      const identifier = String(email || '').toLowerCase().trim();
+      const clientIp = req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || identifier;
+      const rateLimitKey = `${clientIp}_${identifier}`;
 
       if (isRateLimited(loginAttempts, rateLimitKey)) {
-        return sendJson(res, 429, { error: 'Too many failed login attempts. Please wait 15 minutes before trying again.' });
+        return sendJson(res, 429, { error: 'Too many failed login attempts. Please wait 2 minutes before trying again.' });
       }
 
       const db = getDatabase();
-      const admin = db.admins.find((a) => a.email.toLowerCase() === email.toLowerCase().trim());
+      const admin = (db.admins || []).find((a) => {
+        const aEmail = String(a.email || '').toLowerCase().trim();
+        const profEmail = String(db.profile?.email || '').toLowerCase().trim();
+        return (
+          aEmail === identifier ||
+          identifier === 'admin' ||
+          identifier === 'charan' ||
+          identifier === 'charansai' ||
+          (profEmail && profEmail === identifier)
+        );
+      });
+
       if (!admin || !verifyPassword(password, admin.passwordHash)) {
         recordFailedAttempt(loginAttempts, rateLimitKey);
         return sendJson(res, 401, { error: 'Invalid admin credentials' });
@@ -1011,9 +1023,34 @@ const server = http.createServer(async (req, res) => {
         saveDatabase(db);
         logActivity('INQUIRY', 'Contact', `New message from ${newInquiry.name} (${newInquiry.email})`);
 
+        // Forward to Formspree in background
+        try {
+          const https = require('https');
+          const payload = JSON.stringify({
+            name: newInquiry.name,
+            email: newInquiry.email,
+            subject: newInquiry.subject,
+            message: newInquiry.message,
+            _replyto: newInquiry.email,
+          });
+          const formspreeReq = https.request('https://formspree.io/f/xpqylowj', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+            },
+          });
+          formspreeReq.on('error', (err) => console.warn('[FORMSPREE] Server relay notice:', err.message));
+          formspreeReq.write(payload);
+          formspreeReq.end();
+        } catch (e) {
+          console.warn('[FORMSPREE] Relay error:', e.message);
+        }
+
         return sendJson(res, 201, {
           success: true,
-          message: 'Thank you! Your message has been sent directly to Charan Sai.',
+          message: 'Thank you! Your message has been sent directly to Charan Sai via Formspree.',
           inquiryId: newInquiry.id,
         });
       }

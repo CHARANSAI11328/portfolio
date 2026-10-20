@@ -306,9 +306,19 @@ export function getDatabase(): PortfolioDatabase {
 
 export function saveDatabase(db: PortfolioDatabase): void {
   ensureDataDir();
+  const json = JSON.stringify(db, null, 2);
   const tempPath = `${DB_FILE}.tmp`;
-  fs.writeFileSync(tempPath, JSON.stringify(db, null, 2), 'utf-8');
-  fs.renameSync(tempPath, DB_FILE);
+  try {
+    fs.writeFileSync(tempPath, json, 'utf-8');
+    try {
+      fs.renameSync(tempPath, DB_FILE);
+    } catch {
+      fs.writeFileSync(DB_FILE, json, 'utf-8');
+      try { if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath); } catch {}
+    }
+  } catch {
+    fs.writeFileSync(DB_FILE, json, 'utf-8');
+  }
 }
 
 export function logActivity(action: string, entity: string, details: string): void {

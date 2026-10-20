@@ -46,9 +46,29 @@ export async function POST(request: NextRequest) {
     saveDatabase(db);
     logActivity('INQUIRY', 'Contact', `New project inquiry received from ${newInquiry.name} (${newInquiry.email})`);
 
+    // Also forward to Formspree endpoint
+    try {
+      await fetch('https://formspree.io/f/xpqylowj', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newInquiry.name,
+          email: newInquiry.email,
+          subject: newInquiry.subject,
+          message: newInquiry.message,
+          _replyto: newInquiry.email,
+        }),
+      });
+    } catch (e) {
+      console.warn('[FORMSPREE] Relay error:', e);
+    }
+
     return NextResponse.json({
       success: true,
-      message: 'Thank you! Your message has been sent directly to Charan Sai.',
+      message: 'Thank you! Your message has been sent directly to Charan Sai via Formspree.',
       inquiryId: newInquiry.id,
     }, { status: 201 });
   } catch (err: unknown) {

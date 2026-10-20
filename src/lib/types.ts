@@ -153,6 +153,28 @@ export interface AdminUser {
   createdAt: string;
 }
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  bio?: string;
+  avatarUrl?: string;
+  skills?: string[];
+  github?: string;
+  linkedin?: string;
+  email?: string;
+  portfolio?: string;
+  socials?: {
+    github?: string;
+    linkedin?: string;
+    email?: string;
+    portfolio?: string;
+  };
+  displayOrder?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface PortfolioDatabase {
   admins: AdminUser[];
   profile: ProfileData;
@@ -162,6 +184,7 @@ export interface PortfolioDatabase {
   experiences: ExperienceItem[];
   events: EventItem[];
   services: ServiceItem[];
+  team?: TeamMember[];
   inquiries: InquiryItem[];
   settings: SiteSettings;
   activityLogs: ActivityLog[];

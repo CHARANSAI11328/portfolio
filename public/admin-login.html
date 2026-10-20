@@ -194,10 +194,10 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label>Admin Email</label>
+          <label>Admin Username or Email</label>
           <div class="input-wrapper">
-            <i data-lucide="mail"></i>
-            <input type="email" id="email" required placeholder="admin@charansai.website" autocomplete="username">
+            <i data-lucide="user"></i>
+            <input type="text" id="email" required placeholder="Enter administrator username or email" autocomplete="username">
           </div>
         </div>
 
@@ -229,6 +229,7 @@
         }
       })
       .catch(() => {});
+
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();

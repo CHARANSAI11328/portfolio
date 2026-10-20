@@ -7,7 +7,7 @@ import { Shield, Lock, Mail, ArrowRight, AlertCircle, ArrowLeft } from 'lucide-r
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@charansai.website');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +27,11 @@ export default function AdminLoginPage() {
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Invalid credentials');
+      }
+
+      if (data.token) {
+        localStorage.setItem('charan_admin_token', data.token);
+        sessionStorage.setItem('charan_admin_token', data.token);
       }
 
       router.push('/admin');
@@ -82,16 +87,16 @@ export default function AdminLoginPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Admin Email
+                Admin Username or Email
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@charansai.website"
+                  placeholder="Enter administrator username or email"
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#090D16] border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
@@ -102,9 +107,6 @@ export default function AdminLoginPage() {
                 <label className="block text-xs font-semibold text-slate-300">
                   Password
                 </label>
-                <span className="text-[10px] text-slate-500">
-                  Initial default in documentation
-                </span>
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
@@ -113,7 +115,7 @@ export default function AdminLoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter administrator password"
+                  placeholder="••••••••••••"
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#090D16] border border-slate-800 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
@@ -136,13 +138,6 @@ export default function AdminLoginPage() {
               </button>
             </div>
           </form>
-
-          {/* Setup Credential Hint */}
-          <div className="mt-6 p-3 rounded-xl bg-indigo-950/30 border border-indigo-900/50 text-[11px] text-indigo-300/80 leading-relaxed text-center">
-            Default credentials for initial setup:<br />
-            <span className="font-mono text-white select-all">admin@charansai.website</span> • <span className="font-mono text-white select-all">Admin@CharanSai2026!</span><br />
-            <span className="text-[10px] text-slate-500">(Can be customized immediately in Account Settings)</span>
-          </div>
         </div>
       </div>
     </div>

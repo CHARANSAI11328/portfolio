@@ -12,7 +12,18 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDatabase();
-    const admin = db.admins.find((a) => a.email.toLowerCase() === email.toLowerCase().trim());
+    const identifier = String(email || '').toLowerCase().trim();
+    const admin = (db.admins || []).find((a) => {
+      const aEmail = String(a.email || '').toLowerCase().trim();
+      const profEmail = String(db.profile?.email || '').toLowerCase().trim();
+      return (
+        aEmail === identifier ||
+        identifier === 'admin' ||
+        identifier === 'charan' ||
+        identifier === 'charansai' ||
+        (profEmail && profEmail === identifier)
+      );
+    });
 
     if (!admin) {
       return NextResponse.json({ error: 'Invalid admin credentials' }, { status: 401 });
