@@ -27,8 +27,8 @@
       "email": "saikamarajugadda21@gmail.com",
       "portfolio": "https://charansai.website",
       "displayOrder": 1,
-      "createdAt": "2026-10-20T10:34:44.327Z",
-      "updatedAt": "2026-10-20T16:31:57.877Z"
+      "createdAt": "2026-10-20T17:56:49.160Z",
+      "updatedAt": "2026-10-20T17:56:49.160Z"
     },
     {
       "id": "team-1792500786845-9opp",
@@ -54,8 +54,8 @@
       "email": "",
       "portfolio": "",
       "displayOrder": 2,
-      "createdAt": "2026-10-20T16:15:32.888Z",
-      "updatedAt": "2026-10-20T16:31:58.684Z"
+      "createdAt": "2026-10-20T17:56:49.421Z",
+      "updatedAt": "2026-10-20T17:56:49.421Z"
     }
   ],
   "admins": [
@@ -261,8 +261,8 @@
       "featured": true,
       "published": true,
       "displayOrder": 1,
-      "createdAt": "2026-10-20T11:01:33.080Z",
-      "updatedAt": "2026-10-20T16:16:41.560Z"
+      "createdAt": "2026-10-20T17:56:44.097Z",
+      "updatedAt": "2026-10-20T17:56:44.097Z"
     },
     {
       "id": "proj-projex",
@@ -284,8 +284,8 @@
       "featured": true,
       "published": true,
       "displayOrder": 2,
-      "createdAt": "2026-10-20T11:01:33.325Z",
-      "updatedAt": "2026-10-20T16:16:41.808Z"
+      "createdAt": "2026-10-20T17:56:44.356Z",
+      "updatedAt": "2026-10-20T17:56:44.356Z"
     },
     {
       "id": "proj-mameka-mahodayam",
@@ -307,8 +307,8 @@
       "featured": true,
       "published": true,
       "displayOrder": 3,
-      "createdAt": "2026-10-20T11:01:33.578Z",
-      "updatedAt": "2026-10-20T16:16:42.063Z"
+      "createdAt": "2026-10-20T17:56:44.602Z",
+      "updatedAt": "2026-10-20T17:56:44.602Z"
     },
     {
       "id": "proj-business-websites",
@@ -330,8 +330,8 @@
       "featured": true,
       "published": true,
       "displayOrder": 4,
-      "createdAt": "2026-10-20T11:01:33.821Z",
-      "updatedAt": "2026-10-20T16:16:42.310Z"
+      "createdAt": "2026-10-20T17:56:44.858Z",
+      "updatedAt": "2026-10-20T17:56:44.858Z"
     }
   ],
   "services": [

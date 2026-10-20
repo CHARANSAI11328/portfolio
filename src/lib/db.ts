@@ -309,25 +309,68 @@ export function getDatabase(): PortfolioDatabase {
 }
 
 export function getNeonClient() {
-  return null;
+  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
+  if (!dbUrl) return null;
+  return neon(dbUrl);
 }
 
 export function getNeon() {
+  try {
+    const neonPath = path.join(process.cwd(), 'server', 'neon.js');
+    if (fs.existsSync(neonPath)) {
+      return require(neonPath);
+    }
+  } catch {}
   return null;
 }
 
 export async function deleteNeonRecord(
-  _entity: string,
-  _id: string
+  entity: 'projects' | 'skills' | 'team' | 'certifications' | 'experiences' | 'services' | 'events' | 'inquiries',
+  id: string
 ): Promise<boolean> {
-  return true;
+  const n = getNeon();
+  if (!n) return false;
+  try {
+    switch (entity) {
+      case 'projects': return await n.deleteProject(id);
+      case 'skills': return await n.deleteSkill(id);
+      case 'team': return await n.deleteTeamMember(id);
+      case 'certifications': return await n.deleteCertification(id);
+      case 'experiences': return await n.deleteExperience(id);
+      case 'services': return await n.deleteService(id);
+      case 'events': return await n.deleteEvent(id);
+      case 'inquiries': return await n.deleteInquiry(id);
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[NEON] deleteNeonRecord error for ${entity}:`, msg);
+  }
+  return false;
 }
 
 export async function upsertNeonRecord(
-  _entity: string,
-  _item: any
+  entity: 'profile' | 'projects' | 'skills' | 'team' | 'certifications' | 'experiences' | 'services' | 'events' | 'inquiries',
+  item: any
 ): Promise<boolean> {
-  return true;
+  const n = getNeon();
+  if (!n) return false;
+  try {
+    switch (entity) {
+      case 'profile': return await n.upsertProfile(item);
+      case 'projects': return await n.upsertProject(item);
+      case 'skills': return await n.upsertSkill(item);
+      case 'team': return await n.upsertTeamMember(item);
+      case 'certifications': return await n.upsertCertification(item);
+      case 'experiences': return await n.upsertExperience(item);
+      case 'services': return await n.upsertService(item);
+      case 'events': return await n.upsertEvent(item);
+      case 'inquiries': return await n.insertInquiry(item);
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[NEON] upsertNeonRecord error for ${entity}:`, msg);
+  }
+  return false;
 }
 
 export function saveDatabase(db: PortfolioDatabase): void {
@@ -345,6 +388,14 @@ export function saveDatabase(db: PortfolioDatabase): void {
   } catch {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
+
+  // Replicate to Neon PostgreSQL asynchronously (atomic state document)
+  try {
+    const neonModule = getNeon();
+    if (neonModule && typeof neonModule.updatePortfolioState === 'function') {
+      neonModule.updatePortfolioState(db).catch(() => {});
+    }
+  } catch {}
 }
 
 export function logActivity(action: string, entity: string, details: string): void {

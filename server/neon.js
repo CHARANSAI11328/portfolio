@@ -1,220 +1,1668 @@
-/**
- * Neon PostgreSQL Module - DISABLED / DISCONNECTED
- * All external cloud database connections have been completely removed as requested.
- */
+const fs = require('fs');
+const path = require('path');
 
-const isConnected = false;
-
-async function initNeon() {
-  console.log('[DATABASE] Database connections are completely removed. Running in standalone static mode.');
-  return false;
+// Automatically load environment variables from .env.local and .env
+function loadEnv() {
+  const root = path.resolve(__dirname, '..');
+  const files = ['.env.local', '.env'];
+  for (const f of files) {
+    const p = path.join(root, f);
+    if (fs.existsSync(p)) {
+      try {
+        const content = fs.readFileSync(p, 'utf8');
+        content.split('\n').forEach((line) => {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith('#')) return;
+          const eq = trimmed.indexOf('=');
+          if (eq > 0) {
+            const key = trimmed.slice(0, eq).trim();
+            let val = trimmed.slice(eq + 1).trim();
+            if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+              val = val.slice(1, -1);
+            }
+            if (!process.env[key]) {
+              process.env[key] = val;
+            }
+          }
+        });
+      } catch (err) {
+        console.warn('[NEON ENV] Could not load', f, err.message);
+      }
+    }
+  }
 }
+loadEnv();
+
+let sqlClient = null;
+let isConnected = false;
 
 function getClient() {
-  return null;
+  if (sqlClient) return sqlClient;
+  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
+  if (!dbUrl) return null;
+
+  try {
+    const { neon } = require('@neondatabase/serverless');
+    sqlClient = neon(dbUrl);
+    return sqlClient;
+  } catch (err) {
+    console.error('[NEON] Error initializing @neondatabase/serverless driver:', err.message);
+    return null;
+  }
 }
 
-async function query() {
-  return [];
+/**
+ * Initialize Neon tables and seed with initial data if empty.
+ */
+async function initNeon(initialData = null) {
+  const sql = getClient();
+  if (!sql) {
+    console.warn('[NEON] DATABASE_URL not set — running with local filesystem persistence.');
+    return false;
+  }
+
+  try {
+    // 1. Core portfolio state table (atomic validated JSONB state document)
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS portfolio_state (
+        id VARCHAR(50) PRIMARY KEY,
+        data JSONB NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 2. Structured profile table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS profile (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        title VARCHAR(255),
+        bio TEXT,
+        hero_heading TEXT,
+        hero_desc TEXT,
+        location VARCHAR(255),
+        email VARCHAR(255),
+        phone VARCHAR(100),
+        avatar_url TEXT,
+        resume_url TEXT,
+        availability_status VARCHAR(100),
+        availability_text TEXT,
+        social_links JSONB,
+        stats JSONB,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 3. Structured projects table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS projects (
+        id VARCHAR(100) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        slug VARCHAR(255),
+        short_desc TEXT,
+        case_study TEXT,
+        category VARCHAR(100),
+        technologies JSONB,
+        status VARCHAR(100),
+        live_url TEXT,
+        repo_url TEXT,
+        featured BOOLEAN DEFAULT true,
+        published BOOLEAN DEFAULT true,
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 4. Structured skills table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS skills (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        category VARCHAR(100),
+        icon VARCHAR(100),
+        featured BOOLEAN DEFAULT true,
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 5. Structured team members table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS team_members (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        role VARCHAR(255),
+        bio TEXT,
+        avatar_url TEXT,
+        skills JSONB,
+        socials JSONB,
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 6. Structured certifications table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS certifications (
+        id VARCHAR(100) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        issuer VARCHAR(255),
+        issue_date VARCHAR(50),
+        credential_id VARCHAR(255),
+        verification_url TEXT,
+        published BOOLEAN DEFAULT true,
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    try {
+      await sql.query(`ALTER TABLE certifications ADD COLUMN IF NOT EXISTS verification_url TEXT;`);
+      await sql.query(`ALTER TABLE certifications ADD COLUMN IF NOT EXISTS published BOOLEAN DEFAULT true;`);
+    } catch {}
+
+    // 7. Structured experiences table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS experiences (
+        id VARCHAR(100) PRIMARY KEY,
+        role VARCHAR(255) NOT NULL,
+        company VARCHAR(255),
+        location VARCHAR(255),
+        period VARCHAR(100),
+        description TEXT,
+        highlights JSONB,
+        type VARCHAR(50),
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 8. Structured services table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id VARCHAR(100) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        icon VARCHAR(100),
+        category VARCHAR(100),
+        features JSONB,
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 9. Structured events table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS events (
+        id VARCHAR(100) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        role VARCHAR(100),
+        date VARCHAR(50),
+        location VARCHAR(255),
+        description TEXT,
+        published BOOLEAN DEFAULT true,
+        display_order INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 10. Structured inquiries table
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS inquiries (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255),
+        email VARCHAR(255),
+        subject VARCHAR(255),
+        message TEXT,
+        status VARCHAR(50) DEFAULT 'unread',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 11. Persistent uploaded assets table (survives container redeployments and cloud ephemeral storage)
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS uploaded_assets (
+        filename VARCHAR(255) PRIMARY KEY,
+        mime_type VARCHAR(100) NOT NULL,
+        data_base64 TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // 12. Persistent admins table (survives container redeployments)
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS admins (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        role VARCHAR(50) DEFAULT 'admin',
+        password_hash TEXT NOT NULL,
+        token_version INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    isConnected = true;
+    console.log('[NEON] Connected successfully to Neon PostgreSQL database.');
+
+    // Seed default admin if table is empty
+    try {
+      const adminCountRows = await sql.query('SELECT COUNT(*) AS c FROM admins;');
+      const adminCount = parseInt(adminCountRows[0]?.c || '0', 10);
+      if (adminCount === 0) {
+        await sql.query(`
+          INSERT INTO admins (id, name, email, role, password_hash, token_version, created_at, updated_at)
+          VALUES (
+            'admin-charan-01',
+            'Charan Sai',
+            'admin@charansai.website',
+            'superadmin',
+            'salt_charan_2026:3b9357518faa4ed0654bc100a46f83e8acbc6bc3d686d94646127928366ab28c83040b1ed9b821991df6c230bcb70478e052dab1b97f0dcb23703c5724c0c450',
+            12,
+            NOW(),
+            NOW()
+          )
+          ON CONFLICT (id) DO NOTHING;
+        `);
+      }
+    } catch (aErr) {
+      console.warn('[NEON] Could not check/seed admins:', aErr.message);
+    }
+
+    // Only seed from initialData if Neon cloud has NO profile at all; NEVER overwrite or delete existing live data!
+    try {
+      const profileCountRows = await sql.query('SELECT COUNT(*) AS c FROM profile;');
+      const isProfileEmpty = !profileCountRows || parseInt(profileCountRows[0]?.c || '0', 10) === 0;
+      if (isProfileEmpty && initialData) {
+        console.log('[NEON] Database is freshly initialized. Seeding initial profile records...');
+        await saveNeonState(initialData);
+      } else {
+        console.log('[NEON] Existing authoritative live records active in Neon cloud. Preserving all records untouched.');
+      }
+    } catch (sErr) {
+      console.warn('[NEON] Seed check warning:', sErr.message);
+    }
+
+    return true;
+  } catch (err) {
+    console.error('[NEON] Connection or initialization error:', err.message);
+    isConnected = false;
+    return false;
+  }
 }
 
+/**
+ * Fetch the current state from Neon PostgreSQL
+ */
 async function fetchNeonState() {
+  const sql = getClient();
+  if (!sql) return null;
+  try {
+    const rows = await sql.query("SELECT data FROM portfolio_state WHERE id = 'current' LIMIT 1;");
+    let state = (rows && rows.length > 0 && rows[0].data) ? rows[0].data : {};
+
+    // Also populate relational tables so that any direct SQL changes in Neon are reflected
+    try {
+      const [certs, team, projs, skills, exps, servs, events, inqs] = await Promise.all([
+        sql.query("SELECT * FROM certifications ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM team_members ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM projects ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM skills ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM experiences ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM services ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM events ORDER BY display_order ASC, id ASC;"),
+        sql.query("SELECT * FROM inquiries ORDER BY created_at DESC;"),
+      ]);
+
+      if (certs) state.certifications = certs.map(formatCertification);
+      if (team) state.team = team.map(formatTeamMember);
+      if (projs) state.projects = projs.map(formatProject);
+      if (skills) state.skills = skills.map(formatSkill);
+      if (exps) state.experiences = exps.map(formatExperience);
+      if (servs) state.services = servs.map(formatService);
+      if (events) state.events = events.map(formatEvent);
+      if (inqs) state.inquiries = inqs.map(formatInquiry);
+    } catch (tblErr) {
+      console.warn('[NEON] Could not hydrate from relational tables directly:', tblErr.message);
+    }
+
+    return state;
+  } catch (err) {
+    console.error('[NEON] Error fetching state from Neon:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Persist the current state to Neon PostgreSQL (both document JSONB and all individual relational tables)
+ */
+async function saveNeonState(data) {
+  const sql = getClient();
+  if (!sql || !data) return false;
+
+  try {
+    const jsonStr = JSON.stringify(data);
+
+    // 1. Core portfolio_state JSONB document
+    await sql.query(
+      `
+      INSERT INTO portfolio_state (id, data, updated_at)
+      VALUES ('current', $1::jsonb, NOW())
+      ON CONFLICT (id) DO UPDATE
+      SET data = EXCLUDED.data, updated_at = NOW();
+      `,
+      [jsonStr]
+    );
+
+    // 2. Sync Profile Table
+    if (data.profile && typeof data.profile === 'object') {
+      const p = data.profile;
+      await sql.query(
+        `
+        INSERT INTO profile (
+          id, name, title, bio, hero_heading, hero_desc, location, email, phone, avatar_url, resume_url, availability_status, availability_text, social_links, stats, updated_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15::jsonb, NOW())
+        ON CONFLICT (id) DO UPDATE SET
+          name = EXCLUDED.name,
+          title = EXCLUDED.title,
+          bio = EXCLUDED.bio,
+          hero_heading = EXCLUDED.hero_heading,
+          hero_desc = EXCLUDED.hero_desc,
+          location = EXCLUDED.location,
+          email = EXCLUDED.email,
+          phone = EXCLUDED.phone,
+          avatar_url = EXCLUDED.avatar_url,
+          resume_url = EXCLUDED.resume_url,
+          availability_status = EXCLUDED.availability_status,
+          availability_text = EXCLUDED.availability_text,
+          social_links = EXCLUDED.social_links,
+          stats = EXCLUDED.stats,
+          updated_at = NOW();
+        `,
+        [
+          p.id || 'profile-charan-sai',
+          p.name || 'Charan Sai',
+          p.title || '',
+          p.bio || '',
+          p.heroHeading || '',
+          p.heroDesc || '',
+          p.location || '',
+          p.email || '',
+          p.phone || '',
+          p.avatarUrl || '',
+          p.resumeUrl || '',
+          p.availabilityStatus || 'available',
+          p.availabilityText || '',
+          JSON.stringify(p.socialLinks || {}),
+          JSON.stringify(p.stats || []),
+        ]
+      );
+    }
+
+    // 3. Sync Projects Table
+    if (Array.isArray(data.projects)) {
+      const projectIds = [];
+      for (const pr of data.projects) {
+        if (!pr.id || !pr.title) continue;
+        projectIds.push(pr.id);
+        await sql.query(
+          `
+          INSERT INTO projects (
+            id, title, slug, short_desc, case_study, category, technologies, status, live_url, repo_url, featured, published, display_order, updated_at
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, NOW())
+          ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            slug = EXCLUDED.slug,
+            short_desc = EXCLUDED.short_desc,
+            case_study = EXCLUDED.case_study,
+            category = EXCLUDED.category,
+            technologies = EXCLUDED.technologies,
+            status = EXCLUDED.status,
+            live_url = EXCLUDED.live_url,
+            repo_url = EXCLUDED.repo_url,
+            featured = EXCLUDED.featured,
+            published = EXCLUDED.published,
+            display_order = EXCLUDED.display_order,
+            updated_at = NOW();
+          `,
+          [
+            pr.id,
+            pr.title,
+            pr.slug || '',
+            pr.shortDesc || '',
+            pr.caseStudy || '',
+            pr.category || 'Web Applications',
+            JSON.stringify(pr.technologies || []),
+            pr.status || 'Active',
+            pr.liveUrl || '',
+            pr.repoUrl || '',
+            pr.featured !== false,
+            pr.published !== false,
+            pr.displayOrder || 1,
+          ]
+        );
+      }
+    }
+
+    // 4. Sync Skills Table
+    if (Array.isArray(data.skills)) {
+      const skillIds = [];
+      for (const sk of data.skills) {
+        if (!sk.id || !sk.name) continue;
+        skillIds.push(sk.id);
+        await sql.query(
+          `
+          INSERT INTO skills (id, name, category, icon, featured, display_order)
+          VALUES ($1, $2, $3, $4, $5, $6)
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            category = EXCLUDED.category,
+            icon = EXCLUDED.icon,
+            featured = EXCLUDED.featured,
+            display_order = EXCLUDED.display_order;
+          `,
+          [sk.id, sk.name, sk.category || 'General', sk.icon || 'Code', sk.featured !== false, sk.displayOrder || 1]
+        );
+      }
+    }
+
+    // 5. Sync Team Members Table
+    if (Array.isArray(data.team)) {
+      const teamIds = [];
+      for (const m of data.team) {
+        if (!m.id || !m.name) continue;
+        teamIds.push(m.id);
+        await sql.query(
+          `
+          INSERT INTO team_members (id, name, role, bio, avatar_url, skills, socials, display_order, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, NOW())
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            role = EXCLUDED.role,
+            bio = EXCLUDED.bio,
+            avatar_url = EXCLUDED.avatar_url,
+            skills = EXCLUDED.skills,
+            socials = EXCLUDED.socials,
+            display_order = EXCLUDED.display_order,
+            updated_at = NOW();
+          `,
+          [
+            m.id,
+            m.name,
+            m.role || '',
+            m.bio || '',
+            m.avatarUrl || '',
+            JSON.stringify(m.skills || []),
+            JSON.stringify(m.socials || {}),
+            m.displayOrder || 1,
+          ]
+        );
+      }
+    }
+
+    // 6. Sync Certifications Table
+    if (Array.isArray(data.certifications)) {
+      const certIds = [];
+      for (const c of data.certifications) {
+        if (!c.id || !c.title) continue;
+        certIds.push(c.id);
+        await sql.query(
+          `
+          INSERT INTO certifications (id, title, issuer, issue_date, credential_id, verification_url, published, display_order)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            issuer = EXCLUDED.issuer,
+            issue_date = EXCLUDED.issue_date,
+            credential_id = EXCLUDED.credential_id,
+            verification_url = EXCLUDED.verification_url,
+            published = EXCLUDED.published,
+            display_order = EXCLUDED.display_order;
+          `,
+          [
+            c.id,
+            c.title,
+            c.issuer || '',
+            c.issueDate || '',
+            c.credentialId || '',
+            c.verificationUrl || '',
+            c.published !== false,
+            c.displayOrder || 1,
+          ]
+        );
+      }
+    }
+
+    // 7. Sync Experiences Table
+    if (Array.isArray(data.experiences)) {
+      const expIds = [];
+      for (const e of data.experiences) {
+        if (!e.id || !e.role) continue;
+        expIds.push(e.id);
+        await sql.query(
+          `
+          INSERT INTO experiences (id, role, company, location, period, description, highlights, type, display_order)
+          VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+          ON CONFLICT (id) DO UPDATE SET
+            role = EXCLUDED.role,
+            company = EXCLUDED.company,
+            location = EXCLUDED.location,
+            period = EXCLUDED.period,
+            description = EXCLUDED.description,
+            highlights = EXCLUDED.highlights,
+            type = EXCLUDED.type,
+            display_order = EXCLUDED.display_order;
+          `,
+          [
+            e.id,
+            e.role,
+            e.company || '',
+            e.location || '',
+            e.period || '',
+            e.description || '',
+            JSON.stringify(e.highlights || []),
+            e.type || 'work',
+            e.displayOrder || 1,
+          ]
+        );
+      }
+    }
+
+    // 8. Sync Services Table
+    if (Array.isArray(data.services)) {
+      const servIds = [];
+      for (const s of data.services) {
+        if (!s.id || !s.title) continue;
+        servIds.push(s.id);
+        await sql.query(
+          `
+          INSERT INTO services (id, title, description, icon, category, features, display_order)
+          VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
+          ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            description = EXCLUDED.description,
+            icon = EXCLUDED.icon,
+            category = EXCLUDED.category,
+            features = EXCLUDED.features,
+            display_order = EXCLUDED.display_order;
+          `,
+          [
+            s.id,
+            s.title,
+            s.description || '',
+            s.icon || 'Layout',
+            s.category || 'Development',
+            JSON.stringify(s.features || []),
+            s.displayOrder || 1,
+          ]
+        );
+      }
+    }
+
+    // 9. Sync Events Table
+    if (Array.isArray(data.events)) {
+      const eventIds = [];
+      for (const ev of data.events) {
+        if (!ev.id || !ev.title) continue;
+        eventIds.push(ev.id);
+        await sql.query(
+          `
+          INSERT INTO events (id, title, role, date, location, description, published, display_order)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ON CONFLICT (id) DO UPDATE SET
+            title = EXCLUDED.title,
+            role = EXCLUDED.role,
+            date = EXCLUDED.date,
+            location = EXCLUDED.location,
+            description = EXCLUDED.description,
+            published = EXCLUDED.published,
+            display_order = EXCLUDED.display_order;
+          `,
+          [
+            ev.id,
+            ev.title,
+            ev.role || 'Participant',
+            ev.date || '',
+            ev.location || '',
+            ev.description || '',
+            ev.published !== false,
+            ev.displayOrder || 1,
+          ]
+        );
+      }
+    }
+
+    // 10. Sync Inquiries Table
+    if (Array.isArray(data.inquiries)) {
+      const inqIds = [];
+      for (const inq of data.inquiries) {
+        if (!inq.id) continue;
+        inqIds.push(inq.id);
+        await sql.query(
+          `
+          INSERT INTO inquiries (id, name, email, subject, message, status, created_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7::timestamptz)
+          ON CONFLICT (id) DO UPDATE SET
+            status = EXCLUDED.status;
+          `,
+          [
+            inq.id,
+            inq.name || '',
+            inq.email || '',
+            inq.subject || '',
+            inq.message || '',
+            inq.status || 'unread',
+            inq.createdAt || new Date().toISOString(),
+          ]
+        );
+      }
+    }
+
+    return true;
+  } catch (err) {
+    console.error('[NEON] Error saving state to Neon:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Update the atomic portfolio_state JSONB document in Neon
+ */
+async function updatePortfolioState(data) {
+  const sql = getClient();
+  if (!sql || !data) return false;
+  try {
+    const jsonStr = JSON.stringify(data);
+    await sql.query(
+      `INSERT INTO portfolio_state (id, data, updated_at)
+       VALUES ('current', $1::jsonb, NOW())
+       ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();`,
+      [jsonStr]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] Error updating portfolio_state:', err.message);
+    return false;
+  }
+}
+
+// --- TARGETED ATOMIC SQL OPERATIONS (< 300ms latency) ---
+
+async function upsertProfile(p) {
+  const sql = getClient();
+  if (!sql || !p) return false;
+  await sql.query(
+    `INSERT INTO profile (id, name, title, bio, hero_heading, hero_desc, location, email, phone, avatar_url, resume_url, availability_status, availability_text, social_links, stats, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::jsonb, $15::jsonb, NOW())
+     ON CONFLICT (id) DO UPDATE SET
+       name = EXCLUDED.name,
+       title = EXCLUDED.title,
+       bio = EXCLUDED.bio,
+       hero_heading = EXCLUDED.hero_heading,
+       hero_desc = EXCLUDED.hero_desc,
+       location = EXCLUDED.location,
+       email = EXCLUDED.email,
+       phone = EXCLUDED.phone,
+       avatar_url = EXCLUDED.avatar_url,
+       resume_url = EXCLUDED.resume_url,
+       availability_status = EXCLUDED.availability_status,
+       availability_text = EXCLUDED.availability_text,
+       social_links = EXCLUDED.social_links,
+       stats = EXCLUDED.stats,
+       updated_at = NOW();`,
+    [
+      p.id || 'profile-charan-sai',
+      p.name || 'Charan Sai',
+      p.title || '',
+      p.bio || '',
+      p.heroHeading || '',
+      p.heroDesc || '',
+      p.location || '',
+      p.email || '',
+      p.phone || '',
+      p.avatarUrl || '',
+      p.resumeUrl || '',
+      p.availabilityStatus || 'available',
+      p.availabilityText || '',
+      JSON.stringify(p.socialLinks || {}),
+      JSON.stringify(p.stats || []),
+    ]
+  );
+  return true;
+}
+
+async function upsertProject(pr) {
+  const sql = getClient();
+  if (!sql || !pr) return false;
+  await sql.query(
+    `INSERT INTO projects (id, title, slug, short_desc, case_study, category, technologies, status, live_url, repo_url, featured, published, display_order, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13, NOW())
+     ON CONFLICT (id) DO UPDATE SET
+       title = EXCLUDED.title,
+       slug = EXCLUDED.slug,
+       short_desc = EXCLUDED.short_desc,
+       case_study = EXCLUDED.case_study,
+       category = EXCLUDED.category,
+       technologies = EXCLUDED.technologies,
+       status = EXCLUDED.status,
+       live_url = EXCLUDED.live_url,
+       repo_url = EXCLUDED.repo_url,
+       featured = EXCLUDED.featured,
+       published = EXCLUDED.published,
+       display_order = EXCLUDED.display_order,
+       updated_at = NOW();`,
+    [
+      pr.id,
+      pr.title,
+      pr.slug || '',
+      pr.shortDesc || '',
+      pr.caseStudy || '',
+      pr.category || 'Web Applications',
+      JSON.stringify(pr.technologies || []),
+      pr.status || 'Active',
+      pr.liveUrl || '',
+      pr.repoUrl || '',
+      pr.featured !== false,
+      pr.published !== false,
+      pr.displayOrder || 1,
+    ]
+  );
+  return true;
+}
+
+async function deleteProject(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM projects WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{projects}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'projects', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function upsertSkill(sk) {
+  const sql = getClient();
+  if (!sql || !sk) return false;
+  await sql.query(
+    `INSERT INTO skills (id, name, category, icon, featured, display_order)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (id) DO UPDATE SET
+       name = EXCLUDED.name,
+       category = EXCLUDED.category,
+       icon = EXCLUDED.icon,
+       featured = EXCLUDED.featured,
+       display_order = EXCLUDED.display_order;`,
+    [sk.id, sk.name, sk.category || 'General', sk.icon || 'Code', sk.featured !== false, sk.displayOrder || 1]
+  );
+  return true;
+}
+
+async function deleteSkill(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM skills WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{skills}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'skills', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function upsertTeamMember(m) {
+  const sql = getClient();
+  if (!sql || !m) return false;
+  await sql.query(
+    `INSERT INTO team_members (id, name, role, bio, avatar_url, skills, socials, display_order, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8, NOW())
+     ON CONFLICT (id) DO UPDATE SET
+       name = EXCLUDED.name,
+       role = EXCLUDED.role,
+       bio = EXCLUDED.bio,
+       avatar_url = EXCLUDED.avatar_url,
+       skills = EXCLUDED.skills,
+       socials = EXCLUDED.socials,
+       display_order = EXCLUDED.display_order,
+       updated_at = NOW();`,
+    [
+      m.id,
+      m.name,
+      m.role || '',
+      m.bio || '',
+      m.avatarUrl || '',
+      JSON.stringify(m.skills || []),
+      JSON.stringify(m.socials || {}),
+      m.displayOrder || 1,
+    ]
+  );
+  return true;
+}
+
+async function deleteTeamMember(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM team_members WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{team}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'team', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function upsertCertification(c) {
+  const sql = getClient();
+  if (!sql || !c) return false;
+  await sql.query(
+    `INSERT INTO certifications (id, title, issuer, issue_date, credential_id, verification_url, published, display_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     ON CONFLICT (id) DO UPDATE SET
+       title = EXCLUDED.title,
+       issuer = EXCLUDED.issuer,
+       issue_date = EXCLUDED.issue_date,
+       credential_id = EXCLUDED.credential_id,
+       verification_url = EXCLUDED.verification_url,
+       published = EXCLUDED.published,
+       display_order = EXCLUDED.display_order;`,
+    [
+      c.id,
+      c.title,
+      c.issuer || '',
+      c.issueDate || '',
+      c.credentialId || '',
+      c.verificationUrl || '',
+      c.published !== false,
+      c.displayOrder || 1,
+    ]
+  );
+  return true;
+}
+
+async function deleteCertification(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM certifications WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{certifications}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'certifications', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function upsertExperience(e) {
+  const sql = getClient();
+  if (!sql || !e) return false;
+  await sql.query(
+    `INSERT INTO experiences (id, role, company, location, period, description, highlights, type, display_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+     ON CONFLICT (id) DO UPDATE SET
+       role = EXCLUDED.role,
+       company = EXCLUDED.company,
+       location = EXCLUDED.location,
+       period = EXCLUDED.period,
+       description = EXCLUDED.description,
+       highlights = EXCLUDED.highlights,
+       type = EXCLUDED.type,
+       display_order = EXCLUDED.display_order;`,
+    [
+      e.id,
+      e.role,
+      e.company || '',
+      e.location || '',
+      e.period || '',
+      e.description || '',
+      JSON.stringify(e.highlights || []),
+      e.type || 'work',
+      e.displayOrder || 1,
+    ]
+  );
+  return true;
+}
+
+async function deleteExperience(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM experiences WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{experiences}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'experiences', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function upsertService(s) {
+  const sql = getClient();
+  if (!sql || !s) return false;
+  await sql.query(
+    `INSERT INTO services (id, title, description, icon, category, features, display_order)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
+     ON CONFLICT (id) DO UPDATE SET
+       title = EXCLUDED.title,
+       description = EXCLUDED.description,
+       icon = EXCLUDED.icon,
+       category = EXCLUDED.category,
+       features = EXCLUDED.features,
+       display_order = EXCLUDED.display_order;`,
+    [
+      s.id,
+      s.title,
+      s.description || '',
+      s.icon || 'Layout',
+      s.category || 'Development',
+      JSON.stringify(s.features || []),
+      s.displayOrder || 1,
+    ]
+  );
+  return true;
+}
+
+async function deleteService(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM services WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{services}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'services', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function upsertEvent(ev) {
+  const sql = getClient();
+  if (!sql || !ev) return false;
+  await sql.query(
+    `INSERT INTO events (id, title, role, date, location, description, published, display_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     ON CONFLICT (id) DO UPDATE SET
+       title = EXCLUDED.title,
+       role = EXCLUDED.role,
+       date = EXCLUDED.date,
+       location = EXCLUDED.location,
+       description = EXCLUDED.description,
+       published = EXCLUDED.published,
+       display_order = EXCLUDED.display_order;`,
+    [
+      ev.id,
+      ev.title,
+      ev.role || 'Participant',
+      ev.date || '',
+      ev.location || '',
+      ev.description || '',
+      ev.published !== false,
+      ev.displayOrder || 1,
+    ]
+  );
+  return true;
+}
+
+async function deleteEvent(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM events WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{events}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'events', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+async function insertInquiry(inq) {
+  const sql = getClient();
+  if (!sql || !inq) return false;
+  await sql.query(
+    `INSERT INTO inquiries (id, name, email, subject, message, status, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7::timestamptz)
+     ON CONFLICT (id) DO UPDATE SET status = EXCLUDED.status;`,
+    [
+      inq.id,
+      inq.name || '',
+      inq.email || '',
+      inq.subject || '',
+      inq.message || '',
+      inq.status || 'unread',
+      inq.createdAt || new Date().toISOString(),
+    ]
+  );
+  return true;
+}
+
+async function updateInquiry(id, updates) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  if (updates.status) {
+    await sql.query(`UPDATE inquiries SET status = $1 WHERE id = $2;`, [updates.status, id]);
+  }
+  return true;
+}
+
+async function deleteInquiry(id) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  await Promise.all([
+    sql.query(`DELETE FROM inquiries WHERE id = $1;`, [id]),
+    sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(
+         data,
+         '{inquiries}',
+         (SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+          FROM jsonb_array_elements(COALESCE(data->'inquiries', '[]'::jsonb)) elem
+          WHERE elem->>'id' != $1)
+       ),
+       updated_at = NOW()
+       WHERE id = 'current';`,
+      [id]
+    ),
+  ]);
+  return true;
+}
+
+// Helpers to format rows from Neon into camelCase models
+function formatCertification(r) {
+  return {
+    id: r.id,
+    title: r.title,
+    issuer: r.issuer || '',
+    issueDate: r.issue_date || '',
+    credentialId: r.credential_id || '',
+    verificationUrl: r.verification_url || '',
+    published: r.published !== false,
+    displayOrder: r.display_order || 1,
+  };
+}
+
+function formatTeamMember(r) {
+  return {
+    id: r.id,
+    name: r.name,
+    role: r.role || '',
+    bio: r.bio || '',
+    avatarUrl: r.avatar_url || '',
+    skills: Array.isArray(r.skills) ? r.skills : [],
+    socials: (r.socials && typeof r.socials === 'object') ? r.socials : {},
+    github: r.socials?.github || '',
+    linkedin: r.socials?.linkedin || '',
+    email: r.socials?.email || '',
+    portfolio: r.socials?.portfolio || '',
+    displayOrder: r.display_order || 1,
+    createdAt: r.created_at || new Date().toISOString(),
+    updatedAt: r.updated_at || new Date().toISOString(),
+  };
+}
+
+function formatProject(r) {
+  return {
+    id: r.id,
+    title: r.title,
+    slug: r.slug || '',
+    shortDesc: r.short_desc || '',
+    caseStudy: r.case_study || '',
+    category: r.category || 'Web Applications',
+    technologies: Array.isArray(r.technologies) ? r.technologies : [],
+    status: r.status || 'Active',
+    liveUrl: r.live_url || '',
+    repoUrl: r.repo_url || '',
+    featured: r.featured !== false,
+    published: r.published !== false,
+    displayOrder: r.display_order || 1,
+    createdAt: r.created_at || new Date().toISOString(),
+    updatedAt: r.updated_at || new Date().toISOString(),
+  };
+}
+
+function formatSkill(r) {
+  return {
+    id: r.id,
+    name: r.name,
+    category: r.category || 'General',
+    icon: r.icon || 'Code',
+    featured: r.featured !== false,
+    displayOrder: r.display_order || 1,
+  };
+}
+
+function formatProfile(r) {
+  return {
+    id: r.id || 'profile-charan-sai',
+    name: r.name || 'Charan Sai',
+    title: r.title || '',
+    bio: r.bio || '',
+    heroHeading: r.hero_heading || '',
+    heroDesc: r.hero_desc || '',
+    location: r.location || '',
+    email: r.email || '',
+    phone: r.phone || '',
+    avatarUrl: r.avatar_url || '',
+    resumeUrl: r.resume_url || '',
+    availabilityStatus: r.availability_status || 'available',
+    availabilityText: r.availability_text || '',
+    socialLinks: (r.social_links && typeof r.social_links === 'object') ? r.social_links : {},
+    stats: Array.isArray(r.stats) ? r.stats : [],
+    updatedAt: r.updated_at || new Date().toISOString(),
+  };
+}
+
+function formatExperience(r) {
+  return {
+    id: r.id,
+    role: r.role,
+    company: r.company || '',
+    location: r.location || '',
+    period: r.period || '',
+    description: r.description || '',
+    highlights: Array.isArray(r.highlights) ? r.highlights : [],
+    type: r.type || 'work',
+    displayOrder: r.display_order || 1,
+  };
+}
+
+function formatService(r) {
+  return {
+    id: r.id,
+    title: r.title,
+    description: r.description || '',
+    icon: r.icon || 'Layout',
+    category: r.category || 'Development',
+    features: Array.isArray(r.features) ? r.features : [],
+    displayOrder: r.display_order || 1,
+  };
+}
+
+function formatEvent(r) {
+  return {
+    id: r.id,
+    title: r.title,
+    role: r.role || 'Participant',
+    date: r.date || '',
+    location: r.location || '',
+    description: r.description || '',
+    published: r.published !== false,
+    displayOrder: r.display_order || 1,
+  };
+}
+
+function formatInquiry(r) {
+  return {
+    id: r.id,
+    name: r.name || '',
+    email: r.email || '',
+    subject: r.subject || '',
+    message: r.message || '',
+    status: r.status || 'unread',
+    createdAt: r.created_at || new Date().toISOString(),
+  };
+}
+
+/**
+ * Execute raw SQL query against Neon
+ */
+async function query(sqlText, params = []) {
+  const sql = getClient();
+  if (!sql) throw new Error('Neon database client not initialized');
+  return await sql.query(sqlText, params);
+}
+
+/**
+ * Persist uploaded asset base64 data to Neon PostgreSQL
+ */
+async function saveUploadedAsset(filename, mimeType, dataBase64) {
+  const sql = getClient();
+  if (!sql || !filename || !dataBase64) return false;
+  try {
+    await sql.query(
+      `INSERT INTO uploaded_assets (filename, mime_type, data_base64, created_at)
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (filename) DO UPDATE SET
+         mime_type = EXCLUDED.mime_type,
+         data_base64 = EXCLUDED.data_base64,
+         created_at = NOW();`,
+      [filename, mimeType || 'image/jpeg', dataBase64]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] Failed to save uploaded asset:', err.message);
+    return false;
+  }
+}
+
+/**
+ * Retrieve uploaded asset by filename from Neon PostgreSQL
+ */
+async function getUploadedAsset(filename) {
+  const sql = getClient();
+  if (!sql || !filename) return null;
+  try {
+    const rows = await sql.query('SELECT filename, mime_type, data_base64 FROM uploaded_assets WHERE filename = $1 LIMIT 1;', [filename]);
+    if (rows && rows.length > 0) {
+      return rows[0];
+    }
+  } catch (err) {
+    console.warn('[NEON] Failed to fetch uploaded asset from cloud:', err.message);
+  }
   return null;
 }
 
-async function saveNeonState() {
-  return false;
-}
-
-async function updatePortfolioState() {
-  return false;
-}
+/**
+ * Direct Live Neon Query Helpers (Sole Source of Truth)
+ */
 
 async function getTeamMembers() {
-  return [];
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM team_members ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatTeamMember);
+  } catch (err) {
+    console.error('[NEON] getTeamMembers error:', err.message);
+    return [];
+  }
 }
 
-async function getTeamMemberById() {
-  return null;
+async function getTeamMemberById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM team_members WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatTeamMember(rows[0]) : null;
+  } catch (err) {
+    console.error('[NEON] getTeamMemberById error:', err.message);
+    return null;
+  }
 }
 
-async function upsertTeamMember() {
-  return true;
+async function getProjects(onlyPublished = false) {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const where = onlyPublished ? 'WHERE published = true' : '';
+    const rows = await sql.query(`SELECT * FROM projects ${where} ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatProject);
+  } catch (err) {
+    console.error('[NEON] getProjects error:', err.message);
+    return [];
+  }
 }
 
-async function deleteTeamMember() {
-  return true;
-}
-
-async function getProjects() {
-  return [];
-}
-
-async function getProjectById() {
-  return null;
-}
-
-async function upsertProject() {
-  return true;
-}
-
-async function deleteProject() {
-  return true;
+async function getProjectById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM projects WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatProject(rows[0]) : null;
+  } catch (err) {
+    console.error('[NEON] getProjectById error:', err.message);
+    return null;
+  }
 }
 
 async function getSkills() {
-  return [];
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM skills ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatSkill);
+  } catch (err) {
+    console.error('[NEON] getSkills error:', err.message);
+    return [];
+  }
 }
 
-async function getSkillById() {
-  return null;
+async function getSkillById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM skills WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatSkill(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
 }
 
-async function upsertSkill() {
-  return true;
+async function getCertifications(onlyPublished = false) {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const where = onlyPublished ? 'WHERE published = true' : '';
+    const rows = await sql.query(`SELECT * FROM certifications ${where} ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatCertification);
+  } catch (err) {
+    console.error('[NEON] getCertifications error:', err.message);
+    return [];
+  }
 }
 
-async function deleteSkill() {
-  return true;
-}
-
-async function getCertifications() {
-  return [];
-}
-
-async function getCertificationById() {
-  return null;
-}
-
-async function upsertCertification() {
-  return true;
-}
-
-async function deleteCertification() {
-  return true;
+async function getCertificationById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM certifications WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatCertification(rows[0]) : null;
+  } catch (err) {
+    console.error('[NEON] getCertificationById error:', err.message);
+    return null;
+  }
 }
 
 async function getExperiences() {
-  return [];
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM experiences ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatExperience);
+  } catch (err) {
+    console.error('[NEON] getExperiences error:', err.message);
+    return [];
+  }
 }
 
-async function getExperienceById() {
-  return null;
-}
-
-async function upsertExperience() {
-  return true;
-}
-
-async function deleteExperience() {
-  return true;
+async function getExperienceById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM experiences WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatExperience(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
 }
 
 async function getServices() {
-  return [];
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM services ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatService);
+  } catch (err) {
+    console.error('[NEON] getServices error:', err.message);
+    return [];
+  }
 }
 
-async function getServiceById() {
-  return null;
+async function getServiceById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM services WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatService(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
 }
 
-async function upsertService() {
-  return true;
+async function getEvents(onlyPublished = false) {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const where = onlyPublished ? 'WHERE published = true' : '';
+    const rows = await sql.query(`SELECT * FROM events ${where} ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatEvent);
+  } catch (err) {
+    console.error('[NEON] getEvents error:', err.message);
+    return [];
+  }
 }
 
-async function deleteService() {
-  return true;
-}
-
-async function getEvents() {
-  return [];
-}
-
-async function getEventById() {
-  return null;
-}
-
-async function upsertEvent() {
-  return true;
-}
-
-async function deleteEvent() {
-  return true;
+async function getEventById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM events WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatEvent(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
 }
 
 async function getProfile() {
+  const sql = getClient();
+  if (!sql) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM profile WHERE id = 'profile-charan-sai' LIMIT 1;`);
+    if (rows && rows.length > 0) return formatProfile(rows[0]);
+  } catch (err) {
+    console.error('[NEON] getProfile error:', err.message);
+  }
   return null;
-}
-
-async function upsertProfile() {
-  return true;
 }
 
 async function getSettings() {
+  const sql = getClient();
+  if (!sql) return null;
+  try {
+    const rows = await sql.query(`SELECT data FROM portfolio_state WHERE id = 'settings' LIMIT 1;`);
+    if (rows && rows.length > 0 && rows[0].data) return rows[0].data;
+    const curRows = await sql.query(`SELECT data->'settings' as settings FROM portfolio_state WHERE id = 'current' LIMIT 1;`);
+    if (curRows && curRows.length > 0 && curRows[0].settings) return curRows[0].settings;
+  } catch (err) {
+    console.error('[NEON] getSettings error:', err.message);
+  }
   return null;
 }
 
-async function updateSettings() {
-  return true;
+async function updateSettings(settings) {
+  const sql = getClient();
+  if (!sql || !settings) return false;
+  try {
+    await sql.query(
+      `INSERT INTO portfolio_state (id, data, updated_at)
+       VALUES ('settings', $1::jsonb, NOW())
+       ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();`,
+      [JSON.stringify(settings)]
+    );
+    await sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(COALESCE(data, '{}'::jsonb), '{settings}', $1::jsonb), updated_at = NOW()
+       WHERE id = 'current';`,
+      [JSON.stringify(settings)]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateSettings error:', err.message);
+    return false;
+  }
 }
 
 async function getInquiries() {
-  return [];
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM inquiries ORDER BY created_at DESC;`);
+    return (rows || []).map(formatInquiry);
+  } catch (err) {
+    console.error('[NEON] getInquiries error:', err.message);
+    return [];
+  }
 }
 
-async function insertInquiry() {
-  return true;
+async function updateInquiryStatus(id, status) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  try {
+    await sql.query(`UPDATE inquiries SET status = $1 WHERE id = $2;`, [status, id]);
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateInquiryStatus error:', err.message);
+    return false;
+  }
 }
 
-async function updateInquiry() {
-  return true;
-}
-
-async function updateInquiryStatus() {
-  return true;
-}
-
-async function deleteInquiry() {
-  return true;
-}
-
-async function getAdminByEmail() {
+async function getAdminByEmail(email) {
+  const sql = getClient();
+  if (!sql || !email) return null;
+  try {
+    const identifier = String(email).trim().toLowerCase();
+    const rows = await sql.query(
+      `SELECT * FROM admins 
+       WHERE LOWER(email) = $1 
+          OR ($1 IN ('admin', 'charan', 'charansai') AND role = 'superadmin')
+       LIMIT 1;`,
+      [identifier]
+    );
+    if (rows && rows.length > 0) {
+      const a = rows[0];
+      return {
+        id: a.id,
+        name: a.name,
+        email: a.email,
+        role: a.role,
+        passwordHash: a.password_hash,
+        tokenVersion: parseInt(a.token_version, 10) || 1,
+      };
+    }
+  } catch (err) {
+    console.error('[NEON] getAdminByEmail error:', err.message);
+  }
   return null;
 }
 
-async function getAdminById() {
+async function getAdminById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM admins WHERE id = $1 LIMIT 1;`, [id]);
+    if (rows && rows.length > 0) {
+      const a = rows[0];
+      return {
+        id: a.id,
+        name: a.name,
+        email: a.email,
+        role: a.role,
+        passwordHash: a.password_hash,
+        tokenVersion: parseInt(a.token_version, 10) || 1,
+      };
+    }
+  } catch (err) {
+    console.error('[NEON] getAdminById error:', err.message);
+  }
   return null;
 }
 
 async function getAllAdmins() {
-  return [];
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT id, name, email, role, token_version FROM admins;`);
+    return (rows || []).map(a => ({
+      id: a.id,
+      name: a.name,
+      email: a.email,
+      role: a.role,
+      tokenVersion: parseInt(a.token_version, 10) || 1,
+    }));
+  } catch (err) {
+    return [];
+  }
 }
 
-async function updateAdminPassword() {
-  return true;
+async function updateAdminPassword(id, passwordHash, tokenVersion) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  try {
+    await sql.query(
+      `UPDATE admins SET password_hash = $1, token_version = $2, updated_at = NOW() WHERE id = $3;`,
+      [passwordHash, tokenVersion, id]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateAdminPassword error:', err.message);
+    return false;
+  }
 }
 
-async function updateAdminTokenVersion() {
-  return true;
+async function updateAdminTokenVersion(id, tokenVersion) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  try {
+    await sql.query(
+      `UPDATE admins SET token_version = $1, updated_at = NOW() WHERE id = $2;`,
+      [tokenVersion, id]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateAdminTokenVersion error:', err.message);
+    return false;
+  }
 }
-
-async function saveUploadedAsset() {
-  return true;
-}
-
-async function getUploadedAsset() {
-  return null;
-}
-
-function formatCertification(r) { return r; }
-function formatTeamMember(r) { return r; }
-function formatProject(r) { return r; }
-function formatSkill(r) { return r; }
-function formatProfile(r) { return r; }
-function formatExperience(r) { return r; }
-function formatService(r) { return r; }
-function formatEvent(r) { return r; }
-function formatInquiry(r) { return r; }
 
 module.exports = {
   getClient,
@@ -278,3 +1726,4 @@ module.exports = {
   query,
   isNeonConnected: () => isConnected,
 };
+
