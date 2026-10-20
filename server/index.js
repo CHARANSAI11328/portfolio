@@ -15,6 +15,7 @@ const {
   createToken,
   verifyToken,
 } = require('./db');
+const neon = require('./neon');
 
 const isProd = process.env.NODE_ENV === 'production';
 const HOST = '0.0.0.0';
@@ -470,6 +471,18 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/profile') {
       const db = getDatabase();
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM profile WHERE id = 'profile-charan-sai' LIMIT 1;`);
+            if (rows && rows.length > 0) {
+              const liveProfile = neon.formatProfile(rows[0]);
+              db.profile = liveProfile;
+              return sendJson(res, 200, { profile: liveProfile });
+            }
+          } catch (err) {
+            console.warn('[NEON] Profile live query failed, falling back to cache:', err.message);
+          }
+        }
         return sendJson(res, 200, { profile: db.profile });
       }
       if (method === 'PUT') {
@@ -477,6 +490,11 @@ const server = http.createServer(async (req, res) => {
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized admin credentials required' });
         const updates = await parseJsonBody(req);
         db.profile = { ...db.profile, ...updates, updatedAt: new Date().toISOString() };
+        try {
+          await neon.upsertProfile(db.profile);
+        } catch (err) {
+          console.error('[NEON] Failed to sync profile to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Profile', 'Updated personal profile details');
         return sendJson(res, 200, { success: true, profile: db.profile });
@@ -579,6 +597,17 @@ const server = http.createServer(async (req, res) => {
       const admin = getAuthAdmin(req);
 
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM projects ORDER BY display_order ASC, id ASC;`);
+            let projs = rows.map(neon.formatProject);
+            db.projects = projs;
+            if (!admin) projs = projs.filter((p) => p.published);
+            return sendJson(res, 200, { projects: projs, isAdmin: !!admin });
+          } catch (err) {
+            console.warn('[NEON] Projects live query error, using cache:', err.message);
+          }
+        }
         let list = db.projects || [];
         if (!admin) {
           list = list.filter((p) => p.published);
@@ -614,6 +643,11 @@ const server = http.createServer(async (req, res) => {
         };
 
         db.projects.push(newProject);
+        try {
+          await neon.upsertProject(newProject);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new project to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Project', `Added project: ${newProject.title}`);
         return sendJson(res, 201, { success: true, project: newProject });
@@ -633,6 +667,11 @@ const server = http.createServer(async (req, res) => {
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
         db.projects[idx] = { ...db.projects[idx], ...updates, id, updatedAt: new Date().toISOString() };
+        try {
+          await neon.upsertProject(db.projects[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update project in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Project', `Updated project: ${db.projects[idx].title}`);
         return sendJson(res, 200, { success: true, project: db.projects[idx] });
@@ -640,6 +679,11 @@ const server = http.createServer(async (req, res) => {
 
       if (method === 'DELETE') {
         const deleted = db.projects.splice(idx, 1)[0];
+        try {
+          await neon.deleteProject(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete project from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Project', `Deleted project: ${deleted.title}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
@@ -652,6 +696,17 @@ const server = http.createServer(async (req, res) => {
       const admin = getAuthAdmin(req);
 
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM certifications ORDER BY display_order ASC, id ASC;`);
+            let certs = rows.map(neon.formatCertification);
+            db.certifications = certs;
+            if (!admin) certs = certs.filter((c) => c.published);
+            return sendJson(res, 200, { certifications: certs, isAdmin: !!admin });
+          } catch (err) {
+            console.warn('[NEON] Certifications live query error, using cache:', err.message);
+          }
+        }
         let list = db.certifications || [];
         if (!admin) list = list.filter((c) => c.published);
         return sendJson(res, 200, { certifications: list, isAdmin: !!admin });
@@ -676,6 +731,11 @@ const server = http.createServer(async (req, res) => {
         };
 
         db.certifications.push(newCert);
+        try {
+          await neon.upsertCertification(newCert);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new certificate to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Certification', `Added certification: ${newCert.title}`);
         return sendJson(res, 201, { success: true, certification: newCert });
@@ -695,6 +755,11 @@ const server = http.createServer(async (req, res) => {
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
         db.certifications[idx] = { ...db.certifications[idx], ...updates, id };
+        try {
+          await neon.upsertCertification(db.certifications[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update certificate in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Certification', `Updated cert: ${db.certifications[idx].title}`);
         return sendJson(res, 200, { success: true, certification: db.certifications[idx] });
@@ -702,6 +767,11 @@ const server = http.createServer(async (req, res) => {
 
       if (method === 'DELETE') {
         const deleted = db.certifications.splice(idx, 1)[0];
+        try {
+          await neon.deleteCertification(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete certificate from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Certification', `Deleted cert: ${deleted.title}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
@@ -712,6 +782,16 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/skills') {
       const db = getDatabase();
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM skills ORDER BY display_order ASC, id ASC;`);
+            const skills = rows.map(neon.formatSkill);
+            db.skills = skills;
+            return sendJson(res, 200, { skills });
+          } catch (err) {
+            console.warn('[NEON] Skills live query error, using cache:', err.message);
+          }
+        }
         return sendJson(res, 200, { skills: db.skills || [] });
       }
       if (method === 'POST') {
@@ -728,6 +808,11 @@ const server = http.createServer(async (req, res) => {
         };
         db.skills = db.skills || [];
         db.skills.push(newSkill);
+        try {
+          await neon.upsertSkill(newSkill);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new skill to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Skill', `Added skill: ${newSkill.name}`);
         return sendJson(res, 201, { success: true, skill: newSkill });
@@ -745,12 +830,22 @@ const server = http.createServer(async (req, res) => {
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
         db.skills[idx] = { ...db.skills[idx], ...updates, id };
+        try {
+          await neon.upsertSkill(db.skills[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update skill in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Skill', `Updated skill: ${db.skills[idx].name}`);
         return sendJson(res, 200, { success: true, skill: db.skills[idx] });
       }
       if (method === 'DELETE') {
         const del = db.skills.splice(idx, 1)[0];
+        try {
+          await neon.deleteSkill(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete skill from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Skill', `Deleted skill: ${del.name}`);
         return sendJson(res, 200, { success: true });
@@ -761,6 +856,16 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/experience') {
       const db = getDatabase();
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM experiences ORDER BY display_order ASC, id ASC;`);
+            const experiences = rows.map(neon.formatExperience);
+            db.experiences = experiences;
+            return sendJson(res, 200, { experiences });
+          } catch (err) {
+            console.warn('[NEON] Experiences live query error, using cache:', err.message);
+          }
+        }
         return sendJson(res, 200, { experiences: db.experiences || [] });
       }
       if (method === 'POST') {
@@ -780,6 +885,11 @@ const server = http.createServer(async (req, res) => {
         };
         db.experiences = db.experiences || [];
         db.experiences.push(newExp);
+        try {
+          await neon.upsertExperience(newExp);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new experience to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Experience', `Added experience: ${newExp.role}`);
         return sendJson(res, 201, { success: true, experience: newExp });
@@ -800,12 +910,22 @@ const server = http.createServer(async (req, res) => {
           updates.highlights = updates.highlights.split('\n').filter(Boolean);
         }
         db.experiences[idx] = { ...db.experiences[idx], ...updates, id };
+        try {
+          await neon.upsertExperience(db.experiences[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update experience in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Experience', `Updated experience: ${db.experiences[idx].role}`);
         return sendJson(res, 200, { success: true, experience: db.experiences[idx] });
       }
       if (method === 'DELETE') {
         const del = db.experiences.splice(idx, 1)[0];
+        try {
+          await neon.deleteExperience(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete experience from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Experience', `Deleted experience: ${del.role}`);
         return sendJson(res, 200, { success: true });
@@ -817,6 +937,17 @@ const server = http.createServer(async (req, res) => {
       const db = getDatabase();
       const admin = getAuthAdmin(req);
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM events ORDER BY display_order ASC, id ASC;`);
+            let events = rows.map(neon.formatEvent);
+            db.events = events;
+            if (!admin) events = events.filter((e) => e.published);
+            return sendJson(res, 200, { events, isAdmin: !!admin });
+          } catch (err) {
+            console.warn('[NEON] Events live query error, using cache:', err.message);
+          }
+        }
         let list = db.events || [];
         if (!admin) list = list.filter((e) => e.published);
         return sendJson(res, 200, { events: list, isAdmin: !!admin });
@@ -836,6 +967,11 @@ const server = http.createServer(async (req, res) => {
         };
         db.events = db.events || [];
         db.events.push(newEvent);
+        try {
+          await neon.upsertEvent(newEvent);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new event to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Event', `Added event: ${newEvent.title}`);
         return sendJson(res, 201, { success: true, event: newEvent });
@@ -853,12 +989,22 @@ const server = http.createServer(async (req, res) => {
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
         db.events[idx] = { ...db.events[idx], ...updates, id };
+        try {
+          await neon.upsertEvent(db.events[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update event in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Event', `Updated event: ${db.events[idx].title}`);
         return sendJson(res, 200, { success: true, event: db.events[idx] });
       }
       if (method === 'DELETE') {
         const del = db.events.splice(idx, 1)[0];
+        try {
+          await neon.deleteEvent(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete event from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Event', `Deleted event: ${del.title}`);
         return sendJson(res, 200, { success: true });
@@ -869,6 +1015,16 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/services') {
       const db = getDatabase();
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM services ORDER BY display_order ASC, id ASC;`);
+            const services = rows.map(neon.formatService);
+            db.services = services;
+            return sendJson(res, 200, { services });
+          } catch (err) {
+            console.warn('[NEON] Services live query error, using cache:', err.message);
+          }
+        }
         return sendJson(res, 200, { services: db.services || [] });
       }
       if (method === 'POST') {
@@ -886,6 +1042,11 @@ const server = http.createServer(async (req, res) => {
         };
         db.services = db.services || [];
         db.services.push(newServ);
+        try {
+          await neon.upsertService(newServ);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new service to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Service', `Added service: ${newServ.title}`);
         return sendJson(res, 201, { success: true, service: newServ });
@@ -906,12 +1067,22 @@ const server = http.createServer(async (req, res) => {
           updates.features = updates.features.split('\n').filter(Boolean);
         }
         db.services[idx] = { ...db.services[idx], ...updates, id };
+        try {
+          await neon.upsertService(db.services[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update service in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Service', `Updated service: ${db.services[idx].title}`);
         return sendJson(res, 200, { success: true, service: db.services[idx] });
       }
       if (method === 'DELETE') {
         const del = db.services.splice(idx, 1)[0];
+        try {
+          await neon.deleteService(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete service from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Service', `Deleted service: ${del.title}`);
         return sendJson(res, 200, { success: true });
@@ -923,6 +1094,16 @@ const server = http.createServer(async (req, res) => {
       const db = getDatabase();
       db.team = db.team || [];
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM team_members ORDER BY display_order ASC, id ASC;`);
+            const members = rows.map(neon.formatTeamMember);
+            db.team = members;
+            return sendJson(res, 200, { team: members });
+          } catch (err) {
+            console.warn('[NEON] Team live query error, using cache:', err.message);
+          }
+        }
         const sorted = [...db.team].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
         return sendJson(res, 200, { team: sorted });
       }
@@ -960,6 +1141,11 @@ const server = http.createServer(async (req, res) => {
           updatedAt: new Date().toISOString(),
         };
         db.team.push(newMember);
+        try {
+          await neon.upsertTeamMember(newMember);
+        } catch (err) {
+          console.error('[NEON] Failed to sync new team member to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('CREATE', 'Team', `Added team member: ${newMember.name} (${newMember.role})`);
         return sendJson(res, 201, { success: true, member: newMember });
@@ -1003,12 +1189,22 @@ const server = http.createServer(async (req, res) => {
           id,
           updatedAt: new Date().toISOString(),
         };
+        try {
+          await neon.upsertTeamMember(db.team[idx]);
+        } catch (err) {
+          console.error('[NEON] Failed to update team member in Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('UPDATE', 'Team', `Updated team member: ${db.team[idx].name}`);
         return sendJson(res, 200, { success: true, member: db.team[idx] });
       }
       if (method === 'DELETE') {
         const del = db.team.splice(idx, 1)[0];
+        try {
+          await neon.deleteTeamMember(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete team member from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Team', `Removed team member: ${del.name}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
@@ -1043,6 +1239,11 @@ const server = http.createServer(async (req, res) => {
         };
 
         db.inquiries = [newInquiry, ...(db.inquiries || [])];
+        try {
+          await neon.insertInquiry(newInquiry);
+        } catch (err) {
+          console.error('[NEON] Failed to sync inquiry to Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('INQUIRY', 'Contact', `New message from ${newInquiry.name} (${newInquiry.email})`);
 
@@ -1081,6 +1282,16 @@ const server = http.createServer(async (req, res) => {
       if (method === 'GET') {
         const admin = getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
+        if (isNeonConnected()) {
+          try {
+            const rows = await neon.query(`SELECT * FROM inquiries ORDER BY created_at DESC;`);
+            const inquiries = rows.map(neon.formatInquiry);
+            db.inquiries = inquiries;
+            return sendJson(res, 200, { inquiries });
+          } catch (err) {
+            console.warn('[NEON] Inquiries live query error, using cache:', err.message);
+          }
+        }
         return sendJson(res, 200, { inquiries: db.inquiries || [] });
       }
     }
@@ -1096,11 +1307,21 @@ const server = http.createServer(async (req, res) => {
       if (method === 'PATCH') {
         const updates = await parseJsonBody(req);
         db.inquiries[idx] = { ...db.inquiries[idx], ...updates };
+        try {
+          await neon.updateInquiry(id, updates);
+        } catch (err) {
+          console.error('[NEON] Failed to update inquiry in Neon:', err.message);
+        }
         saveDatabase(db);
         return sendJson(res, 200, { success: true, inquiry: db.inquiries[idx] });
       }
       if (method === 'DELETE') {
         const del = db.inquiries.splice(idx, 1)[0];
+        try {
+          await neon.deleteInquiry(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete inquiry from Neon:', err.message);
+        }
         saveDatabase(db);
         logActivity('DELETE', 'Inquiry', `Deleted inquiry from: ${del.name}`);
         return sendJson(res, 200, { success: true });

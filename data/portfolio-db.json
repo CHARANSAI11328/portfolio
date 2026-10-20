@@ -2,11 +2,10 @@
   "team": [
     {
       "id": "team-charan-lead",
-      "bio": "Systems design, full-stack web architectures, secure APIs, and client solution delivery.",
       "name": "Charan Sai",
       "role": "Lead Architect & Full-Stack Engineer",
-      "email": "saikamarajugadda21@gmail.com",
-      "github": "https://github.com/CHARANSAI11328",
+      "bio": "Systems design, full-stack web architectures, secure APIs, and client solution delivery.",
+      "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
       "skills": [
         "Next.js",
         "React",
@@ -23,10 +22,13 @@
         "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
         "portfolio": "https://charansai.website"
       },
+      "github": "https://github.com/CHARANSAI11328",
       "linkedin": "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
-      "avatarUrl": "/uploads/WhatsApp_Image_2026-10-19_at_3_1792404836043.jpg",
+      "email": "saikamarajugadda21@gmail.com",
       "portfolio": "https://charansai.website",
-      "displayOrder": 1
+      "displayOrder": 1,
+      "createdAt": "2026-10-20T10:34:44.327Z",
+      "updatedAt": "2026-10-20T13:28:59.704Z"
     },
     {
       "id": "team-1792500786845-9opp",
@@ -35,19 +37,19 @@
       "bio": "Core engineering and design contributor.",
       "avatarUrl": "",
       "skills": [],
+      "socials": {
+        "email": "",
+        "github": "",
+        "linkedin": "",
+        "portfolio": ""
+      },
       "github": "",
       "linkedin": "",
       "email": "",
       "portfolio": "",
-      "socials": {
-        "github": "",
-        "linkedin": "",
-        "email": "",
-        "portfolio": ""
-      },
       "displayOrder": 2,
-      "createdAt": "2026-10-20T12:53:06.845Z",
-      "updatedAt": "2026-10-20T12:53:06.845Z"
+      "createdAt": "2026-10-20T12:53:15.543Z",
+      "updatedAt": "2026-10-20T13:28:59.951Z"
     }
   ],
   "admins": [
@@ -66,129 +68,129 @@
   "skills": [
     {
       "id": "sk-1",
-      "icon": "Code",
       "name": "React",
       "category": "Frontend",
+      "icon": "Code",
       "featured": true,
       "displayOrder": 1
     },
     {
       "id": "sk-2",
-      "icon": "Layers",
       "name": "Next.js",
       "category": "Frontend",
+      "icon": "Layers",
       "featured": true,
       "displayOrder": 2
     },
     {
       "id": "sk-3",
-      "icon": "Code",
       "name": "JavaScript",
       "category": "Languages",
+      "icon": "Code",
       "featured": true,
       "displayOrder": 3
     },
     {
       "id": "sk-4",
-      "icon": "FileCode",
       "name": "TypeScript",
       "category": "Languages",
+      "icon": "FileCode",
       "featured": true,
       "displayOrder": 4
     },
     {
       "id": "sk-5",
-      "icon": "Globe",
       "name": "HTML5 & CSS3",
       "category": "Frontend",
+      "icon": "Globe",
       "featured": true,
       "displayOrder": 5
     },
     {
       "id": "sk-6",
-      "icon": "Palette",
       "name": "Tailwind CSS",
       "category": "Frontend",
+      "icon": "Palette",
       "featured": true,
       "displayOrder": 6
     },
     {
       "id": "sk-7",
-      "icon": "Smartphone",
       "name": "Flutter & Dart",
       "category": "Frontend",
+      "icon": "Smartphone",
       "featured": true,
       "displayOrder": 7
     },
     {
       "id": "sk-8",
-      "icon": "Coffee",
       "name": "Java",
       "category": "Languages",
+      "icon": "Coffee",
       "featured": true,
       "displayOrder": 8
     },
     {
       "id": "sk-9",
-      "icon": "Terminal",
       "name": "Python",
       "category": "Languages",
+      "icon": "Terminal",
       "featured": true,
       "displayOrder": 9
     },
     {
       "id": "sk-10",
-      "icon": "Database",
       "name": "PostgreSQL",
       "category": "Backend & Data",
+      "icon": "Database",
       "featured": true,
       "displayOrder": 10
     },
     {
       "id": "sk-11",
-      "icon": "Server",
       "name": "Neon",
       "category": "Backend & Data",
+      "icon": "Server",
       "featured": true,
       "displayOrder": 11
     },
     {
       "id": "sk-12",
-      "icon": "Flame",
       "name": "Firebase",
       "category": "Backend & Data",
+      "icon": "Flame",
       "featured": true,
       "displayOrder": 12
     },
     {
       "id": "sk-13",
-      "icon": "GitBranch",
       "name": "Git & GitHub",
       "category": "Tools & Platforms",
+      "icon": "GitBranch",
       "featured": true,
       "displayOrder": 13
     },
     {
       "id": "sk-14",
-      "icon": "Cloud",
       "name": "Netlify & Render",
       "category": "Tools & Platforms",
+      "icon": "Cloud",
       "featured": true,
       "displayOrder": 14
     },
     {
       "id": "sk-15",
-      "icon": "Cpu",
       "name": "AI-Assisted Dev",
       "category": "Tools & Platforms",
+      "icon": "Cpu",
       "featured": true,
       "displayOrder": 15
     },
     {
       "id": "sk-1792398208463",
-      "icon": "Code",
       "name": "HTML",
       "category": "Languages",
+      "icon": "Code",
       "featured": true,
       "displayOrder": 16
     }
@@ -235,102 +237,103 @@
   "projects": [
     {
       "id": "proj-lettergen-pro",
-      "slug": "lettergen-pro",
       "title": "LETTERGEN PRO",
-      "status": "Completed",
-      "liveUrl": "",
-      "repoUrl": "",
-      "category": "Desktop & Systems",
-      "featured": true,
-      "caseStudy": "Comprehensive desktop letter drafting automation suite built in Java Swing with vector PDF output generation, template management, and relational database synchronization with PostgreSQL on Neon.",
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "published": true,
+      "slug": "lettergen-pro",
       "shortDesc": "A Java Swing desktop letter-generation application with related website and PDF functionality and a PostgreSQL/Neon-backed data component.",
-      "updatedAt": "2026-10-19T05:59:11.259Z",
-      "displayOrder": 1,
+      "caseStudy": "Comprehensive desktop letter drafting automation suite built in Java Swing with vector PDF output generation, template management, and relational database synchronization with PostgreSQL on Neon.",
+      "category": "Desktop & Systems",
       "technologies": [
         "Java",
         "Swing",
         "PostgreSQL",
         "Neon",
         "PDF Automation"
-      ]
+      ],
+      "status": "Completed",
+      "liveUrl": "",
+      "repoUrl": "",
+      "featured": true,
+      "published": true,
+      "displayOrder": 1,
+      "createdAt": "2026-10-20T11:01:33.080Z",
+      "updatedAt": "2026-10-20T13:28:52.338Z"
     },
     {
       "id": "proj-projex",
-      "slug": "projex",
       "title": "PROJEX",
-      "status": "Active Development",
-      "liveUrl": "",
-      "repoUrl": "",
-      "category": "Web Applications",
-      "featured": true,
-      "caseStudy": "Built to empower engineering students with structured skill pathways, interactive curriculum roadmaps, verified skill assessments, hands-on guided project milestones, and real-time progress analytics.",
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "published": true,
+      "slug": "projex",
       "shortDesc": "An engineering-student-focused learning and career-readiness platform involving learning roadmaps, skills, assessments, guided projects, and progress tracking.",
-      "updatedAt": "2026-10-19T05:59:11.259Z",
-      "displayOrder": 2,
+      "caseStudy": "Built to empower engineering students with structured skill pathways, interactive curriculum roadmaps, verified skill assessments, hands-on guided project milestones, and real-time progress analytics.",
+      "category": "Web Applications",
       "technologies": [
         "Next.js",
         "React",
         "TypeScript",
         "PostgreSQL",
         "Tailwind CSS"
-      ]
+      ],
+      "status": "Active Development",
+      "liveUrl": "",
+      "repoUrl": "",
+      "featured": true,
+      "published": true,
+      "displayOrder": 2,
+      "createdAt": "2026-10-20T11:01:33.325Z",
+      "updatedAt": "2026-10-20T13:28:52.588Z"
     },
     {
       "id": "proj-mameka-mahodayam",
-      "slug": "mameka-mahodayam",
       "title": "MAMEKA MAHODAYAM",
-      "status": "In Progress",
-      "liveUrl": "https://project-mm-1.onrender.com",
-      "repoUrl": "",
-      "category": "Digital Publishing",
-      "featured": true,
-      "caseStudy": "Modern regional journalism web portal tailored for seamless Telugu vernacular typography, digital e-paper edition viewing, responsive article reading, and dynamic editorial publishing workflows.",
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "published": true,
+      "slug": "mameka-mahodayam",
       "shortDesc": "A digital newspaper platform featuring Telugu content, article presentation, archive management, and a developing publishing workflow.",
-      "updatedAt": "2026-10-19T05:59:11.259Z",
-      "displayOrder": 3,
+      "caseStudy": "Modern regional journalism web portal tailored for seamless Telugu vernacular typography, digital e-paper edition viewing, responsive article reading, and dynamic editorial publishing workflows.",
+      "category": "Digital Publishing",
       "technologies": [
         "Next.js",
         "JavaScript",
         "Render",
         "Digital Publishing",
         "CSS3"
-      ]
+      ],
+      "status": "In Progress",
+      "liveUrl": "https://project-mm-1.onrender.com",
+      "repoUrl": "",
+      "featured": true,
+      "published": true,
+      "displayOrder": 3,
+      "createdAt": "2026-10-20T11:01:33.578Z",
+      "updatedAt": "2026-10-20T13:28:52.839Z"
     },
     {
       "id": "proj-business-websites",
-      "slug": "business-websites",
       "title": "BUSINESS WEBSITES & DIGITAL SOLUTIONS",
-      "status": "Active Development",
-      "liveUrl": "",
-      "repoUrl": "",
-      "category": "Business Solutions",
-      "featured": true,
-      "caseStudy": "Designing and engineering tailored web solutions for businesses seeking high conversion, rapid page load times, SEO optimization, and brand presentation across diverse client industries.",
-      "createdAt": "2026-10-19T05:59:11.259Z",
-      "published": true,
+      "slug": "business-websites",
       "shortDesc": "Scalable business website architectures, client landing portals, and responsive corporate platforms built for commercial conversion.",
-      "updatedAt": "2026-10-19T05:59:11.259Z",
-      "displayOrder": 4,
+      "caseStudy": "Designing and engineering tailored web solutions for businesses seeking high conversion, rapid page load times, SEO optimization, and brand presentation across diverse client industries.",
+      "category": "Business Solutions",
       "technologies": [
         "React",
         "Next.js",
         "Tailwind CSS",
         "Framer Motion",
         "SEO"
-      ]
+      ],
+      "status": "Active Development",
+      "liveUrl": "",
+      "repoUrl": "",
+      "featured": true,
+      "published": true,
+      "displayOrder": 4,
+      "createdAt": "2026-10-20T11:01:33.821Z",
+      "updatedAt": "2026-10-20T13:28:53.094Z"
     }
   ],
   "services": [
     {
       "id": "serv-web-app",
-      "icon": "Layout",
       "title": "Web Application Development",
+      "description": "Custom, full-stack dynamic web applications built with Next.js, React, and robust database architectures.",
+      "icon": "Layout",
       "category": "Development",
       "features": [
         "Modern React & Next.js",
@@ -338,13 +341,13 @@
         "Secure Authentication",
         "Responsive UI/UX"
       ],
-      "description": "Custom, full-stack dynamic web applications built with Next.js, React, and robust database architectures.",
       "displayOrder": 1
     },
     {
       "id": "serv-biz-sites",
-      "icon": "Globe",
       "title": "Business Websites & Redesigns",
+      "description": "Fast, high-converting digital storefronts and landing pages optimized for search engines, brand impact, and speed.",
+      "icon": "Globe",
       "category": "Design & Web",
       "features": [
         "Bespoke Aesthetic",
@@ -352,13 +355,13 @@
         "SEO Optimization",
         "Lightning Performance"
       ],
-      "description": "Fast, high-converting digital storefronts and landing pages optimized for search engines, brand impact, and speed.",
       "displayOrder": 2
     },
     {
       "id": "serv-desktop",
-      "icon": "Monitor",
       "title": "Software & Desktop Utilities",
+      "description": "Specialized desktop software, automated document/PDF generation, and relational data management in Java.",
+      "icon": "Monitor",
       "category": "Software Engineering",
       "features": [
         "Java Swing & Modern UI",
@@ -366,13 +369,13 @@
         "Relational DB Sync",
         "Offline Reliability"
       ],
-      "description": "Specialized desktop software, automated document/PDF generation, and relational data management in Java.",
       "displayOrder": 3
     },
     {
       "id": "serv-ai",
-      "icon": "Sparkles",
       "title": "AI-Assisted Digital Solutions",
+      "description": "Integrating modern AI capabilities, intelligent data automation, and workflow acceleration into products.",
+      "icon": "Sparkles",
       "category": "AI & Data",
       "features": [
         "Intelligent Workflows",
@@ -380,7 +383,6 @@
         "Data Processing",
         "Rapid Prototyping"
       ],
-      "description": "Integrating modern AI capabilities, intelligent data automation, and workflow acceleration into products.",
       "displayOrder": 4
     }
   ],
@@ -407,39 +409,67 @@
     {
       "id": "exp-btech",
       "role": "B.Tech in Computer Science and Engineering — Data Science",
-      "type": "education",
-      "period": "2022 — Present",
       "company": "St. Ann's College of Engineering & Technology",
       "location": "Chirala, Andhra Pradesh, India",
+      "period": "2022 — Present",
+      "description": "Specializing in computer science fundamentals, data analytics, software development, algorithms, and engineering project lifecycles.",
       "highlights": [
         "Core focus on Data Science, Data Structures, Database Systems & Full-Stack Engineering",
         "Actively developing production-grade software projects and platforms for students and businesses"
       ],
-      "description": "Specializing in computer science fundamentals, data analytics, software development, algorithms, and engineering project lifecycles.",
+      "type": "education",
       "displayOrder": 1
     },
     {
       "id": "exp-dev",
       "role": "Independent Developer & Digital Solutions",
-      "type": "work",
-      "period": "2023 — Present",
       "company": "Freelance & Independent Projects",
       "location": "India",
+      "period": "2023 — Present",
+      "description": "Engineering responsive web applications, Java desktop automation software, regional news platforms, and business websites for clients and open-source initiatives.",
       "highlights": [
         "Designed and deployed responsive Next.js and React web portals",
         "Built LETTERGEN PRO Java desktop utility and Mameka Mahodayam Telugu news publishing platform"
       ],
-      "description": "Engineering responsive web applications, Java desktop automation software, regional news platforms, and business websites for clients and open-source initiatives.",
+      "type": "work",
       "displayOrder": 2
     }
   ],
   "activityLogs": [
     {
-      "id": "log-1792500786879-trf6",
+      "id": "log-1792502969763-hv8s",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Sai Krishna (Test Member)",
+      "timestamp": "2026-10-20T13:29:29.763Z"
+    },
+    {
+      "id": "log-1792502968946-sucq",
       "action": "CREATE",
       "entity": "Team",
-      "details": "Added team member: P. Bhavani (TEAM LEADER)",
-      "timestamp": "2026-10-20T12:53:06.879Z"
+      "details": "Added team member: Sai Krishna (Test Member) (Cloud & Database Architect)",
+      "timestamp": "2026-10-20T13:29:28.946Z"
+    },
+    {
+      "id": "log-1792502968374-jrw6",
+      "action": "DELETE",
+      "entity": "Certification",
+      "details": "Deleted cert: Neon Live Sync Pro Certificate",
+      "timestamp": "2026-10-20T13:29:28.374Z"
+    },
+    {
+      "id": "log-1792502966993-bgyf",
+      "action": "CREATE",
+      "entity": "Certification",
+      "details": "Added certification: Neon Live Sync Pro Certificate",
+      "timestamp": "2026-10-20T13:29:26.993Z"
+    },
+    {
+      "id": "log-1792502966122-s83v",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-20T13:29:26.122Z"
     },
     {
       "id": "log-1792500786800-m7b1",
@@ -755,34 +785,6 @@
       "entity": "Team",
       "details": "Updated team member: QA & Test Architect",
       "timestamp": "2026-10-19T14:13:41.727Z"
-    },
-    {
-      "id": "log-1792419221646-t08w",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: QA & Reliability Specialist (Automated QA Engineer)",
-      "timestamp": "2026-10-19T14:13:41.646Z"
-    },
-    {
-      "id": "log-1792408178770-7fxs",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T11:09:38.770Z"
-    },
-    {
-      "id": "log-1792407207951-f90d",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-19T10:53:27.951Z"
-    },
-    {
-      "id": "log-1792406966587-mscl",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: test_qa_1792406966567_d6655938.png",
-      "timestamp": "2026-10-19T10:49:26.587Z"
     }
   ],
   "certifications": []

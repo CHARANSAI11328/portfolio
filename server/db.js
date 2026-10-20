@@ -415,9 +415,9 @@ function saveDatabase(db) {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
 
-  // Asynchronously replicate to Neon PostgreSQL
-  neon.saveNeonState(db).catch((err) => {
-    console.warn('[NEON] Async save error:', err.message);
+  // Asynchronously replicate atomic state to Neon PostgreSQL
+  neon.updatePortfolioState(db).catch((err) => {
+    console.warn('[NEON] Async state update error:', err.message);
   });
 }
 

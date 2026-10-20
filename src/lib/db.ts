@@ -330,13 +330,13 @@ export function saveDatabase(db: PortfolioDatabase): void {
     fs.writeFileSync(DB_FILE, json, 'utf-8');
   }
 
-  // Replicate to Neon PostgreSQL asynchronously (atomic state + all relational tables)
+  // Replicate to Neon PostgreSQL asynchronously (atomic state document)
   try {
     const neonPath = path.join(process.cwd(), 'server', 'neon.js');
     if (fs.existsSync(neonPath)) {
       const neon = require(neonPath);
-      if (neon && typeof neon.saveNeonState === 'function') {
-        neon.saveNeonState(db).catch(() => {});
+      if (neon && typeof neon.updatePortfolioState === 'function') {
+        neon.updatePortfolioState(db).catch(() => {});
       }
     }
   } catch {}
