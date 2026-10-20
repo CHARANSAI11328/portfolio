@@ -9,19 +9,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
   }
 
-  const db = getDatabase();
   const n = getNeon();
   if (n) {
     try {
-      const rows = await n.query(`SELECT * FROM inquiries ORDER BY created_at DESC;`);
-      if (rows && rows.length > 0) {
-        const liveInquiries = rows.map(n.formatInquiry);
-        db.inquiries = liveInquiries;
-        return NextResponse.json({ inquiries: liveInquiries });
-      }
-    } catch {}
+      const liveInquiries = await n.getInquiries();
+      return NextResponse.json({ inquiries: liveInquiries });
+    } catch (err: unknown) {
+      console.warn('[NEON] Error querying inquiries:', err);
+    }
   }
 
+  const db = getDatabase();
   const inquiries = (db.inquiries || []).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );

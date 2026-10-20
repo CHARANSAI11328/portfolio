@@ -308,8 +308,10 @@ export function getDatabase(): PortfolioDatabase {
   }
 }
 
+const DEFAULT_DATABASE_URL = 'postgresql://neondb_owner:npg_s5wgGbf9JDoQ@ep-cold-breeze-b4q8znjq-pooler.c-6.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require';
+
 export function getNeonClient() {
-  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
+  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED || DEFAULT_DATABASE_URL;
   if (!dbUrl) return null;
   return neon(dbUrl);
 }

@@ -4,20 +4,18 @@ import { verifyApiAuth } from '@/lib/auth';
 import { TeamMember } from '@/lib/types';
 
 export async function GET() {
-  const db = getDatabase();
   const n = getNeon();
   if (n) {
     try {
-      const rows = await n.query(`SELECT * FROM team_members ORDER BY display_order ASC, id ASC;`);
-      if (rows && rows.length > 0) {
-        const liveMembers = rows.map(n.formatTeamMember);
-        db.team = liveMembers;
-        return NextResponse.json({ team: liveMembers }, {
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-        });
-      }
-    } catch {}
+      const liveMembers = await n.getTeamMembers();
+      return NextResponse.json({ team: liveMembers }, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
+    } catch (err: unknown) {
+      console.warn('[NEON] Error querying team:', err);
+    }
   }
+  const db = getDatabase();
   const team = (db.team || []).sort(
     (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)
   );

@@ -4,20 +4,18 @@ import { verifyApiAuth } from '@/lib/auth';
 import { ServiceItem } from '@/lib/types';
 
 export async function GET() {
-  const db = getDatabase();
   const n = getNeon();
   if (n) {
     try {
-      const rows = await n.query(`SELECT * FROM services ORDER BY display_order ASC, id ASC;`);
-      if (rows && rows.length > 0) {
-        const liveServices = rows.map(n.formatService);
-        db.services = liveServices;
-        return NextResponse.json({ services: liveServices }, {
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-        });
-      }
-    } catch {}
+      const liveServices = await n.getServices();
+      return NextResponse.json({ services: liveServices }, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
+    } catch (err: unknown) {
+      console.warn('[NEON] Error querying services:', err);
+    }
   }
+  const db = getDatabase();
   const services = (db.services || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   return NextResponse.json({ services }, {
     headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },

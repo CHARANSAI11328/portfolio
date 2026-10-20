@@ -36,9 +36,11 @@ loadEnv();
 let sqlClient = null;
 let isConnected = false;
 
+const DEFAULT_DATABASE_URL = 'postgresql://neondb_owner:npg_s5wgGbf9JDoQ@ep-cold-breeze-b4q8znjq-pooler.c-6.us-east-2.aws.neon.tech/neondb?channel_binding=require&sslmode=require';
+
 function getClient() {
   if (sqlClient) return sqlClient;
-  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
+  const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED || DEFAULT_DATABASE_URL;
   if (!dbUrl) return null;
 
   try {
@@ -230,16 +232,59 @@ async function initNeon(initialData = null) {
       );
     `);
 
+    // 12. Persistent admins table (survives container redeployments)
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS admins (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        role VARCHAR(50) DEFAULT 'admin',
+        password_hash TEXT NOT NULL,
+        token_version INT DEFAULT 1,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
     isConnected = true;
     console.log('[NEON] Connected successfully to Neon PostgreSQL database.');
 
-    // Only seed from initialData if Neon cloud is empty; otherwise preserve cloud state
-    const existingCloudState = await fetchNeonState();
-    if (!existingCloudState && initialData) {
-      await saveNeonState(initialData);
-    } else if (existingCloudState) {
-      // Sync relational tables with the authoritative cloud state
-      await saveNeonState(existingCloudState);
+    // Seed default admin if table is empty
+    try {
+      const adminCountRows = await sql.query('SELECT COUNT(*) AS c FROM admins;');
+      const adminCount = parseInt(adminCountRows[0]?.c || '0', 10);
+      if (adminCount === 0) {
+        await sql.query(`
+          INSERT INTO admins (id, name, email, role, password_hash, token_version, created_at, updated_at)
+          VALUES (
+            'admin-charan-01',
+            'Charan Sai',
+            'admin@charansai.website',
+            'superadmin',
+            'salt_charan_2026:3b9357518faa4ed0654bc100a46f83e8acbc6bc3d686d94646127928366ab28c83040b1ed9b821991df6c230bcb70478e052dab1b97f0dcb23703c5724c0c450',
+            12,
+            NOW(),
+            NOW()
+          )
+          ON CONFLICT (id) DO NOTHING;
+        `);
+      }
+    } catch (aErr) {
+      console.warn('[NEON] Could not check/seed admins:', aErr.message);
+    }
+
+    // Only seed from initialData if Neon cloud has NO profile at all; NEVER overwrite or delete existing live data!
+    try {
+      const profileCountRows = await sql.query('SELECT COUNT(*) AS c FROM profile;');
+      const isProfileEmpty = !profileCountRows || parseInt(profileCountRows[0]?.c || '0', 10) === 0;
+      if (isProfileEmpty && initialData) {
+        console.log('[NEON] Database is freshly initialized. Seeding initial profile records...');
+        await saveNeonState(initialData);
+      } else {
+        console.log('[NEON] Existing authoritative live records active in Neon cloud. Preserving all records untouched.');
+      }
+    } catch (sErr) {
+      console.warn('[NEON] Seed check warning:', sErr.message);
     }
 
     return true;
@@ -1319,30 +1364,396 @@ async function getUploadedAsset(filename) {
   return null;
 }
 
+/**
+ * Direct Live Neon Query Helpers (Sole Source of Truth)
+ */
+
+async function getTeamMembers() {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM team_members ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatTeamMember);
+  } catch (err) {
+    console.error('[NEON] getTeamMembers error:', err.message);
+    return [];
+  }
+}
+
+async function getTeamMemberById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM team_members WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatTeamMember(rows[0]) : null;
+  } catch (err) {
+    console.error('[NEON] getTeamMemberById error:', err.message);
+    return null;
+  }
+}
+
+async function getProjects(onlyPublished = false) {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const where = onlyPublished ? 'WHERE published = true' : '';
+    const rows = await sql.query(`SELECT * FROM projects ${where} ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatProject);
+  } catch (err) {
+    console.error('[NEON] getProjects error:', err.message);
+    return [];
+  }
+}
+
+async function getProjectById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM projects WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatProject(rows[0]) : null;
+  } catch (err) {
+    console.error('[NEON] getProjectById error:', err.message);
+    return null;
+  }
+}
+
+async function getSkills() {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM skills ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatSkill);
+  } catch (err) {
+    console.error('[NEON] getSkills error:', err.message);
+    return [];
+  }
+}
+
+async function getSkillById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM skills WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatSkill(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function getCertifications(onlyPublished = false) {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const where = onlyPublished ? 'WHERE published = true' : '';
+    const rows = await sql.query(`SELECT * FROM certifications ${where} ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatCertification);
+  } catch (err) {
+    console.error('[NEON] getCertifications error:', err.message);
+    return [];
+  }
+}
+
+async function getCertificationById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM certifications WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatCertification(rows[0]) : null;
+  } catch (err) {
+    console.error('[NEON] getCertificationById error:', err.message);
+    return null;
+  }
+}
+
+async function getExperiences() {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM experiences ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatExperience);
+  } catch (err) {
+    console.error('[NEON] getExperiences error:', err.message);
+    return [];
+  }
+}
+
+async function getExperienceById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM experiences WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatExperience(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function getServices() {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM services ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatService);
+  } catch (err) {
+    console.error('[NEON] getServices error:', err.message);
+    return [];
+  }
+}
+
+async function getServiceById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM services WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatService(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function getEvents(onlyPublished = false) {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const where = onlyPublished ? 'WHERE published = true' : '';
+    const rows = await sql.query(`SELECT * FROM events ${where} ORDER BY display_order ASC, id ASC;`);
+    return (rows || []).map(formatEvent);
+  } catch (err) {
+    console.error('[NEON] getEvents error:', err.message);
+    return [];
+  }
+}
+
+async function getEventById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM events WHERE id = $1 LIMIT 1;`, [id]);
+    return (rows && rows.length > 0) ? formatEvent(rows[0]) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function getProfile() {
+  const sql = getClient();
+  if (!sql) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM profile WHERE id = 'profile-charan-sai' LIMIT 1;`);
+    if (rows && rows.length > 0) return formatProfile(rows[0]);
+  } catch (err) {
+    console.error('[NEON] getProfile error:', err.message);
+  }
+  return null;
+}
+
+async function getSettings() {
+  const sql = getClient();
+  if (!sql) return null;
+  try {
+    const rows = await sql.query(`SELECT data FROM portfolio_state WHERE id = 'settings' LIMIT 1;`);
+    if (rows && rows.length > 0 && rows[0].data) return rows[0].data;
+    const curRows = await sql.query(`SELECT data->'settings' as settings FROM portfolio_state WHERE id = 'current' LIMIT 1;`);
+    if (curRows && curRows.length > 0 && curRows[0].settings) return curRows[0].settings;
+  } catch (err) {
+    console.error('[NEON] getSettings error:', err.message);
+  }
+  return null;
+}
+
+async function updateSettings(settings) {
+  const sql = getClient();
+  if (!sql || !settings) return false;
+  try {
+    await sql.query(
+      `INSERT INTO portfolio_state (id, data, updated_at)
+       VALUES ('settings', $1::jsonb, NOW())
+       ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();`,
+      [JSON.stringify(settings)]
+    );
+    await sql.query(
+      `UPDATE portfolio_state
+       SET data = jsonb_set(COALESCE(data, '{}'::jsonb), '{settings}', $1::jsonb), updated_at = NOW()
+       WHERE id = 'current';`,
+      [JSON.stringify(settings)]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateSettings error:', err.message);
+    return false;
+  }
+}
+
+async function getInquiries() {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT * FROM inquiries ORDER BY created_at DESC;`);
+    return (rows || []).map(formatInquiry);
+  } catch (err) {
+    console.error('[NEON] getInquiries error:', err.message);
+    return [];
+  }
+}
+
+async function updateInquiryStatus(id, status) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  try {
+    await sql.query(`UPDATE inquiries SET status = $1 WHERE id = $2;`, [status, id]);
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateInquiryStatus error:', err.message);
+    return false;
+  }
+}
+
+async function getAdminByEmail(email) {
+  const sql = getClient();
+  if (!sql || !email) return null;
+  try {
+    const identifier = String(email).trim().toLowerCase();
+    const rows = await sql.query(
+      `SELECT * FROM admins 
+       WHERE LOWER(email) = $1 
+          OR ($1 IN ('admin', 'charan', 'charansai') AND role = 'superadmin')
+       LIMIT 1;`,
+      [identifier]
+    );
+    if (rows && rows.length > 0) {
+      const a = rows[0];
+      return {
+        id: a.id,
+        name: a.name,
+        email: a.email,
+        role: a.role,
+        passwordHash: a.password_hash,
+        tokenVersion: parseInt(a.token_version, 10) || 1,
+      };
+    }
+  } catch (err) {
+    console.error('[NEON] getAdminByEmail error:', err.message);
+  }
+  return null;
+}
+
+async function getAdminById(id) {
+  const sql = getClient();
+  if (!sql || !id) return null;
+  try {
+    const rows = await sql.query(`SELECT * FROM admins WHERE id = $1 LIMIT 1;`, [id]);
+    if (rows && rows.length > 0) {
+      const a = rows[0];
+      return {
+        id: a.id,
+        name: a.name,
+        email: a.email,
+        role: a.role,
+        passwordHash: a.password_hash,
+        tokenVersion: parseInt(a.token_version, 10) || 1,
+      };
+    }
+  } catch (err) {
+    console.error('[NEON] getAdminById error:', err.message);
+  }
+  return null;
+}
+
+async function getAllAdmins() {
+  const sql = getClient();
+  if (!sql) return [];
+  try {
+    const rows = await sql.query(`SELECT id, name, email, role, token_version FROM admins;`);
+    return (rows || []).map(a => ({
+      id: a.id,
+      name: a.name,
+      email: a.email,
+      role: a.role,
+      tokenVersion: parseInt(a.token_version, 10) || 1,
+    }));
+  } catch (err) {
+    return [];
+  }
+}
+
+async function updateAdminPassword(id, passwordHash, tokenVersion) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  try {
+    await sql.query(
+      `UPDATE admins SET password_hash = $1, token_version = $2, updated_at = NOW() WHERE id = $3;`,
+      [passwordHash, tokenVersion, id]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateAdminPassword error:', err.message);
+    return false;
+  }
+}
+
+async function updateAdminTokenVersion(id, tokenVersion) {
+  const sql = getClient();
+  if (!sql || !id) return false;
+  try {
+    await sql.query(
+      `UPDATE admins SET token_version = $1, updated_at = NOW() WHERE id = $2;`,
+      [tokenVersion, id]
+    );
+    return true;
+  } catch (err) {
+    console.error('[NEON] updateAdminTokenVersion error:', err.message);
+    return false;
+  }
+}
+
 module.exports = {
   getClient,
   initNeon,
   fetchNeonState,
   saveNeonState,
   updatePortfolioState,
-  upsertProfile,
-  upsertProject,
-  deleteProject,
-  upsertSkill,
-  deleteSkill,
+  getTeamMembers,
+  getTeamMemberById,
   upsertTeamMember,
   deleteTeamMember,
+  getProjects,
+  getProjectById,
+  upsertProject,
+  deleteProject,
+  getSkills,
+  getSkillById,
+  upsertSkill,
+  deleteSkill,
+  getCertifications,
+  getCertificationById,
   upsertCertification,
   deleteCertification,
+  getExperiences,
+  getExperienceById,
   upsertExperience,
   deleteExperience,
+  getServices,
+  getServiceById,
   upsertService,
   deleteService,
+  getEvents,
+  getEventById,
   upsertEvent,
   deleteEvent,
+  getProfile,
+  upsertProfile,
+  getSettings,
+  updateSettings,
+  getInquiries,
   insertInquiry,
   updateInquiry,
+  updateInquiryStatus,
   deleteInquiry,
+  getAdminByEmail,
+  getAdminById,
+  getAllAdmins,
+  updateAdminPassword,
+  updateAdminTokenVersion,
   saveUploadedAsset,
   getUploadedAsset,
   formatCertification,

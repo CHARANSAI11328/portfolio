@@ -13,25 +13,22 @@ export async function PATCH(
 
   const { id } = await params;
   const db = getDatabase();
+  db.inquiries = db.inquiries || [];
   const inquiry = db.inquiries.find((i) => i.id === id);
-
-  if (!inquiry) {
-    return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
-  }
 
   try {
     const { status } = await request.json();
     if (status) {
-      inquiry.status = status;
+      if (inquiry) inquiry.status = status;
       const n = getNeon();
       if (n && typeof n.updateInquiry === 'function') {
         await n.updateInquiry(id, { status }).catch(() => {});
       }
       saveDatabase(db);
-      logActivity('UPDATE', 'Inquiry', `Marked inquiry from ${inquiry.name} as ${status}`);
+      logActivity('UPDATE', 'Inquiry', `Marked inquiry ${id} as ${status}`);
     }
 
-    return NextResponse.json({ success: true, inquiry });
+    return NextResponse.json({ success: true, inquiry: inquiry || { id, status } });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to update inquiry';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -49,16 +46,14 @@ export async function DELETE(
 
   const { id } = await params;
   const db = getDatabase();
+  db.inquiries = db.inquiries || [];
   const inquiry = db.inquiries.find((i) => i.id === id);
-
-  if (!inquiry) {
-    return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
-  }
+  const delName = inquiry ? inquiry.name : id;
 
   db.inquiries = db.inquiries.filter((i) => i.id !== id);
   await deleteNeonRecord('inquiries', id);
   saveDatabase(db);
-  logActivity('DELETE', 'Inquiry', `Deleted inquiry from ${inquiry.name}`);
+  logActivity('DELETE', 'Inquiry', `Deleted inquiry from ${delName}`);
 
   return NextResponse.json({ success: true, message: 'Inquiry deleted' });
 }

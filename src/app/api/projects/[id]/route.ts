@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function GET(
@@ -7,8 +7,17 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const db = getDatabase();
-  const project = db.projects.find((p) => p.id === id || p.slug === id);
+  const n = getNeon();
+  let project = null;
+  if (n) {
+    try {
+      project = await n.getProjectById(id);
+    } catch {}
+  }
+  if (!project) {
+    const db = getDatabase();
+    project = db.projects.find((p) => p.id === id || p.slug === id);
+  }
 
   if (!project) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
@@ -35,13 +44,23 @@ export async function PUT(
   const db = getDatabase();
   const index = db.projects.findIndex((p) => p.id === id);
 
-  if (index === -1) {
+  const n = getNeon();
+  let existing = null;
+  if (n) {
+    try {
+      existing = await n.getProjectById(id);
+    } catch {}
+  }
+  if (!existing && index !== -1) {
+    existing = db.projects[index];
+  }
+
+  if (!existing) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 });
   }
 
   try {
     const updates = await request.json();
-    const existing = db.projects[index];
 
     const updatedProject = {
       ...existing,
@@ -50,7 +69,11 @@ export async function PUT(
       updatedAt: new Date().toISOString(),
     };
 
-    db.projects[index] = updatedProject;
+    if (index !== -1) {
+      db.projects[index] = updatedProject;
+    } else {
+      db.projects.push(updatedProject);
+    }
     await upsertNeonRecord('projects', updatedProject);
     saveDatabase(db);
     logActivity('UPDATE', 'Project', `Updated project: ${updatedProject.title}`);
@@ -74,15 +97,12 @@ export async function DELETE(
   const { id } = await params;
   const db = getDatabase();
   const project = db.projects.find((p) => p.id === id);
-
-  if (!project) {
-    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-  }
+  const delTitle = project ? project.title : id;
 
   db.projects = db.projects.filter((p) => p.id !== id);
   await deleteNeonRecord('projects', id);
   saveDatabase(db);
-  logActivity('DELETE', 'Project', `Deleted project: ${project.title}`);
+  logActivity('DELETE', 'Project', `Deleted project: ${delTitle}`);
 
   return NextResponse.json({ success: true, message: 'Project removed successfully' });
 }

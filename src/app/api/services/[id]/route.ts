@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function PUT(
@@ -13,20 +13,37 @@ export async function PUT(
 
   const { id } = await params;
   const db = getDatabase();
+  db.services = db.services || [];
   const index = db.services.findIndex((s) => s.id === id);
 
-  if (index === -1) {
+  const n = getNeon();
+  let existing = null;
+  if (n) {
+    try {
+      existing = await n.getServiceById(id);
+    } catch {}
+  }
+  if (!existing && index !== -1) {
+    existing = db.services[index];
+  }
+
+  if (!existing) {
     return NextResponse.json({ error: 'Service not found' }, { status: 404 });
   }
 
   try {
     const updates = await request.json();
-    db.services[index] = { ...db.services[index], ...updates, id };
-    await upsertNeonRecord('services', db.services[index]);
+    const updatedService = { ...existing, ...updates, id };
+    if (index !== -1) {
+      db.services[index] = updatedService;
+    } else {
+      db.services.push(updatedService);
+    }
+    await upsertNeonRecord('services', updatedService);
     saveDatabase(db);
-    logActivity('UPDATE', 'Service', `Updated service: ${db.services[index].title}`);
+    logActivity('UPDATE', 'Service', `Updated service: ${updatedService.title}`);
 
-    return NextResponse.json({ success: true, service: db.services[index] });
+    return NextResponse.json({ success: true, service: updatedService });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to update service';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -44,16 +61,14 @@ export async function DELETE(
 
   const { id } = await params;
   const db = getDatabase();
+  db.services = db.services || [];
   const serv = db.services.find((s) => s.id === id);
-
-  if (!serv) {
-    return NextResponse.json({ error: 'Service not found' }, { status: 404 });
-  }
+  const delTitle = serv ? serv.title : id;
 
   db.services = db.services.filter((s) => s.id !== id);
   await deleteNeonRecord('services', id);
   saveDatabase(db);
-  logActivity('DELETE', 'Service', `Deleted service: ${serv.title}`);
+  logActivity('DELETE', 'Service', `Deleted service: ${delTitle}`);
 
   return NextResponse.json({ success: true, message: 'Service removed successfully' });
 }

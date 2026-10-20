@@ -120,8 +120,7 @@ function buildAuthCookie(req, token, isLogout = false) {
 }
 
 // Helper to verify request admin auth (supports Authorization Bearer header and session cookie)
-function getAuthAdmin(req) {
-  const db = getDatabase();
+async function getAuthAdmin(req) {
   const candidates = [];
 
   // 1. Prioritize Authorization: Bearer header
@@ -143,7 +142,13 @@ function getAuthAdmin(req) {
   for (const token of candidates) {
     const payload = verifyToken(token);
     if (payload && (payload.id || payload.email)) {
-      const admin = (db.admins || []).find((a) => a.id === payload.id || a.email === payload.email);
+      let admin = null;
+      if (payload.id) admin = await neon.getAdminById(payload.id);
+      if (!admin && payload.email) admin = await neon.getAdminByEmail(payload.email);
+      if (!admin) {
+        const db = getDatabase();
+        admin = (db.admins || []).find((a) => a.id === payload.id || a.email === payload.email);
+      }
       if (admin) return admin;
     }
   }
@@ -302,18 +307,21 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 429, { error: 'Too many failed login attempts. Please wait 2 minutes before trying again.' });
       }
 
-      const db = getDatabase();
-      const admin = (db.admins || []).find((a) => {
-        const aEmail = String(a.email || '').toLowerCase().trim();
-        const profEmail = String(db.profile?.email || '').toLowerCase().trim();
-        return (
-          aEmail === identifier ||
-          identifier === 'admin' ||
-          identifier === 'charan' ||
-          identifier === 'charansai' ||
-          (profEmail && profEmail === identifier)
-        );
-      });
+      let admin = await neon.getAdminByEmail(identifier);
+      if (!admin) {
+        const db = getDatabase();
+        admin = (db.admins || []).find((a) => {
+          const aEmail = String(a.email || '').toLowerCase().trim();
+          const profEmail = String(db.profile?.email || '').toLowerCase().trim();
+          return (
+            aEmail === identifier ||
+            identifier === 'admin' ||
+            identifier === 'charan' ||
+            identifier === 'charansai' ||
+            (profEmail && profEmail === identifier)
+          );
+        });
+      }
 
       if (!admin || !verifyPassword(password, admin.passwordHash)) {
         recordFailedAttempt(loginAttempts, rateLimitKey);
@@ -340,10 +348,11 @@ const server = http.createServer(async (req, res) => {
 
     // Auth Logout with Token Version Invalidation
     if (pathname === '/api/auth/logout' && method === 'POST') {
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (admin) {
+        await neon.updateAdminTokenVersion(admin.id, (admin.tokenVersion || 1) + 1);
         const db = getDatabase();
-        const adminIndex = db.admins.findIndex((a) => a.id === admin.id);
+        const adminIndex = (db.admins || []).findIndex((a) => a.id === admin.id);
         if (adminIndex !== -1) {
           db.admins[adminIndex].tokenVersion = (db.admins[adminIndex].tokenVersion || 1) + 1;
           saveDatabase(db);
@@ -356,12 +365,29 @@ const server = http.createServer(async (req, res) => {
 
     // Database & Neon PostgreSQL Status
     if (pathname === '/api/db/status' && method === 'GET') {
-      const db = getDatabase();
-      return sendJson(res, 200, {
-        database: 'Neon PostgreSQL',
-        connected: isNeonConnected(),
-        branch: process.env.NEON_BRANCH || 'production',
-        counts: {
+      let counts = {};
+      try {
+        const [adm, prj, skl, tm, crt, srv, exp] = await Promise.all([
+          neon.query('SELECT COUNT(*) AS c FROM admins;'),
+          neon.query('SELECT COUNT(*) AS c FROM projects;'),
+          neon.query('SELECT COUNT(*) AS c FROM skills;'),
+          neon.query('SELECT COUNT(*) AS c FROM team_members;'),
+          neon.query('SELECT COUNT(*) AS c FROM certifications;'),
+          neon.query('SELECT COUNT(*) AS c FROM services;'),
+          neon.query('SELECT COUNT(*) AS c FROM experiences;'),
+        ]);
+        counts = {
+          admins: parseInt(adm[0]?.c || 0, 10),
+          projects: parseInt(prj[0]?.c || 0, 10),
+          skills: parseInt(skl[0]?.c || 0, 10),
+          team: parseInt(tm[0]?.c || 0, 10),
+          certifications: parseInt(crt[0]?.c || 0, 10),
+          services: parseInt(srv[0]?.c || 0, 10),
+          experiences: parseInt(exp[0]?.c || 0, 10),
+        };
+      } catch (err) {
+        const db = getDatabase();
+        counts = {
           admins: (db.admins || []).length,
           projects: (db.projects || []).length,
           skills: (db.skills || []).length,
@@ -369,14 +395,20 @@ const server = http.createServer(async (req, res) => {
           certifications: (db.certifications || []).length,
           services: (db.services || []).length,
           experiences: (db.experiences || []).length,
-        },
+        };
+      }
+      return sendJson(res, 200, {
+        database: 'Neon PostgreSQL',
+        connected: isNeonConnected(),
+        branch: process.env.NEON_BRANCH || 'production',
+        counts,
         timestamp: new Date().toISOString(),
       });
     }
 
     // Auth Me
     if (pathname === '/api/auth/me' && method === 'GET') {
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) {
         return sendJson(res, 401, { authenticated: false, admin: null });
       }
@@ -397,7 +429,7 @@ const server = http.createServer(async (req, res) => {
 
     // Auth Change Password (Protected, Rate-Limited, Session-Revoking)
     if (pathname === '/api/auth/change-password' && method === 'POST') {
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) {
         return sendJson(res, 401, { error: 'Unauthorized. Admin credentials required.' });
       }
@@ -434,28 +466,28 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 400, { error: 'New password must be different from current password.' });
       }
 
-      const db = getDatabase();
-      const adminIndex = db.admins.findIndex((a) => a.id === admin.id);
-      if (adminIndex === -1) {
-        return sendJson(res, 500, { error: 'Admin account record not found.' });
-      }
+      const newTokenVersion = (admin.tokenVersion || 1) + 1;
+      const newHash = hashPassword(newPassword);
 
-      // Invalidate all existing tokens by incrementing tokenVersion
-      const newTokenVersion = (db.admins[adminIndex].tokenVersion || 1) + 1;
-      db.admins[adminIndex].passwordHash = hashPassword(newPassword);
-      db.admins[adminIndex].tokenVersion = newTokenVersion;
-      db.admins[adminIndex].passwordChangedAt = new Date().toISOString();
-      saveDatabase(db);
+      await neon.updateAdminPassword(admin.id, newHash, newTokenVersion);
+      const db = getDatabase();
+      const adminIndex = (db.admins || []).findIndex((a) => a.id === admin.id);
+      if (adminIndex !== -1) {
+        db.admins[adminIndex].passwordHash = newHash;
+        db.admins[adminIndex].tokenVersion = newTokenVersion;
+        db.admins[adminIndex].passwordChangedAt = new Date().toISOString();
+        saveDatabase(db);
+      }
 
       clearFailedAttempts(passwordChangeAttempts, rateLimitKey);
       logActivity('SECURITY', 'Admin', 'Admin password changed successfully and all existing sessions revoked');
 
       // Issue a fresh token for current session
       const freshToken = createToken({
-        id: db.admins[adminIndex].id,
-        email: db.admins[adminIndex].email,
-        name: db.admins[adminIndex].name,
-        role: db.admins[adminIndex].role,
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role,
         tokenVersion: newTokenVersion,
       });
       const cookieHeader = buildAuthCookie(req, freshToken);
@@ -469,41 +501,40 @@ const server = http.createServer(async (req, res) => {
 
     // Profile GET & PUT
     if (pathname === '/api/profile') {
-      const db = getDatabase();
       if (method === 'GET') {
-        if (isNeonConnected()) {
-          try {
-            const rows = await neon.query(`SELECT * FROM profile WHERE id = 'profile-charan-sai' LIMIT 1;`);
-            if (rows && rows.length > 0) {
-              const liveProfile = neon.formatProfile(rows[0]);
-              db.profile = liveProfile;
-              return sendJson(res, 200, { profile: liveProfile });
-            }
-          } catch (err) {
-            console.warn('[NEON] Profile live query failed, falling back to cache:', err.message);
+        try {
+          const liveProfile = await neon.getProfile();
+          if (liveProfile) {
+            return sendJson(res, 200, { profile: liveProfile });
           }
+        } catch (err) {
+          console.warn('[NEON] Profile live query failed:', err.message);
         }
-        return sendJson(res, 200, { profile: db.profile });
+        const db = getDatabase();
+        return sendJson(res, 200, { profile: db.profile || {} });
       }
       if (method === 'PUT') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized admin credentials required' });
         const updates = await parseJsonBody(req);
-        db.profile = { ...db.profile, ...updates, updatedAt: new Date().toISOString() };
+        const existing = (await neon.getProfile()) || getDatabase().profile || {};
+        const updatedProfile = { ...existing, ...updates, updatedAt: new Date().toISOString() };
         try {
-          await neon.upsertProfile(db.profile);
+          await neon.upsertProfile(updatedProfile);
         } catch (err) {
           console.error('[NEON] Failed to sync profile to Neon:', err.message);
         }
+        const db = getDatabase();
+        db.profile = updatedProfile;
         saveDatabase(db);
         logActivity('UPDATE', 'Profile', 'Updated personal profile details');
-        return sendJson(res, 200, { success: true, profile: db.profile });
+        return sendJson(res, 200, { success: true, profile: updatedProfile });
       }
     }
 
     // Asset Upload (Protected, Strict Raster Only, Magic Bytes Verified)
     if (pathname === '/api/upload' && method === 'POST') {
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) {
         return sendJson(res, 401, { error: 'Unauthorized. Admin credentials required.' });
       }
@@ -601,27 +632,20 @@ const server = http.createServer(async (req, res) => {
 
     // Projects GET & POST
     if (pathname === '/api/projects') {
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
 
       if (method === 'GET') {
-        if (isNeonConnected()) {
-          try {
-            const rows = await neon.query(`SELECT * FROM projects ORDER BY display_order ASC, id ASC;`);
-            let projs = rows.map(neon.formatProject);
-            db.projects = projs;
-            if (!admin) projs = projs.filter((p) => p.published);
-            return sendJson(res, 200, { projects: projs, isAdmin: !!admin });
-          } catch (err) {
-            console.warn('[NEON] Projects live query error, using cache:', err.message);
-          }
+        try {
+          const projs = await neon.getProjects(!admin);
+          return sendJson(res, 200, { projects: projs, isAdmin: !!admin });
+        } catch (err) {
+          console.warn('[NEON] Projects live query error:', err.message);
+          const db = getDatabase();
+          let list = db.projects || [];
+          if (!admin) list = list.filter((p) => p.published);
+          list.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+          return sendJson(res, 200, { projects: list, isAdmin: !!admin });
         }
-        let list = db.projects || [];
-        if (!admin) {
-          list = list.filter((p) => p.published);
-        }
-        list.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-        return sendJson(res, 200, { projects: list, isAdmin: !!admin });
       }
 
       if (method === 'POST') {
@@ -645,17 +669,15 @@ const server = http.createServer(async (req, res) => {
           repoUrl: body.repoUrl?.trim() || '',
           featured: !!body.featured,
           published: typeof body.published === 'boolean' ? body.published : true,
-          displayOrder: db.projects.length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || 1,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
 
+        await neon.upsertProject(newProject);
+        const db = getDatabase();
+        db.projects = db.projects || [];
         db.projects.push(newProject);
-        try {
-          await neon.upsertProject(newProject);
-        } catch (err) {
-          console.error('[NEON] Failed to sync new project to Neon:', err.message);
-        }
         saveDatabase(db);
         logActivity('CREATE', 'Project', `Added project: ${newProject.title}`);
         return sendJson(res, 201, { success: true, project: newProject });
@@ -665,59 +687,49 @@ const server = http.createServer(async (req, res) => {
     // Projects Single (PUT, DELETE)
     if (pathname.startsWith('/api/projects/')) {
       const id = pathname.replace('/api/projects/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
 
-      const idx = db.projects.findIndex((p) => p.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Project not found' });
+      const existing = await neon.getProjectById(id);
+      if (!existing) return sendJson(res, 404, { error: 'Project not found' });
 
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
-        db.projects[idx] = { ...db.projects[idx], ...updates, id, updatedAt: new Date().toISOString() };
-        try {
-          await neon.upsertProject(db.projects[idx]);
-        } catch (err) {
-          console.error('[NEON] Failed to update project in Neon:', err.message);
-        }
+        const updated = { ...existing, ...updates, id, updatedAt: new Date().toISOString() };
+        await neon.upsertProject(updated);
+        const db = getDatabase();
+        const idx = (db.projects || []).findIndex((p) => p.id === id);
+        if (idx !== -1) db.projects[idx] = updated;
         saveDatabase(db);
-        logActivity('UPDATE', 'Project', `Updated project: ${db.projects[idx].title}`);
-        return sendJson(res, 200, { success: true, project: db.projects[idx] });
+        logActivity('UPDATE', 'Project', `Updated project: ${updated.title}`);
+        return sendJson(res, 200, { success: true, project: updated });
       }
 
       if (method === 'DELETE') {
-        const deleted = db.projects.splice(idx, 1)[0];
-        try {
-          await neon.deleteProject(id);
-        } catch (err) {
-          console.error('[NEON] Failed to delete project from Neon:', err.message);
-        }
+        await neon.deleteProject(id);
+        const db = getDatabase();
+        db.projects = (db.projects || []).filter((p) => p.id !== id);
         saveDatabase(db);
-        logActivity('DELETE', 'Project', `Deleted project: ${deleted.title}`);
+        logActivity('DELETE', 'Project', `Deleted project: ${id}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
       }
     }
 
     // Certifications GET & POST
     if (pathname === '/api/certifications') {
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
 
       if (method === 'GET') {
-        if (isNeonConnected()) {
-          try {
-            const rows = await neon.query(`SELECT * FROM certifications ORDER BY display_order ASC, id ASC;`);
-            let certs = rows.map(neon.formatCertification);
-            db.certifications = certs;
-            if (!admin) certs = certs.filter((c) => c.published);
-            return sendJson(res, 200, { certifications: certs, isAdmin: !!admin });
-          } catch (err) {
-            console.warn('[NEON] Certifications live query error, using cache:', err.message);
-          }
+        try {
+          const certs = await neon.getCertifications(!admin);
+          return sendJson(res, 200, { certifications: certs, isAdmin: !!admin });
+        } catch (err) {
+          console.warn('[NEON] Certifications live query error:', err.message);
+          const db = getDatabase();
+          let list = db.certifications || [];
+          if (!admin) list = list.filter((c) => c.published);
+          return sendJson(res, 200, { certifications: list, isAdmin: !!admin });
         }
-        let list = db.certifications || [];
-        if (!admin) list = list.filter((c) => c.published);
-        return sendJson(res, 200, { certifications: list, isAdmin: !!admin });
       }
 
       if (method === 'POST') {
@@ -735,15 +747,13 @@ const server = http.createServer(async (req, res) => {
           credentialId: body.credentialId?.trim() || '',
           verificationUrl: body.verificationUrl?.trim() || '',
           published: typeof body.published === 'boolean' ? body.published : true,
-          displayOrder: db.certifications.length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || 1,
         };
 
+        await neon.upsertCertification(newCert);
+        const db = getDatabase();
+        db.certifications = db.certifications || [];
         db.certifications.push(newCert);
-        try {
-          await neon.upsertCertification(newCert);
-        } catch (err) {
-          console.error('[NEON] Failed to sync new certificate to Neon:', err.message);
-        }
         saveDatabase(db);
         logActivity('CREATE', 'Certification', `Added certification: ${newCert.title}`);
         return sendJson(res, 201, { success: true, certification: newCert });
@@ -753,74 +763,70 @@ const server = http.createServer(async (req, res) => {
     // Certifications Single (PUT, DELETE)
     if (pathname.startsWith('/api/certifications/')) {
       const id = pathname.replace('/api/certifications/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
 
-      const idx = db.certifications.findIndex((c) => c.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Certification not found' });
+      const existing = await neon.getCertificationById(id);
+      if (!existing) return sendJson(res, 404, { error: 'Certification not found' });
 
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
-        db.certifications[idx] = { ...db.certifications[idx], ...updates, id };
-        try {
-          await neon.upsertCertification(db.certifications[idx]);
-        } catch (err) {
-          console.error('[NEON] Failed to update certificate in Neon:', err.message);
-        }
+        const updated = { ...existing, ...updates, id };
+        await neon.upsertCertification(updated);
+        const db = getDatabase();
+        const idx = (db.certifications || []).findIndex((c) => c.id === id);
+        if (idx !== -1) db.certifications[idx] = updated;
         saveDatabase(db);
-        logActivity('UPDATE', 'Certification', `Updated cert: ${db.certifications[idx].title}`);
-        return sendJson(res, 200, { success: true, certification: db.certifications[idx] });
+        logActivity('UPDATE', 'Certification', `Updated cert: ${updated.title}`);
+        return sendJson(res, 200, { success: true, certification: updated });
       }
 
       if (method === 'DELETE') {
-        const deleted = db.certifications.splice(idx, 1)[0];
-        try {
-          await neon.deleteCertification(id);
-        } catch (err) {
-          console.error('[NEON] Failed to delete certificate from Neon:', err.message);
-        }
+        await neon.deleteCertification(id);
+        const db = getDatabase();
+        db.certifications = (db.certifications || []).filter((c) => c.id !== id);
         saveDatabase(db);
-        logActivity('DELETE', 'Certification', `Deleted cert: ${deleted.title}`);
+        logActivity('DELETE', 'Certification', `Deleted cert: ${id}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
       }
     }
 
     // Skills GET & POST
     if (pathname === '/api/skills') {
-      const db = getDatabase();
       if (method === 'GET') {
         if (isNeonConnected()) {
           try {
-            const rows = await neon.query(`SELECT * FROM skills ORDER BY display_order ASC, id ASC;`);
-            const skills = rows.map(neon.formatSkill);
-            db.skills = skills;
+            const skills = await neon.getSkills();
             return sendJson(res, 200, { skills });
           } catch (err) {
-            console.warn('[NEON] Skills live query error, using cache:', err.message);
+            console.warn('[NEON] Skills live query error:', err.message);
           }
         }
+        const db = getDatabase();
         return sendJson(res, 200, { skills: db.skills || [] });
       }
       if (method === 'POST') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
         const body = await parseJsonBody(req);
+        if (!body.name) return sendJson(res, 400, { error: 'Skill name is required' });
+        const db = getDatabase();
+        const count = isNeonConnected() ? (await neon.getSkills()).length : (db.skills || []).length;
         const newSkill = {
           id: `sk-${Date.now()}`,
           name: body.name.trim(),
           category: body.category || 'Frontend',
           icon: body.icon || 'Code',
           featured: typeof body.featured === 'boolean' ? body.featured : true,
-          displayOrder: (db.skills || []).length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || count + 1,
         };
-        db.skills = db.skills || [];
-        db.skills.push(newSkill);
         try {
           await neon.upsertSkill(newSkill);
         } catch (err) {
           console.error('[NEON] Failed to sync new skill to Neon:', err.message);
         }
+        db.skills = db.skills || [];
+        db.skills.push(newSkill);
         saveDatabase(db);
         logActivity('CREATE', 'Skill', `Added skill: ${newSkill.name}`);
         return sendJson(res, 201, { success: true, skill: newSkill });
@@ -829,57 +835,71 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith('/api/skills/')) {
       const id = pathname.replace('/api/skills/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
+      const db = getDatabase();
       db.skills = db.skills || [];
       const idx = db.skills.findIndex((s) => s.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Skill not found' });
+
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
-        db.skills[idx] = { ...db.skills[idx], ...updates, id };
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getSkillById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.skills[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Skill not found' });
+
+        const updatedSkill = { ...existing, ...updates, id };
         try {
-          await neon.upsertSkill(db.skills[idx]);
+          await neon.upsertSkill(updatedSkill);
         } catch (err) {
           console.error('[NEON] Failed to update skill in Neon:', err.message);
         }
+        if (idx !== -1) db.skills[idx] = updatedSkill;
         saveDatabase(db);
-        logActivity('UPDATE', 'Skill', `Updated skill: ${db.skills[idx].name}`);
-        return sendJson(res, 200, { success: true, skill: db.skills[idx] });
+        logActivity('UPDATE', 'Skill', `Updated skill: ${updatedSkill.name}`);
+        return sendJson(res, 200, { success: true, skill: updatedSkill });
       }
       if (method === 'DELETE') {
-        const del = db.skills.splice(idx, 1)[0];
         try {
           await neon.deleteSkill(id);
         } catch (err) {
           console.error('[NEON] Failed to delete skill from Neon:', err.message);
         }
+        let delName = id;
+        if (idx !== -1) {
+          const del = db.skills.splice(idx, 1)[0];
+          delName = del.name;
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Skill', `Deleted skill: ${del.name}`);
+        logActivity('DELETE', 'Skill', `Deleted skill: ${delName}`);
         return sendJson(res, 200, { success: true });
       }
     }
 
     // Experience GET, POST, PUT, DELETE
     if (pathname === '/api/experience') {
-      const db = getDatabase();
       if (method === 'GET') {
         if (isNeonConnected()) {
           try {
-            const rows = await neon.query(`SELECT * FROM experiences ORDER BY display_order ASC, id ASC;`);
-            const experiences = rows.map(neon.formatExperience);
-            db.experiences = experiences;
+            const experiences = await neon.getExperiences();
             return sendJson(res, 200, { experiences });
           } catch (err) {
-            console.warn('[NEON] Experiences live query error, using cache:', err.message);
+            console.warn('[NEON] Experiences live query error:', err.message);
           }
         }
+        const db = getDatabase();
         return sendJson(res, 200, { experiences: db.experiences || [] });
       }
       if (method === 'POST') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
         const body = await parseJsonBody(req);
+        const db = getDatabase();
+        const count = isNeonConnected() ? (await neon.getExperiences()).length : (db.experiences || []).length;
         const newExp = {
           id: `exp-${Date.now()}`,
           role: body.role?.trim() || '',
@@ -889,15 +909,15 @@ const server = http.createServer(async (req, res) => {
           description: body.description?.trim() || '',
           highlights: Array.isArray(body.highlights) ? body.highlights : (body.highlights ? body.highlights.split('\n').filter(Boolean) : []),
           type: body.type || 'work',
-          displayOrder: (db.experiences || []).length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || count + 1,
         };
-        db.experiences = db.experiences || [];
-        db.experiences.push(newExp);
         try {
           await neon.upsertExperience(newExp);
         } catch (err) {
           console.error('[NEON] Failed to sync new experience to Neon:', err.message);
         }
+        db.experiences = db.experiences || [];
+        db.experiences.push(newExp);
         saveDatabase(db);
         logActivity('CREATE', 'Experience', `Added experience: ${newExp.role}`);
         return sendJson(res, 201, { success: true, experience: newExp });
@@ -906,56 +926,67 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith('/api/experience/')) {
       const id = pathname.replace('/api/experience/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
+      const db = getDatabase();
       db.experiences = db.experiences || [];
       const idx = db.experiences.findIndex((e) => e.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Experience not found' });
+
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
         if (updates.highlights && typeof updates.highlights === 'string') {
           updates.highlights = updates.highlights.split('\n').filter(Boolean);
         }
-        db.experiences[idx] = { ...db.experiences[idx], ...updates, id };
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getExperienceById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.experiences[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Experience not found' });
+
+        const updatedExp = { ...existing, ...updates, id };
         try {
-          await neon.upsertExperience(db.experiences[idx]);
+          await neon.upsertExperience(updatedExp);
         } catch (err) {
           console.error('[NEON] Failed to update experience in Neon:', err.message);
         }
+        if (idx !== -1) db.experiences[idx] = updatedExp;
         saveDatabase(db);
-        logActivity('UPDATE', 'Experience', `Updated experience: ${db.experiences[idx].role}`);
-        return sendJson(res, 200, { success: true, experience: db.experiences[idx] });
+        logActivity('UPDATE', 'Experience', `Updated experience: ${updatedExp.role}`);
+        return sendJson(res, 200, { success: true, experience: updatedExp });
       }
       if (method === 'DELETE') {
-        const del = db.experiences.splice(idx, 1)[0];
         try {
           await neon.deleteExperience(id);
         } catch (err) {
           console.error('[NEON] Failed to delete experience from Neon:', err.message);
         }
+        let delName = id;
+        if (idx !== -1) {
+          const del = db.experiences.splice(idx, 1)[0];
+          delName = del.role;
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Experience', `Deleted experience: ${del.role}`);
+        logActivity('DELETE', 'Experience', `Deleted experience: ${delName}`);
         return sendJson(res, 200, { success: true });
       }
     }
 
     // Events GET, POST, PUT, DELETE
     if (pathname === '/api/events') {
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (method === 'GET') {
         if (isNeonConnected()) {
           try {
-            const rows = await neon.query(`SELECT * FROM events ORDER BY display_order ASC, id ASC;`);
-            let events = rows.map(neon.formatEvent);
-            db.events = events;
-            if (!admin) events = events.filter((e) => e.published);
+            let events = await neon.getEvents(!admin);
             return sendJson(res, 200, { events, isAdmin: !!admin });
           } catch (err) {
-            console.warn('[NEON] Events live query error, using cache:', err.message);
+            console.warn('[NEON] Events live query error:', err.message);
           }
         }
+        const db = getDatabase();
         let list = db.events || [];
         if (!admin) list = list.filter((e) => e.published);
         return sendJson(res, 200, { events: list, isAdmin: !!admin });
@@ -963,6 +994,8 @@ const server = http.createServer(async (req, res) => {
       if (method === 'POST') {
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
         const body = await parseJsonBody(req);
+        const db = getDatabase();
+        const count = isNeonConnected() ? (await neon.getEvents()).length : (db.events || []).length;
         const newEvent = {
           id: `ev-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
           title: body.title?.trim() || '',
@@ -971,15 +1004,15 @@ const server = http.createServer(async (req, res) => {
           location: body.location || '',
           description: body.description || '',
           published: typeof body.published === 'boolean' ? body.published : true,
-          displayOrder: (db.events || []).length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || count + 1,
         };
-        db.events = db.events || [];
-        db.events.push(newEvent);
         try {
           await neon.upsertEvent(newEvent);
         } catch (err) {
           console.error('[NEON] Failed to sync new event to Neon:', err.message);
         }
+        db.events = db.events || [];
+        db.events.push(newEvent);
         saveDatabase(db);
         logActivity('CREATE', 'Event', `Added event: ${newEvent.title}`);
         return sendJson(res, 201, { success: true, event: newEvent });
@@ -988,57 +1021,71 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith('/api/events/')) {
       const id = pathname.replace('/api/events/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
+      const db = getDatabase();
       db.events = db.events || [];
       const idx = db.events.findIndex((e) => e.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Event not found' });
+
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
-        db.events[idx] = { ...db.events[idx], ...updates, id };
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getEventById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.events[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Event not found' });
+
+        const updatedEvent = { ...existing, ...updates, id };
         try {
-          await neon.upsertEvent(db.events[idx]);
+          await neon.upsertEvent(updatedEvent);
         } catch (err) {
           console.error('[NEON] Failed to update event in Neon:', err.message);
         }
+        if (idx !== -1) db.events[idx] = updatedEvent;
         saveDatabase(db);
-        logActivity('UPDATE', 'Event', `Updated event: ${db.events[idx].title}`);
-        return sendJson(res, 200, { success: true, event: db.events[idx] });
+        logActivity('UPDATE', 'Event', `Updated event: ${updatedEvent.title}`);
+        return sendJson(res, 200, { success: true, event: updatedEvent });
       }
       if (method === 'DELETE') {
-        const del = db.events.splice(idx, 1)[0];
         try {
           await neon.deleteEvent(id);
         } catch (err) {
           console.error('[NEON] Failed to delete event from Neon:', err.message);
         }
+        let delName = id;
+        if (idx !== -1) {
+          const del = db.events.splice(idx, 1)[0];
+          delName = del.title;
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Event', `Deleted event: ${del.title}`);
+        logActivity('DELETE', 'Event', `Deleted event: ${delName}`);
         return sendJson(res, 200, { success: true });
       }
     }
 
     // Services GET, POST, PUT, DELETE
     if (pathname === '/api/services') {
-      const db = getDatabase();
       if (method === 'GET') {
         if (isNeonConnected()) {
           try {
-            const rows = await neon.query(`SELECT * FROM services ORDER BY display_order ASC, id ASC;`);
-            const services = rows.map(neon.formatService);
-            db.services = services;
+            const services = await neon.getServices();
             return sendJson(res, 200, { services });
           } catch (err) {
-            console.warn('[NEON] Services live query error, using cache:', err.message);
+            console.warn('[NEON] Services live query error:', err.message);
           }
         }
+        const db = getDatabase();
         return sendJson(res, 200, { services: db.services || [] });
       }
       if (method === 'POST') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
         const body = await parseJsonBody(req);
+        const db = getDatabase();
+        const count = isNeonConnected() ? (await neon.getServices()).length : (db.services || []).length;
         const newServ = {
           id: `serv-${Date.now()}`,
           title: body.title?.trim() || '',
@@ -1046,15 +1093,15 @@ const server = http.createServer(async (req, res) => {
           icon: body.icon || 'Layout',
           category: body.category || 'Development',
           features: Array.isArray(body.features) ? body.features : (body.features ? body.features.split('\n').filter(Boolean) : []),
-          displayOrder: (db.services || []).length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || count + 1,
         };
-        db.services = db.services || [];
-        db.services.push(newServ);
         try {
           await neon.upsertService(newServ);
         } catch (err) {
           console.error('[NEON] Failed to sync new service to Neon:', err.message);
         }
+        db.services = db.services || [];
+        db.services.push(newServ);
         saveDatabase(db);
         logActivity('CREATE', 'Service', `Added service: ${newServ.title}`);
         return sendJson(res, 201, { success: true, service: newServ });
@@ -1063,60 +1110,71 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith('/api/services/')) {
       const id = pathname.replace('/api/services/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
+      const db = getDatabase();
       db.services = db.services || [];
       const idx = db.services.findIndex((s) => s.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Service not found' });
+
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
         if (updates.features && typeof updates.features === 'string') {
           updates.features = updates.features.split('\n').filter(Boolean);
         }
-        db.services[idx] = { ...db.services[idx], ...updates, id };
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getServiceById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.services[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Service not found' });
+
+        const updatedServ = { ...existing, ...updates, id };
         try {
-          await neon.upsertService(db.services[idx]);
+          await neon.upsertService(updatedServ);
         } catch (err) {
           console.error('[NEON] Failed to update service in Neon:', err.message);
         }
+        if (idx !== -1) db.services[idx] = updatedServ;
         saveDatabase(db);
-        logActivity('UPDATE', 'Service', `Updated service: ${db.services[idx].title}`);
-        return sendJson(res, 200, { success: true, service: db.services[idx] });
+        logActivity('UPDATE', 'Service', `Updated service: ${updatedServ.title}`);
+        return sendJson(res, 200, { success: true, service: updatedServ });
       }
       if (method === 'DELETE') {
-        const del = db.services.splice(idx, 1)[0];
         try {
           await neon.deleteService(id);
         } catch (err) {
           console.error('[NEON] Failed to delete service from Neon:', err.message);
         }
+        let delName = id;
+        if (idx !== -1) {
+          const del = db.services.splice(idx, 1)[0];
+          delName = del.title;
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Service', `Deleted service: ${del.title}`);
+        logActivity('DELETE', 'Service', `Deleted service: ${delName}`);
         return sendJson(res, 200, { success: true });
       }
     }
 
     // Team Members GET, POST, PUT, DELETE
     if (pathname === '/api/team') {
-      const db = getDatabase();
-      db.team = db.team || [];
       if (method === 'GET') {
         if (isNeonConnected()) {
           try {
-            const rows = await neon.query(`SELECT * FROM team_members ORDER BY display_order ASC, id ASC;`);
-            const members = rows.map(neon.formatTeamMember);
-            db.team = members;
-            return sendJson(res, 200, { team: members });
+            const team = await neon.getTeamMembers();
+            return sendJson(res, 200, { team });
           } catch (err) {
-            console.warn('[NEON] Team live query error, using cache:', err.message);
+            console.warn('[NEON] Team live query error:', err.message);
           }
         }
-        const sorted = [...db.team].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+        const db = getDatabase();
+        const sorted = [...(db.team || [])].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
         return sendJson(res, 200, { team: sorted });
       }
       if (method === 'POST') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized. Admin credentials required.' });
         const body = await parseJsonBody(req);
         if (!body.name || !body.role) {
@@ -1132,6 +1190,8 @@ const server = http.createServer(async (req, res) => {
         const linkedin = body.linkedin?.trim() || body.socials?.linkedin?.trim() || '';
         const email = body.email?.trim() || body.socials?.email?.trim() || '';
         const portfolio = body.portfolio?.trim() || body.socials?.portfolio?.trim() || '';
+        const db = getDatabase();
+        const count = isNeonConnected() ? (await neon.getTeamMembers()).length : (db.team || []).length;
         const newMember = {
           id: `team-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
           name: body.name.trim(),
@@ -1144,16 +1204,17 @@ const server = http.createServer(async (req, res) => {
           email,
           portfolio,
           socials: { github, linkedin, email, portfolio },
-          displayOrder: parseInt(body.displayOrder, 10) || db.team.length + 1,
+          displayOrder: parseInt(body.displayOrder, 10) || count + 1,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        db.team.push(newMember);
         try {
           await neon.upsertTeamMember(newMember);
         } catch (err) {
           console.error('[NEON] Failed to sync new team member to Neon:', err.message);
         }
+        db.team = db.team || [];
+        db.team.push(newMember);
         saveDatabase(db);
         logActivity('CREATE', 'Team', `Added team member: ${newMember.name} (${newMember.role})`);
         return sendJson(res, 201, { success: true, member: newMember });
@@ -1162,27 +1223,37 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname.startsWith('/api/team/')) {
       const id = pathname.replace('/api/team/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized. Admin credentials required.' });
+      const db = getDatabase();
       db.team = db.team || [];
       const idx = db.team.findIndex((m) => m.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Team member not found' });
+
       if (method === 'PUT') {
         const updates = await parseJsonBody(req);
-        let skills = db.team[idx].skills;
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getTeamMemberById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.team[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Team member not found' });
+
+        let skills = existing.skills;
         if (Array.isArray(updates.skills)) {
           skills = updates.skills;
         } else if (typeof updates.skills === 'string') {
           skills = updates.skills.split(',').map((s) => s.trim()).filter(Boolean);
         }
-        const github = (updates.github !== undefined ? updates.github : updates.socials?.github !== undefined ? updates.socials.github : db.team[idx].github) || '';
-        const linkedin = (updates.linkedin !== undefined ? updates.linkedin : updates.socials?.linkedin !== undefined ? updates.socials.linkedin : db.team[idx].linkedin) || '';
-        const email = (updates.email !== undefined ? updates.email : updates.socials?.email !== undefined ? updates.socials.email : db.team[idx].email) || '';
-        const portfolio = (updates.portfolio !== undefined ? updates.portfolio : updates.socials?.portfolio !== undefined ? updates.socials.portfolio : db.team[idx].portfolio) || '';
-        const avatarUrl = (updates.avatarUrl !== undefined ? updates.avatarUrl : db.team[idx].avatarUrl) || '';
-        db.team[idx] = {
-          ...db.team[idx],
+        const github = (updates.github !== undefined ? updates.github : updates.socials?.github !== undefined ? updates.socials.github : existing.github) || '';
+        const linkedin = (updates.linkedin !== undefined ? updates.linkedin : updates.socials?.linkedin !== undefined ? updates.socials.linkedin : existing.linkedin) || '';
+        const email = (updates.email !== undefined ? updates.email : updates.socials?.email !== undefined ? updates.socials.email : existing.email) || '';
+        const portfolio = (updates.portfolio !== undefined ? updates.portfolio : updates.socials?.portfolio !== undefined ? updates.socials.portfolio : existing.portfolio) || '';
+        const avatarUrl = (updates.avatarUrl !== undefined ? updates.avatarUrl : existing.avatarUrl) || '';
+
+        const updatedMember = {
+          ...existing,
           ...updates,
           avatarUrl: String(avatarUrl).trim(),
           skills,
@@ -1199,31 +1270,36 @@ const server = http.createServer(async (req, res) => {
           id,
           updatedAt: new Date().toISOString(),
         };
+
         try {
-          await neon.upsertTeamMember(db.team[idx]);
+          await neon.upsertTeamMember(updatedMember);
         } catch (err) {
           console.error('[NEON] Failed to update team member in Neon:', err.message);
         }
+        if (idx !== -1) db.team[idx] = updatedMember;
         saveDatabase(db);
-        logActivity('UPDATE', 'Team', `Updated team member: ${db.team[idx].name}`);
-        return sendJson(res, 200, { success: true, member: db.team[idx] });
+        logActivity('UPDATE', 'Team', `Updated team member: ${updatedMember.name}`);
+        return sendJson(res, 200, { success: true, member: updatedMember });
       }
       if (method === 'DELETE') {
-        const del = db.team.splice(idx, 1)[0];
         try {
           await neon.deleteTeamMember(id);
         } catch (err) {
           console.error('[NEON] Failed to delete team member from Neon:', err.message);
         }
+        let delName = id;
+        if (idx !== -1) {
+          const del = db.team.splice(idx, 1)[0];
+          delName = del.name;
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Team', `Removed team member: ${del.name}`);
+        logActivity('DELETE', 'Team', `Removed team member: ${delName}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
       }
     }
 
     // Contact Submissions (Public POST, Admin GET, Admin PATCH, Admin DELETE)
     if (pathname === '/api/contact') {
-      const db = getDatabase();
       if (method === 'POST') {
         const { name, email, subject, message, _hp } = await parseJsonBody(req);
         if (_hp) {
@@ -1248,12 +1324,13 @@ const server = http.createServer(async (req, res) => {
           createdAt: new Date().toISOString(),
         };
 
-        db.inquiries = [newInquiry, ...(db.inquiries || [])];
         try {
           await neon.insertInquiry(newInquiry);
         } catch (err) {
           console.error('[NEON] Failed to sync inquiry to Neon:', err.message);
         }
+        const db = getDatabase();
+        db.inquiries = [newInquiry, ...(db.inquiries || [])];
         saveDatabase(db);
         logActivity('INQUIRY', 'Contact', `New message from ${newInquiry.name} (${newInquiry.email})`);
 
@@ -1290,65 +1367,86 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (method === 'GET') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
         if (isNeonConnected()) {
           try {
-            const rows = await neon.query(`SELECT * FROM inquiries ORDER BY created_at DESC;`);
-            const inquiries = rows.map(neon.formatInquiry);
-            db.inquiries = inquiries;
+            const inquiries = await neon.getInquiries();
             return sendJson(res, 200, { inquiries });
           } catch (err) {
-            console.warn('[NEON] Inquiries live query error, using cache:', err.message);
+            console.warn('[NEON] Inquiries live query error:', err.message);
           }
         }
+        const db = getDatabase();
         return sendJson(res, 200, { inquiries: db.inquiries || [] });
       }
     }
 
     if (pathname.startsWith('/api/contact/')) {
       const id = pathname.replace('/api/contact/', '');
-      const db = getDatabase();
-      const admin = getAuthAdmin(req);
+      const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
+      const db = getDatabase();
       db.inquiries = db.inquiries || [];
       const idx = db.inquiries.findIndex((i) => i.id === id);
-      if (idx === -1) return sendJson(res, 404, { error: 'Inquiry not found' });
+
       if (method === 'PATCH') {
         const updates = await parseJsonBody(req);
-        db.inquiries[idx] = { ...db.inquiries[idx], ...updates };
         try {
           await neon.updateInquiry(id, updates);
         } catch (err) {
           console.error('[NEON] Failed to update inquiry in Neon:', err.message);
         }
-        saveDatabase(db);
-        return sendJson(res, 200, { success: true, inquiry: db.inquiries[idx] });
+        if (idx !== -1) {
+          db.inquiries[idx] = { ...db.inquiries[idx], ...updates };
+          saveDatabase(db);
+          return sendJson(res, 200, { success: true, inquiry: db.inquiries[idx] });
+        }
+        return sendJson(res, 200, { success: true, inquiry: { id, ...updates } });
       }
       if (method === 'DELETE') {
-        const del = db.inquiries.splice(idx, 1)[0];
         try {
           await neon.deleteInquiry(id);
         } catch (err) {
           console.error('[NEON] Failed to delete inquiry from Neon:', err.message);
         }
+        let delName = id;
+        if (idx !== -1) {
+          const del = db.inquiries.splice(idx, 1)[0];
+          delName = del.name;
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Inquiry', `Deleted inquiry from: ${del.name}`);
+        logActivity('DELETE', 'Inquiry', `Deleted inquiry from: ${delName}`);
         return sendJson(res, 200, { success: true });
       }
     }
 
     // Settings GET & PUT
     if (pathname === '/api/settings') {
-      const db = getDatabase();
       if (method === 'GET') {
+        if (isNeonConnected()) {
+          try {
+            const settings = await neon.getSettings();
+            if (settings) return sendJson(res, 200, { settings });
+          } catch (err) {
+            console.warn('[NEON] Settings live query error:', err.message);
+          }
+        }
+        const db = getDatabase();
         return sendJson(res, 200, { settings: db.settings });
       }
       if (method === 'PUT') {
-        const admin = getAuthAdmin(req);
+        const admin = await getAuthAdmin(req);
         if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
         const updates = await parseJsonBody(req);
-        db.settings = { ...db.settings, ...updates };
+        const db = getDatabase();
+        const newSettings = { ...db.settings, ...updates };
+        try {
+          await neon.updateSettings(newSettings);
+        } catch (err) {
+          console.error('[NEON] Failed to update settings in Neon:', err.message);
+        }
+        db.settings = newSettings;
         saveDatabase(db);
         logActivity('UPDATE', 'Settings', 'Updated appearance & SEO settings');
         return sendJson(res, 200, { success: true, settings: db.settings });
@@ -1474,15 +1572,13 @@ server.on('error', (err) => {
   }
 });
 
-server.listen(currentPort, HOST, async () => {
+async function startServer() {
   console.log(`\n=======================================================`);
-  console.log(`  Charan Sai Portfolio Server is RUNNING!`);
+  console.log(`  Starting Charan Sai Portfolio Server...`);
   console.log(`  Environment:      ${process.env.NODE_ENV || 'development'}`);
   console.log(`  Host & Port:      ${HOST}:${currentPort}`);
   console.log(`  Storage DATA_DIR: ${path.join(__dirname, '..', 'data')}`);
   console.log(`  Storage UPLOADS:  ${UPLOADS_DIR}`);
-  console.log(`  Website URL:      http://localhost:${currentPort}`);
-  console.log(`  Admin Dashboard:  http://localhost:${currentPort}/admin`);
 
   try {
     const neonOk = await initNeonDatabase();
@@ -1496,7 +1592,14 @@ server.listen(currentPort, HOST, async () => {
     console.error(`  Database Error:   ${err.message}`);
   }
 
-  console.log(`=======================================================\n`);
-});
+  server.listen(currentPort, HOST, () => {
+    console.log(`  Charan Sai Portfolio Server is RUNNING!`);
+    console.log(`  Website URL:      http://localhost:${currentPort}`);
+    console.log(`  Admin Dashboard:  http://localhost:${currentPort}/admin`);
+    console.log(`=======================================================\n`);
+  });
+}
+
+startServer();
 
 

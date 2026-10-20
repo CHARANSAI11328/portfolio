@@ -3,18 +3,18 @@ import { getDatabase, saveDatabase, logActivity, upsertNeonRecord, getNeon } fro
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function GET() {
-  const db = getDatabase();
   const n = getNeon();
   if (n) {
     try {
-      const rows = await n.query(`SELECT * FROM profile WHERE id = 'profile-charan-sai' LIMIT 1;`);
-      if (rows && rows.length > 0) {
-        const liveProfile = n.formatProfile(rows[0]);
-        db.profile = liveProfile;
+      const liveProfile = await n.getProfile();
+      if (liveProfile) {
         return NextResponse.json({ profile: liveProfile });
       }
-    } catch {}
+    } catch (err: unknown) {
+      console.warn('[NEON] Error querying profile:', err);
+    }
   }
+  const db = getDatabase();
   return NextResponse.json({ profile: db.profile });
 }
 

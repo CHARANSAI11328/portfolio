@@ -4,20 +4,18 @@ import { verifyApiAuth } from '@/lib/auth';
 import { ExperienceItem } from '@/lib/types';
 
 export async function GET() {
-  const db = getDatabase();
   const n = getNeon();
   if (n) {
     try {
-      const rows = await n.query(`SELECT * FROM experiences ORDER BY display_order ASC, id ASC;`);
-      if (rows && rows.length > 0) {
-        const liveExperiences = rows.map(n.formatExperience);
-        db.experiences = liveExperiences;
-        return NextResponse.json({ experiences: liveExperiences }, {
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-        });
-      }
-    } catch {}
+      const liveExperiences = await n.getExperiences();
+      return NextResponse.json({ experiences: liveExperiences }, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
+    } catch (err: unknown) {
+      console.warn('[NEON] Error querying experiences:', err);
+    }
   }
+  const db = getDatabase();
   const experiences = (db.experiences || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   return NextResponse.json({ experiences }, {
     headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },

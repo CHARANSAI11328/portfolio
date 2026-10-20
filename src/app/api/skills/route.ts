@@ -4,20 +4,18 @@ import { verifyApiAuth } from '@/lib/auth';
 import { SkillItem } from '@/lib/types';
 
 export async function GET() {
-  const db = getDatabase();
   const n = getNeon();
   if (n) {
     try {
-      const rows = await n.query(`SELECT * FROM skills ORDER BY display_order ASC, id ASC;`);
-      if (rows && rows.length > 0) {
-        const liveSkills = rows.map(n.formatSkill);
-        db.skills = liveSkills;
-        return NextResponse.json({ skills: liveSkills }, {
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-        });
-      }
-    } catch {}
+      const liveSkills = await n.getSkills();
+      return NextResponse.json({ skills: liveSkills }, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
+    } catch (err: unknown) {
+      console.warn('[NEON] Error querying skills:', err);
+    }
   }
+  const db = getDatabase();
   const skills = (db.skills || []).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
   return NextResponse.json({ skills }, {
     headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },

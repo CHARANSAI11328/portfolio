@@ -28,7 +28,7 @@
       "portfolio": "https://charansai.website",
       "displayOrder": 1,
       "createdAt": "2026-10-20T10:34:44.327Z",
-      "updatedAt": "2026-10-20T16:16:47.102Z"
+      "updatedAt": "2026-10-20T16:31:57.877Z"
     },
     {
       "id": "team-1792500786845-9opp",
@@ -44,9 +44,9 @@
         "Team Mentorship"
       ],
       "socials": {
+        "email": "",
         "github": "",
         "linkedin": "",
-        "email": "",
         "portfolio": ""
       },
       "github": "",
@@ -55,7 +55,7 @@
       "portfolio": "",
       "displayOrder": 2,
       "createdAt": "2026-10-20T16:15:32.888Z",
-      "updatedAt": "2026-10-20T16:31:32.652Z"
+      "updatedAt": "2026-10-20T16:31:58.684Z"
     }
   ],
   "admins": [

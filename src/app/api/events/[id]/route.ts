@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord } from '@/lib/db';
+import { getDatabase, saveDatabase, logActivity, deleteNeonRecord, upsertNeonRecord, getNeon } from '@/lib/db';
 import { verifyApiAuth } from '@/lib/auth';
 
 export async function PUT(
@@ -13,20 +13,37 @@ export async function PUT(
 
   const { id } = await params;
   const db = getDatabase();
+  db.events = db.events || [];
   const index = db.events.findIndex((e) => e.id === id);
 
-  if (index === -1) {
+  const n = getNeon();
+  let existing = null;
+  if (n) {
+    try {
+      existing = await n.getEventById(id);
+    } catch {}
+  }
+  if (!existing && index !== -1) {
+    existing = db.events[index];
+  }
+
+  if (!existing) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
   try {
     const updates = await request.json();
-    db.events[index] = { ...db.events[index], ...updates, id };
-    await upsertNeonRecord('events', db.events[index]);
+    const updatedEvent = { ...existing, ...updates, id };
+    if (index !== -1) {
+      db.events[index] = updatedEvent;
+    } else {
+      db.events.push(updatedEvent);
+    }
+    await upsertNeonRecord('events', updatedEvent);
     saveDatabase(db);
-    logActivity('UPDATE', 'Event', `Updated event: ${db.events[index].title}`);
+    logActivity('UPDATE', 'Event', `Updated event: ${updatedEvent.title}`);
 
-    return NextResponse.json({ success: true, event: db.events[index] });
+    return NextResponse.json({ success: true, event: updatedEvent });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to update event';
     return NextResponse.json({ error: message }, { status: 500 });
@@ -44,16 +61,14 @@ export async function DELETE(
 
   const { id } = await params;
   const db = getDatabase();
+  db.events = db.events || [];
   const event = db.events.find((e) => e.id === id);
-
-  if (!event) {
-    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
-  }
+  const delTitle = event ? event.title : id;
 
   db.events = db.events.filter((e) => e.id !== id);
   await deleteNeonRecord('events', id);
   saveDatabase(db);
-  logActivity('DELETE', 'Event', `Deleted event: ${event.title}`);
+  logActivity('DELETE', 'Event', `Deleted event: ${delTitle}`);
 
   return NextResponse.json({ success: true, message: 'Event removed successfully' });
 }
