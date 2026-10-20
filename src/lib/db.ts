@@ -34,8 +34,11 @@ const INITIAL_PROFILE: ProfileData = {
   availabilityStatus: "available",
   availabilityText: "Available for freelance projects",
   socialLinks: {
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
+    github: "https://github.com/CHARANSAI11328",
+    linkedin: "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
+    twitter: "https://x.com/C6H11O5D",
+    x: "https://x.com/C6H11O5D",
+    leetcode: "https://leetcode.com/u/89IIBeaoVG/",
     email: "mailto:contact@charansai.website",
     website: "https://charansai.website",
   },

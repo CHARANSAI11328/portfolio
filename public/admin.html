@@ -882,6 +882,28 @@
               </div>
             </div>
 
+            <div class="form-row" style="background: rgba(15, 23, 42, 0.6); padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <label style="font-weight: 700; color: #E2E8F0; margin-bottom: 0.75rem; display: block;">Social & Coding Profiles</label>
+              <div class="form-grid-2">
+                <div class="form-row">
+                  <label>GitHub Profile URL</label>
+                  <input type="url" id="profGithub" class="form-input" placeholder="https://github.com/...">
+                </div>
+                <div class="form-row">
+                  <label>LinkedIn Profile URL</label>
+                  <input type="url" id="profLinkedin" class="form-input" placeholder="https://www.linkedin.com/in/...">
+                </div>
+                <div class="form-row">
+                  <label>X (Twitter) Profile URL</label>
+                  <input type="url" id="profTwitter" class="form-input" placeholder="https://x.com/...">
+                </div>
+                <div class="form-row">
+                  <label>LeetCode Profile URL</label>
+                  <input type="url" id="profLeetcode" class="form-input" placeholder="https://leetcode.com/u/...">
+                </div>
+              </div>
+            </div>
+
             <div class="form-row" style="background: rgba(99, 102, 241, 0.05); padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(99, 102, 241, 0.2);">
               <label style="font-weight: 700; color: #E2E8F0; margin-bottom: 0.75rem; display: block;">Profile Picture Management</label>
               <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
@@ -1963,6 +1985,11 @@
       document.getElementById('profAvailStatus').value = cmsData.profile.availabilityStatus || 'available';
       document.getElementById('profAvailText').value = cmsData.profile.availabilityText || '';
       document.getElementById('profResumeUrl').value = cmsData.profile.resumeUrl || '';
+      const sl = cmsData.profile.socialLinks || {};
+      document.getElementById('profGithub').value = sl.github || '';
+      document.getElementById('profLinkedin').value = sl.linkedin || '';
+      document.getElementById('profTwitter').value = sl.twitter || sl.x || '';
+      document.getElementById('profLeetcode').value = sl.leetcode || '';
       const avUrl = cmsData.profile.avatarUrl || '/images/charan_sai_avatar.jpg';
       document.getElementById('profAvatarUrl').value = avUrl;
       updateAvatarPreview(avUrl);
@@ -2699,6 +2726,15 @@
         availabilityText: document.getElementById('profAvailText').value.trim(),
         resumeUrl: document.getElementById('profResumeUrl').value.trim(),
         avatarUrl: document.getElementById('profAvatarUrl').value.trim(),
+        socialLinks: {
+          github: document.getElementById('profGithub').value.trim(),
+          linkedin: document.getElementById('profLinkedin').value.trim(),
+          twitter: document.getElementById('profTwitter').value.trim(),
+          x: document.getElementById('profTwitter').value.trim(),
+          leetcode: document.getElementById('profLeetcode').value.trim(),
+          email: `mailto:${document.getElementById('profEmail').value.trim()}`,
+          website: 'https://charansai.website'
+        },
       };
 
       try {

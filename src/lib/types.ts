@@ -16,6 +16,8 @@ export interface ProfileData {
     github?: string;
     linkedin?: string;
     twitter?: string;
+    x?: string;
+    leetcode?: string;
     email?: string;
     website?: string;
   };
@@ -167,6 +169,9 @@ export interface TeamMember {
   socials?: {
     github?: string;
     linkedin?: string;
+    twitter?: string;
+    x?: string;
+    leetcode?: string;
     email?: string;
     portfolio?: string;
   };

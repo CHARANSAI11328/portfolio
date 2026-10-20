@@ -306,6 +306,28 @@
       transition: all 0.2s;
     }
     .btn-secondary:hover { background: rgba(0,0,0,0.03); border-color: var(--border-hover); }
+    .social-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.42rem 0.9rem;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .social-chip:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.18);
+    }
+    .social-chip svg { flex-shrink: 0; }
     .stats-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1545,6 +1567,31 @@
           </a>
         </div>
 
+        <!-- Social & Coding Profiles Strip -->
+        <div class="hero-social-strip" style="display: flex; align-items: center; gap: 0.65rem; margin-top: -1.25rem; margin-bottom: 2rem; flex-wrap: wrap;">
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem;">Profiles:</span>
+          
+          <a href="https://github.com/CHARANSAI11328" id="heroLinkGithub" target="_blank" rel="noopener noreferrer" class="social-chip" title="GitHub — CHARANSAI11328" aria-label="GitHub Profile">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 1rem; height: 1rem;"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            <span>GitHub</span>
+          </a>
+
+          <a href="https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/" id="heroLinkLinkedin" target="_blank" rel="noopener noreferrer" class="social-chip" title="LinkedIn Profile" aria-label="LinkedIn Profile">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 1rem; height: 1rem;"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c.92 0 1.67-.75 1.67-1.67s-.75-1.67-1.67-1.67-1.67.75-1.67 1.67.75 1.67 1.67 1.67M5.07 18.5h2.79v-8.37H5.07v8.37z"/></svg>
+            <span>LinkedIn</span>
+          </a>
+
+          <a href="https://x.com/C6H11O5D" id="heroLinkTwitter" target="_blank" rel="noopener noreferrer" class="social-chip" title="X Profile — @C6H11O5D" aria-label="X Profile">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 0.9rem; height: 0.9rem;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>X</span>
+          </a>
+
+          <a href="https://leetcode.com/u/89IIBeaoVG/" id="heroLinkLeetcode" target="_blank" rel="noopener noreferrer" class="social-chip" title="LeetCode Profile" aria-label="LeetCode Profile">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 1rem; height: 1rem;"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.874 5.874 0 0 0 .349 1.017 5.938 5.938 0 0 0 4.818 3.551 5.955 5.955 0 0 0 1.254-.031 6.042 6.042 0 0 0 2.227-.852l3.49-2.316a1.381 1.381 0 0 0-.824-2.48h-5.24a3.172 3.172 0 0 1-2.28-1.02 3.25 3.25 0 0 1-.77-2.368 3.218 3.218 0 0 1 1.01-2.18l3.774-4.04 4.908-5.244A1.38 1.38 0 0 0 13.483 0zm-2.88 7.218l-3.854 4.126a1.38 1.38 0 1 0 2.016 1.884l3.854-4.126a1.38 1.38 0 1 0-2.016-1.884zM16.14 12.923h6.48a1.38 1.38 0 0 0 0-2.76h-6.48a1.38 1.38 0 0 0 0 2.76z"/></svg>
+            <span>LeetCode</span>
+          </a>
+        </div>
+
         <div class="stats-row">
           <div>
             <div class="stat-val">4+</div>
@@ -1946,10 +1993,12 @@
 
       <div class="footer-bottom">
         <div>© 2026 Charan Sai. All rights reserved. • Chirala, Andhra Pradesh, India • <span style="display: inline-flex; align-items: center; gap: 4px; color: #10B981; font-weight: 600; font-size: 0.75rem;"><span style="width: 6px; height: 6px; border-radius: 50%; background: #10B981;"></span>Systems Online</span></div>
-        <div style="display: flex; gap: 1rem; align-items: center;">
-          <a href="https://github.com" target="_blank" style="color: var(--text-muted);"><i data-lucide="github" style="width: 1rem; height: 1rem;"></i></a>
-          <a href="https://linkedin.com" target="_blank" style="color: var(--text-muted);"><i data-lucide="linkedin" style="width: 1rem; height: 1rem;"></i></a>
-          <a href="mailto:contact@charansai.website" style="color: var(--text-muted);"><i data-lucide="mail" style="width: 1rem; height: 1rem;"></i></a>
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <a href="https://github.com/CHARANSAI11328" id="footerLinkGithub" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); transition: color 0.2s;" title="GitHub Profile" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor" style="width: 1.1rem; height: 1.1rem;"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg></a>
+          <a href="https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/" id="footerLinkLinkedin" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); transition: color 0.2s;" title="LinkedIn Profile" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" style="width: 1.1rem; height: 1.1rem;"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c.92 0 1.67-.75 1.67-1.67s-.75-1.67-1.67-1.67-1.67.75-1.67 1.67.75 1.67 1.67 1.67M5.07 18.5h2.79v-8.37H5.07v8.37z"/></svg></a>
+          <a href="https://x.com/C6H11O5D" id="footerLinkTwitter" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); transition: color 0.2s;" title="X Profile" aria-label="X Profile"><svg viewBox="0 0 24 24" fill="currentColor" style="width: 1rem; height: 1rem;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="https://leetcode.com/u/89IIBeaoVG/" id="footerLinkLeetcode" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); transition: color 0.2s;" title="LeetCode Profile" aria-label="LeetCode Profile"><svg viewBox="0 0 24 24" fill="currentColor" style="width: 1.1rem; height: 1.1rem;"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.874 5.874 0 0 0 .349 1.017 5.938 5.938 0 0 0 4.818 3.551 5.955 5.955 0 0 0 1.254-.031 6.042 6.042 0 0 0 2.227-.852l3.49-2.316a1.381 1.381 0 0 0-.824-2.48h-5.24a3.172 3.172 0 0 1-2.28-1.02 3.25 3.25 0 0 1-.77-2.368 3.218 3.218 0 0 1 1.01-2.18l3.774-4.04 4.908-5.244A1.38 1.38 0 0 0 13.483 0zm-2.88 7.218l-3.854 4.126a1.38 1.38 0 1 0 2.016 1.884l3.854-4.126a1.38 1.38 0 1 0-2.016-1.884zM16.14 12.923h6.48a1.38 1.38 0 0 0 0-2.76h-6.48a1.38 1.38 0 0 0 0 2.76z"/></svg></a>
+          <a href="mailto:contact@charansai.website" id="footerLinkEmail" style="color: var(--text-muted); transition: color 0.2s;" title="Email"><i data-lucide="mail" style="width: 1.1rem; height: 1.1rem;"></i></a>
           <a href="/admin" style="color: var(--accent-primary); font-weight: 600; text-decoration: none;">CMS Login</a>
         </div>
       </div>
@@ -2440,6 +2489,33 @@
             if (cEm) { cEm.textContent = p.email; cEm.href = `mailto:${p.email}`; }
           }
 
+          // Dynamic Social Profiles Sync
+          if (p.socialLinks) {
+            const sl = p.socialLinks;
+            const gh = sl.github || 'https://github.com/CHARANSAI11328';
+            const li = sl.linkedin || 'https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/';
+            const tw = sl.twitter || sl.x || 'https://x.com/C6H11O5D';
+            const lc = sl.leetcode || 'https://leetcode.com/u/89IIBeaoVG/';
+
+            const hGh = document.getElementById('heroLinkGithub');
+            const hLi = document.getElementById('heroLinkLinkedin');
+            const hTw = document.getElementById('heroLinkTwitter');
+            const hLc = document.getElementById('heroLinkLeetcode');
+            if (hGh) hGh.href = gh;
+            if (hLi) hLi.href = li;
+            if (hTw) hTw.href = tw;
+            if (hLc) hLc.href = lc;
+
+            const fGh = document.getElementById('footerLinkGithub');
+            const fLi = document.getElementById('footerLinkLinkedin');
+            const fTw = document.getElementById('footerLinkTwitter');
+            const fLc = document.getElementById('footerLinkLeetcode');
+            if (fGh) fGh.href = gh;
+            if (fLi) fLi.href = li;
+            if (fTw) fTw.href = tw;
+            if (fLc) fLc.href = lc;
+          }
+
           // Avatar vs Abstract Visual Portal Toggle
           const hAvatar = document.getElementById('heroPortalAvatar');
           const hAbstract = document.getElementById('heroAbstractPortal');
@@ -2620,6 +2696,13 @@
               }
               if (socials.linkedin) {
                 socialButtons.push(`<a href="${socials.linkedin}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="LinkedIn Profile" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76c.92 0 1.67-.75 1.67-1.67s-.75-1.67-1.67-1.67-1.67.75-1.67 1.67.75 1.67 1.67 1.67M5.07 18.5h2.79v-8.37H5.07v8.37z"/></svg></a>`);
+              }
+              if (socials.twitter || socials.x) {
+                const twUrl = socials.twitter || socials.x;
+                socialButtons.push(`<a href="${twUrl}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="X Profile" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>`);
+              }
+              if (socials.leetcode) {
+                socialButtons.push(`<a href="${socials.leetcode}" target="_blank" rel="noopener noreferrer" class="team-social-btn" title="LeetCode Profile" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.874 5.874 0 0 0 .349 1.017 5.938 5.938 0 0 0 4.818 3.551 5.955 5.955 0 0 0 1.254-.031 6.042 6.042 0 0 0 2.227-.852l3.49-2.316a1.381 1.381 0 0 0-.824-2.48h-5.24a3.172 3.172 0 0 1-2.28-1.02 3.25 3.25 0 0 1-.77-2.368 3.218 3.218 0 0 1 1.01-2.18l3.774-4.04 4.908-5.244A1.38 1.38 0 0 0 13.483 0zm-2.88 7.218l-3.854 4.126a1.38 1.38 0 1 0 2.016 1.884l3.854-4.126a1.38 1.38 0 1 0-2.016-1.884zM16.14 12.923h6.48a1.38 1.38 0 0 0 0-2.76h-6.48a1.38 1.38 0 0 0 0 2.76z"/></svg></a>`);
               }
               if (socials.email) {
                 socialButtons.push(`<a href="mailto:${socials.email}" class="team-social-btn" title="Send Email" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></a>`);

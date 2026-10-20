@@ -956,6 +956,89 @@ export default function AdminDashboardPage() {
                   />
                 </div>
 
+                <div className="pt-4 border-t border-slate-800">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                    Social & Coding Profiles
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        GitHub Profile URL
+                      </label>
+                      <input
+                        type="url"
+                        value={profile.socialLinks?.github || ''}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            socialLinks: { ...(profile.socialLinks || {}), github: e.target.value },
+                          })
+                        }
+                        placeholder="https://github.com/..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F19] border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        LinkedIn Profile URL
+                      </label>
+                      <input
+                        type="url"
+                        value={profile.socialLinks?.linkedin || ''}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            socialLinks: { ...(profile.socialLinks || {}), linkedin: e.target.value },
+                          })
+                        }
+                        placeholder="https://www.linkedin.com/in/..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F19] border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        X (Twitter) Profile URL
+                      </label>
+                      <input
+                        type="url"
+                        value={profile.socialLinks?.twitter || profile.socialLinks?.x || ''}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            socialLinks: {
+                              ...(profile.socialLinks || {}),
+                              twitter: e.target.value,
+                              x: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="https://x.com/..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F19] border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        LeetCode Profile URL
+                      </label>
+                      <input
+                        type="url"
+                        value={profile.socialLinks?.leetcode || ''}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            socialLinks: { ...(profile.socialLinks || {}), leetcode: e.target.value },
+                          })
+                        }
+                        placeholder="https://leetcode.com/u/..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#0B0F19] border border-slate-800 text-sm text-white focus:outline-none focus:border-indigo-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="pt-4 border-t border-slate-800 flex justify-end">
                   <button
                     type="submit"
