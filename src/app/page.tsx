@@ -12,8 +12,6 @@ import Services from '@/components/Services';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 
-export const revalidate = 0; // Always serve fresh dynamic content managed by the CMS
-
 export default async function HomePage() {
   const db = getDatabase();
 

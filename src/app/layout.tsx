@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeContext';
+import { InteractiveTerminal } from '@/components/InteractiveTerminal';
 
 export const metadata: Metadata = {
   title: 'Charan Sai — Independent Developer & Digital Solutions',
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
         <ThemeProvider>
           {children}
+          <InteractiveTerminal />
         </ThemeProvider>
       </body>
     </html>

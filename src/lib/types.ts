@@ -139,6 +139,7 @@ export interface SiteSettings {
     certifications: boolean;
     experience: boolean;
     events: boolean;
+    team?: boolean;
     services: boolean;
     contact: boolean;
   };

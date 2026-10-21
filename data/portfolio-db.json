@@ -185,14 +185,6 @@
       "icon": "Cpu",
       "featured": true,
       "displayOrder": 15
-    },
-    {
-      "id": "sk-1792398208463",
-      "name": "HTML",
-      "category": "Languages",
-      "icon": "Code",
-      "featured": true,
-      "displayOrder": 16
     }
   ],
   "profile": {
@@ -436,6 +428,13 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1792571651142-r2rm",
+      "action": "DELETE",
+      "entity": "Skill",
+      "details": "Deleted skill: HTML",
+      "timestamp": "2026-10-21T08:34:11.142Z"
+    },
     {
       "id": "log-1792568967412-wt2w",
       "action": "CREATE",
@@ -778,13 +777,6 @@
       "entity": "Admin",
       "details": "Admin admin@charansai.website signed in",
       "timestamp": "2026-10-20T07:50:39.720Z"
-    },
-    {
-      "id": "log-1792482639671-2ass",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:50:39.671Z"
     }
   ],
   "certifications": []

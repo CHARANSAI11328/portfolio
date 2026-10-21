@@ -318,7 +318,9 @@ export function getNeon() {
   try {
     const neonPath = path.join(process.cwd(), 'server', 'neon.js');
     if (fs.existsSync(neonPath)) {
-      return require(neonPath);
+      // Use dynamic runtime require to prevent build-time static bundler tracing
+      const dynamicRequire = eval('require');
+      return dynamicRequire(neonPath);
     }
   } catch {}
   return null;

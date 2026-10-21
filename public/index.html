@@ -3187,5 +3187,786 @@
       </div>
     </div>
   </div>
+  <!-- ========================================== -->
+  <!-- DEVELOPER TERMINAL & COMMAND PALETTE (>_)  -->
+  <!-- ========================================== -->
+  <style>
+    /* Scoped Developer Terminal Styles */
+    #devTermBadge {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(10, 15, 30, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #F8FAFC;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.15);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    #devTermBadge:hover {
+      transform: translateY(-2px);
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(16, 185, 129, 0.3);
+    }
+    #devTermBadge:active {
+      transform: scale(0.97);
+    }
+    .dev-term-pulse {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 9999px;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+      display: inline-block;
+      animation: devTermPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes devTermPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    #devTermTooltip {
+      position: absolute;
+      right: calc(100% + 0.75rem);
+      white-space: nowrap;
+      background: rgba(10, 15, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #E2E8F0;
+      font-size: 0.72rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(6px);
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    #devTermBadge:hover #devTermTooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .dev-term-kbd {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.25rem;
+      font-size: 0.65rem;
+    }
+
+    /* Terminal Overlay */
+    #devTermOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      animation: devTermFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes devTermFadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    #devTermCard {
+      width: 100%;
+      max-width: 48rem;
+      height: 540px;
+      max-height: 85vh;
+      background: rgba(10, 14, 26, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 1rem;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(16, 185, 129, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      color: #E2E8F0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #devTermCard.is-maximized {
+      max-width: calc(100vw - 2rem);
+      height: calc(100vh - 2rem);
+      max-height: calc(100vh - 2rem);
+      border-radius: 0.75rem;
+    }
+
+    /* Chrome Bar */
+    .dev-term-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      user-select: none;
+    }
+    .dev-traffic-lights {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dev-traffic-btn {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 800;
+      line-height: 1;
+      padding: 0;
+      transition: opacity 0.15s;
+    }
+    .dev-traffic-close { background: #EF4444; color: #7F1D1D; }
+    .dev-traffic-min { background: #F59E0B; color: #78350F; }
+    .dev-traffic-max { background: #10B981; color: #064E3B; }
+    .dev-traffic-btn span { opacity: 0; }
+    .dev-traffic-lights:hover .dev-traffic-btn span { opacity: 1; }
+
+    /* Shortcuts bar */
+    .dev-term-shortcuts {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      background: rgba(15, 23, 42, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      overflow-x: auto;
+      white-space: nowrap;
+      font-size: 0.68rem;
+    }
+    .dev-term-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94A3B8;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.35rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .dev-term-chip:hover {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34D399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Terminal Body */
+    .dev-term-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+    }
+    .dev-term-prompt-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-top: 0.25rem;
+    }
+    .dev-term-prompt-symbol {
+      color: #10B981;
+      font-weight: 700;
+    }
+    .dev-term-prompt-tilde {
+      color: #818CF8;
+      font-weight: 700;
+    }
+    #devTermInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #34D399;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      caret-color: #10B981;
+    }
+
+    /* Footer */
+    .dev-term-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 1rem;
+      background: rgba(15, 23, 42, 0.7);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.68rem;
+      color: #64748B;
+      user-select: none;
+    }
+
+    /* Minimized Tab */
+    #devTermMinPill {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 0.75rem;
+      background: rgba(10, 15, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #F8FAFC;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+    }
+
+    /* Matrix Rain Canvas */
+    #devTermMatrixCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      z-index: 10;
+      background: rgba(5, 10, 15, 0.95);
+    }
+  </style>
+
+  <!-- Minimized Restore Pill -->
+  <div id="devTermMinPill" onclick="devTerminalRestore()">
+    <span style="width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: #F59E0B; display: inline-block;"></span>
+    <span style="color: #10B981; font-weight: 700;">&gt;_ terminal</span>
+    <span style="font-size: 0.65rem; color: #94A3B8; background: rgba(255,255,255,0.1); padding: 0.1rem 0.35rem; border-radius: 0.25rem;">Restore</span>
+  </div>
+
+  <!-- Floating Badge Button -->
+  <div id="devTermBadge" onclick="devTerminalOpen()" title="Developer Terminal (Ctrl+K)">
+    <div id="devTermTooltip">
+      <span>Developer Terminal</span>
+      <span class="dev-term-kbd">Ctrl+K or `</span>
+    </div>
+    <span class="dev-term-pulse"></span>
+    <span style="color: #10B981; font-weight: 800; font-size: 0.85rem;">&gt;_</span>
+    <span style="font-size: 0.75rem; font-weight: 600; letter-spacing: -0.01em;">Terminal</span>
+  </div>
+
+  <!-- Terminal Modal Dialog -->
+  <div id="devTermOverlay" onclick="if(event.target === this) devTerminalClose()">
+    <div id="devTermCard" onclick="event.stopPropagation()">
+      <!-- macOS Chrome Header -->
+      <div class="dev-term-header">
+        <div class="dev-traffic-lights">
+          <button class="dev-traffic-btn dev-traffic-close" onclick="devTerminalClose()" title="Close"><span>×</span></button>
+          <button class="dev-traffic-btn dev-traffic-min" onclick="devTerminalMinimize()" title="Minimize"><span>-</span></button>
+          <button class="dev-traffic-btn dev-traffic-max" onclick="devTerminalToggleMax()" title="Maximize / Fullscreen"><span>+</span></button>
+          <span style="color: #64748B; font-size: 0.72rem; margin-left: 0.5rem;">charan@portfolio: ~ (zsh)</span>
+        </div>
+        <div style="font-size: 0.7rem; color: #64748B; display: flex; align-items: center; gap: 0.35rem;">
+          <span style="color: #10B981; font-weight: 700;">&gt;_</span>
+          <span>interactive-cli</span>
+        </div>
+        <div style="font-size: 0.68rem; color: #64748B; background: rgba(255,255,255,0.06); padding: 0.15rem 0.45rem; border-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.08);">
+          ESC to close
+        </div>
+      </div>
+
+      <!-- Quick Action Chips -->
+      <div class="dev-term-shortcuts">
+        <span style="color: #64748B; font-size: 0.65rem; padding-top: 0.15rem;">Shortcuts:</span>
+        <button class="dev-term-chip" onclick="devTerminalExec('help')">help</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('about')">about</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('skills')">skills</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('projects')">projects</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('contact')">contact</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('resume')">resume</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('matrix')">matrix</button>
+        <button class="dev-term-chip" onclick="devTerminalExec('clear')">clear</button>
+      </div>
+
+      <!-- Terminal Output & Prompt -->
+      <div class="dev-term-body" id="devTermBody" onclick="document.getElementById('devTermInput').focus()">
+        <canvas id="devTermMatrixCanvas"></canvas>
+        <div id="devTermOutputLog"></div>
+
+        <div class="dev-term-prompt-row">
+          <span class="dev-term-prompt-symbol">➜</span>
+          <span class="dev-term-prompt-tilde">~</span>
+          <input type="text" id="devTermInput" autocomplete="off" spellcheck="false" placeholder="Type 'help' for commands..." />
+        </div>
+        <div id="devTermScrollAnchor" style="height: 1px;"></div>
+      </div>
+
+      <!-- Terminal Footer -->
+      <div class="dev-term-footer">
+        <div>
+          <span style="color: #10B981;">●</span> Ready | UTF-8 • Native Engine
+        </div>
+        <div>
+          Use ↑ ↓ for history • Tab to complete
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Terminal State & History
+      const historyStack = [];
+      let historyPtr = -1;
+      let tempInputVal = '';
+      let isMaximized = false;
+      let isMatrixRunning = false;
+      let matrixAnimId = null;
+
+      const overlay = document.getElementById('devTermOverlay');
+      const card = document.getElementById('devTermCard');
+      const badge = document.getElementById('devTermBadge');
+      const minPill = document.getElementById('devTermMinPill');
+      const input = document.getElementById('devTermInput');
+      const outputLog = document.getElementById('devTermOutputLog');
+      const body = document.getElementById('devTermBody');
+      const matrixCanvas = document.getElementById('devTermMatrixCanvas');
+
+      // Static Portfolio Facts
+      const facts = {
+        name: "Charan Sai",
+        title: "Lead Architect & Full-Stack Engineer",
+        education: "B.Tech CSE (Data Science) @ St. Ann's College of Engineering & Technology, Chirala",
+        location: "Bapatla / Chirala, Andhra Pradesh, India",
+        bio: "Systems design, full-stack web architectures, secure APIs, and client solution delivery. Crafting scalable and high-performance digital solutions.",
+        status: "Available for freelance projects & innovative collaborations 🟢",
+        email: "saikamarajugadda21@gmail.com",
+        resumeUrl: "/KAMARAJUGADDA_CHARAN_SAI_Resume.pdf?v=20261019",
+        socials: {
+          github: "https://github.com/CHARANSAI11328",
+          linkedin: "https://www.linkedin.com/in/charan-sai-kamarajugadda-865870370/",
+          twitter: "https://x.com/C6H11O5D",
+          leetcode: "https://leetcode.com/u/89IIBeaoVG/",
+          website: "https://charansai.website"
+        },
+        projects: [
+          {
+            title: "LETTERGEN PRO",
+            cat: "Desktop & Systems",
+            status: "Completed",
+            tech: "Java, Swing, PostgreSQL, Neon, PDF Automation",
+            desc: "Desktop letter drafting automation suite built in Java Swing with vector PDF generation and Neon PostgreSQL sync."
+          },
+          {
+            title: "PROJEX",
+            cat: "Web Applications",
+            status: "Active Development",
+            tech: "Next.js, React, TypeScript, PostgreSQL, Tailwind",
+            desc: "Engineering learning and career-readiness platform featuring roadmaps, skills assessments, and milestone tracking."
+          },
+          {
+            title: "MAMEKA MAHODAYAM",
+            cat: "Digital Publishing",
+            status: "In Progress",
+            tech: "Next.js, JavaScript, Render, CSS3",
+            desc: "Regional Telugu vernacular journalism portal and e-paper publishing platform.",
+            live: "https://project-mm-1.onrender.com"
+          },
+          {
+            title: "BUSINESS WEBSITES & DIGITAL SOLUTIONS",
+            cat: "Business Solutions",
+            status: "Active Development",
+            tech: "React, Next.js, Tailwind CSS, SEO",
+            desc: "High-conversion business storefronts and tailored corporate platforms built for commercial impact."
+          }
+        ],
+        skills: {
+          "Frontend": ["React", "Next.js", "HTML5 & CSS3", "Tailwind CSS", "Flutter & Dart"],
+          "Backend & Data": ["PostgreSQL", "Neon DB", "Node.js", "Firebase", "RESTful APIs"],
+          "Languages": ["JavaScript (ES6+)", "TypeScript", "Java", "Python", "SQL", "Dart"],
+          "DevOps & Tools": ["Git & GitHub", "Render", "Netlify", "Docker", "Fly.io", "AI-Assisted Dev"]
+        }
+      };
+
+      // Banner Init
+      function initBanner() {
+        outputLog.innerHTML = `
+          <div style="margin-bottom: 0.75rem; color: #10B981; font-weight: 700; font-size: 0.75rem; line-height: 1.2;">
+            ___ _                          ____        _<br>
+           / __| |_  __ _ _ _ __ _ _ _    / ___|  __ _(_)<br>
+          | (__| ' \\/ _\` | '_/ _\` | ' \\   \\___ \\ / _\` | |<br>
+           \\___|_||_\\__,_|_| \\__,_|_||_|  |____/ \\__,_|_|
+          </div>
+          <div style="border-left: 2px solid #10B981; padding-left: 0.75rem; margin-bottom: 0.75rem; font-size: 0.75rem; color: #94A3B8;">
+            <div style="color: #F8FAFC; font-weight: 700;">Charan Sai — Interactive Developer Terminal [v2.4.0]</div>
+            <div>Lead Architect & Full-Stack Engineer • Chirala / Bapatla, AP, India</div>
+            <div style="color: #34D399; margin-top: 0.25rem;">Type <strong style="color: #fff; background: rgba(255,255,255,0.1); padding: 0.1rem 0.3rem; border-radius: 0.25rem;">help</strong> or click any shortcut chip above.</div>
+          </div>
+        `;
+      }
+      initBanner();
+
+      // UI Controls
+      window.devTerminalOpen = function() {
+        overlay.style.display = 'flex';
+        badge.style.display = 'none';
+        minPill.style.display = 'none';
+        setTimeout(() => input.focus(), 50);
+      };
+
+      window.devTerminalClose = function() {
+        if (isMatrixRunning) stopMatrixRain();
+        overlay.style.display = 'none';
+        badge.style.display = 'flex';
+        minPill.style.display = 'none';
+      };
+
+      window.devTerminalMinimize = function() {
+        overlay.style.display = 'none';
+        badge.style.display = 'none';
+        minPill.style.display = 'flex';
+      };
+
+      window.devTerminalRestore = function() {
+        minPill.style.display = 'none';
+        window.devTerminalOpen();
+      };
+
+      window.devTerminalToggleMax = function() {
+        isMaximized = !isMaximized;
+        if (isMaximized) {
+          card.classList.add('is-maximized');
+        } else {
+          card.classList.remove('is-maximized');
+        }
+      };
+
+      window.devTerminalExec = function(cmd) {
+        input.value = cmd;
+        handleCommand(cmd);
+      };
+
+      // Auto Scroll
+      function scrollToBottom() {
+        body.scrollTop = body.scrollHeight;
+      }
+
+      // Command Execution
+      function handleCommand(raw) {
+        const trimmed = raw.trim();
+        if (!trimmed) return;
+
+        historyStack.push(trimmed);
+        historyPtr = -1;
+        input.value = '';
+
+        const parts = trimmed.split(' ');
+        const c = parts[0].toLowerCase();
+        const arg = parts.slice(1).join(' ');
+
+        // Append Command Header
+        const timeStr = new Date().toLocaleTimeString();
+        const block = document.createElement('div');
+        block.style.marginBottom = '0.75rem';
+        block.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: #94A3B8; margin-bottom: 0.35rem;">
+            <span style="color: #10B981; font-weight: 700;">➜</span>
+            <span style="color: #818CF8; font-weight: 700;">~</span>
+            <span style="color: #F8FAFC;">${escapeHtml(trimmed)}</span>
+            <span style="margin-left: auto; font-size: 0.65rem; color: #64748B;">${timeStr}</span>
+          </div>
+          <div style="padding-left: 1rem;" class="dev-out-content"></div>
+        `;
+        const contentBox = block.querySelector('.dev-out-content');
+
+        switch (c) {
+          case 'help':
+          case '?':
+          case 'commands':
+            contentBox.innerHTML = `
+              <div style="color: #94A3B8; margin-bottom: 0.35rem;">Available CLI Commands:</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.4rem;">
+                <div><strong style="color: #10B981;">help</strong> - List available commands</div>
+                <div><strong style="color: #10B981;">about</strong> - Developer bio & current focus</div>
+                <div><strong style="color: #10B981;">skills</strong> - Categorized tech stack proficiencies</div>
+                <div><strong style="color: #10B981;">projects</strong> - Showcase projects with live links</div>
+                <div><strong style="color: #10B981;">contact</strong> - Direct channels & social handles</div>
+                <div><strong style="color: #10B981;">resume</strong> - Open / download curriculum vitae</div>
+                <div><strong style="color: #10B981;">matrix</strong> - Cybernetic green rain visualizer</div>
+                <div><strong style="color: #10B981;">sudo</strong> - Elevated superuser authorization</div>
+                <div><strong style="color: #10B981;">theme</strong> - Toggle light/dark appearance</div>
+                <div><strong style="color: #10B981;">date</strong> - Display current system time</div>
+                <div><strong style="color: #10B981;">clear</strong> - Clear terminal history buffer</div>
+                <div><strong style="color: #10B981;">exit</strong> - Close the terminal modal</div>
+              </div>
+            `;
+            break;
+
+          case 'about':
+          case 'bio':
+          case 'whoami':
+            contentBox.innerHTML = `
+              <div style="background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="color: #fff; font-weight: 700; font-size: 0.85rem;">${facts.name}</div>
+                <div style="color: #10B981; font-size: 0.72rem; margin-bottom: 0.4rem;">${facts.title}</div>
+                <p style="color: #CBD5E1; margin: 0 0 0.5rem 0; line-height: 1.5;">${facts.bio}</p>
+                <div style="font-size: 0.7rem; color: #94A3B8; display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem;">
+                  <div>Location: <span style="color: #F8FAFC;">${facts.location}</span></div>
+                  <div>Education: <span style="color: #F8FAFC;">${facts.education}</span></div>
+                  <div>Status: <span style="color: #34D399;">${facts.status}</span></div>
+                  <div>Email: <a href="mailto:${facts.email}" style="color: #818CF8; text-decoration: underline;">${facts.email}</a></div>
+                </div>
+              </div>
+            `;
+            break;
+
+          case 'skills':
+          case 'stack':
+          case 'tech':
+            let skHtml = `<div style="color: #94A3B8; margin-bottom: 0.35rem;">Technical Proficiencies:</div>`;
+            for (const [cat, list] of Object.entries(facts.skills)) {
+              skHtml += `
+                <div style="margin-bottom: 0.4rem;">
+                  <span style="color: #10B981; font-size: 0.68rem; text-transform: uppercase; font-weight: 700;">${cat}:</span>
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.2rem;">
+                    ${list.map(s => `<span style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.7rem; color: #E2E8F0;">${s}</span>`).join('')}
+                  </div>
+                </div>
+              `;
+            }
+            contentBox.innerHTML = skHtml;
+            break;
+
+          case 'projects':
+          case 'work':
+          case 'portfolio':
+            let pjHtml = `<div style="color: #94A3B8; margin-bottom: 0.35rem;">Core Showcase Projects:</div>`;
+            facts.projects.forEach(p => {
+              pjHtml += `
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem; padding: 0.6rem; margin-bottom: 0.5rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <strong style="color: #fff;">${p.title}</strong>
+                    <span style="font-size: 0.65rem; color: #10B981; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); padding: 0.1rem 0.35rem; border-radius: 0.25rem;">${p.status}</span>
+                  </div>
+                  <p style="color: #94A3B8; margin: 0 0 0.35rem 0; font-size: 0.72rem;">${p.desc}</p>
+                  <div style="font-size: 0.68rem; color: #64748B;">Tech: ${p.tech}</div>
+                  ${p.live ? `<div style="margin-top: 0.35rem;"><a href="${p.live}" target="_blank" rel="noopener noreferrer" style="color: #34D399; text-decoration: underline;">🔗 Visit Live Project (${p.live})</a></div>` : ''}
+                </div>
+              `;
+            });
+            contentBox.innerHTML = pjHtml;
+            break;
+
+          case 'contact':
+          case 'socials':
+          case 'email':
+          case 'links':
+            contentBox.innerHTML = `
+              <div style="color: #94A3B8; margin-bottom: 0.35rem;">Verified Communication Channels:</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.35rem;">
+                <div>Email: <a href="mailto:${facts.email}" style="color: #818CF8; text-decoration: underline;">${facts.email}</a></div>
+                <div>GitHub: <a href="${facts.socials.github}" target="_blank" rel="noopener noreferrer" style="color: #34D399; text-decoration: underline;">github.com/CHARANSAI11328</a></div>
+                <div>LinkedIn: <a href="${facts.socials.linkedin}" target="_blank" rel="noopener noreferrer" style="color: #38BDF8; text-decoration: underline;">charan-sai-kamarajugadda</a></div>
+                <div>Twitter / X: <a href="${facts.socials.twitter}" target="_blank" rel="noopener noreferrer" style="color: #22D3EE; text-decoration: underline;">@C6H11O5D</a></div>
+                <div>LeetCode: <a href="${facts.socials.leetcode}" target="_blank" rel="noopener noreferrer" style="color: #FBBF24; text-decoration: underline;">89IIBeaoVG</a></div>
+                <div>Website: <a href="${facts.socials.website}" target="_blank" rel="noopener noreferrer" style="color: #C084FC; text-decoration: underline;">charansai.website</a></div>
+              </div>
+            `;
+            break;
+
+          case 'resume':
+          case 'cv':
+            window.open(facts.resumeUrl, '_blank');
+            contentBox.innerHTML = `
+              <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); padding: 0.6rem; border-radius: 0.5rem; color: #34D399;">
+                <div>📄 <strong>Resume Dispatched</strong></div>
+                <div style="font-size: 0.7rem; color: #CBD5E1; margin: 0.25rem 0;">Opening curriculum vitae in a new browser tab. If blocked by popup blocker:</div>
+                <a href="${facts.resumeUrl}" download target="_blank" style="display: inline-block; background: #10B981; color: #000; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 0.25rem; text-decoration: none; font-size: 0.7rem; margin-top: 0.25rem;">Download PDF Resume</a>
+              </div>
+            `;
+            break;
+
+          case 'clear':
+          case 'cls':
+            outputLog.innerHTML = '';
+            initBanner();
+            return;
+
+          case 'matrix':
+          case 'rain':
+          case 'cyber':
+            startMatrixRain();
+            contentBox.innerHTML = `<span style="color: #10B981;">Digital Rain Activated. Press ESC to stop.</span>`;
+            break;
+
+          case 'sudo':
+            contentBox.innerHTML = `<span style="color: #F87171;">User 'guest' is not in the sudoers file. This incident has been logged and transmitted to Charan Sai. 🚨</span>`;
+            break;
+
+          case 'date':
+            contentBox.innerHTML = `<span>${new Date().toString()}</span>`;
+            break;
+
+          case 'theme':
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            const mode = html.classList.contains('dark') ? 'DARK' : 'LIGHT';
+            try { localStorage.setItem('charan_portfolio_theme', mode.toLowerCase()); } catch(e){}
+            contentBox.innerHTML = `<span>Display appearance mode shifted to: <strong>${mode}</strong></span>`;
+            break;
+
+          case 'exit':
+          case 'quit':
+          case 'q':
+            devTerminalClose();
+            return;
+
+          case 'echo':
+            contentBox.textContent = arg;
+            break;
+
+          default:
+            contentBox.innerHTML = `<span style="color: #F87171;">zsh: command not found: ${escapeHtml(c)}<br>Type 'help' for available commands.</span>`;
+        }
+
+        outputLog.appendChild(block);
+        scrollToBottom();
+      }
+
+      function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      // Input Keys (Enter, Arrow Up/Down, Tab)
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleCommand(input.value);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (historyStack.length === 0) return;
+          if (historyPtr === -1) {
+            tempInputVal = input.value;
+            historyPtr = historyStack.length - 1;
+            input.value = historyStack[historyPtr];
+          } else if (historyPtr > 0) {
+            historyPtr--;
+            input.value = historyStack[historyPtr];
+          }
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (historyPtr === -1) return;
+          if (historyPtr < historyStack.length - 1) {
+            historyPtr++;
+            input.value = historyStack[historyPtr];
+          } else {
+            historyPtr = -1;
+            input.value = tempInputVal;
+          }
+        } else if (e.key === 'Tab') {
+          e.preventDefault();
+          const val = input.value.trim().toLowerCase();
+          const cmds = ['help', 'about', 'skills', 'projects', 'contact', 'resume', 'matrix', 'clear', 'sudo', 'date', 'theme', 'exit'];
+          const match = cmds.find(x => x.startsWith(val));
+          if (match) input.value = match + ' ';
+        }
+      });
+
+      // Global Hotkeys
+      window.addEventListener('keydown', function(e) {
+        const active = document.activeElement;
+        const isEditing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+
+        // Ctrl+K / Cmd+K
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (overlay.style.display === 'flex') {
+            devTerminalClose();
+          } else {
+            devTerminalOpen();
+          }
+          return;
+        }
+
+        // Backtick (`)
+        if (e.key === '`' && !isEditing) {
+          e.preventDefault();
+          if (overlay.style.display === 'flex') {
+            devTerminalClose();
+          } else {
+            devTerminalOpen();
+          }
+          return;
+        }
+
+        // Escape
+        if (e.key === 'Escape' && overlay.style.display === 'flex') {
+          e.preventDefault();
+          if (isMatrixRunning) {
+            stopMatrixRain();
+          } else {
+            devTerminalClose();
+          }
+        }
+      });
+
+      // Matrix Digital Rain Canvas Animation
+      function startMatrixRain() {
+        if (isMatrixRunning) return;
+        isMatrixRunning = true;
+        matrixCanvas.style.display = 'block';
+
+        const ctx = matrixCanvas.getContext('2d');
+        let w = matrixCanvas.width = body.clientWidth;
+        let h = matrixCanvas.height = body.clientHeight;
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテトCHARANSAI1010101XYZ';
+        const fontSize = 14;
+        let cols = Math.floor(w / fontSize);
+        let drops = new Array(cols).fill(1);
+
+        function drawRain() {
+          ctx.fillStyle = 'rgba(5, 10, 15, 0.08)';
+          ctx.fillRect(0, 0, w, h);
+          ctx.font = fontSize + 'px "JetBrains Mono", monospace';
+
+          for (let i = 0; i < drops.length; i++) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillStyle = Math.random() > 0.88 ? '#A7F3D0' : '#10B981';
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            if (drops[i] * fontSize > h && Math.random() > 0.975) {
+              drops[i] = 0;
+            }
+            drops[i]++;
+          }
+          matrixAnimId = requestAnimationFrame(drawRain);
+        }
+        drawRain();
+
+        matrixCanvas.onclick = stopMatrixRain;
+      }
+
+      function stopMatrixRain() {
+        if (!isMatrixRunning) return;
+        isMatrixRunning = false;
+        cancelAnimationFrame(matrixAnimId);
+        matrixCanvas.style.display = 'none';
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -10,7 +10,11 @@ interface FooterProps {
 }
 
 export default function Footer({ profile }: FooterProps) {
-  const currentYear = new Date().getFullYear();
+  const [currentYear, setCurrentYear] = React.useState<number>(2026);
+
+  React.useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
 
   return (
     <footer className="relative pt-12 pb-16 overflow-hidden">
