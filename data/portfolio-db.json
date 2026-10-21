@@ -29,33 +29,6 @@
       "displayOrder": 1,
       "createdAt": "2026-10-20T17:56:49.160Z",
       "updatedAt": "2026-10-20T17:56:49.160Z"
-    },
-    {
-      "id": "team-1792500786845-9opp",
-      "name": "P. Bhavani",
-      "role": "TEAM LEADER",
-      "bio": "Engineering lead directing full-stack development, architectural design, and digital delivery.",
-      "avatarUrl": "",
-      "skills": [
-        "Leadership",
-        "Full-Stack Development",
-        "System Architecture",
-        "React",
-        "Team Mentorship"
-      ],
-      "socials": {
-        "email": "",
-        "github": "",
-        "linkedin": "",
-        "portfolio": ""
-      },
-      "github": "",
-      "linkedin": "",
-      "email": "",
-      "portfolio": "",
-      "displayOrder": 2,
-      "createdAt": "2026-10-20T17:56:49.421Z",
-      "updatedAt": "2026-10-20T17:56:49.421Z"
     }
   ],
   "admins": [

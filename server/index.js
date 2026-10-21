@@ -916,6 +916,7 @@ const server = http.createServer(async (req, res) => {
           const del = db.skills.splice(idx, 1)[0];
           delName = del.name;
         }
+        db.skills = (db.skills || []).filter((s) => s.id !== id);
         saveDatabase(db);
         logActivity('DELETE', 'Skill', `Deleted skill: ${delName}`);
         return sendJson(res, 200, { success: true });
@@ -1010,6 +1011,7 @@ const server = http.createServer(async (req, res) => {
           const del = db.experiences.splice(idx, 1)[0];
           delName = del.role;
         }
+        db.experiences = (db.experiences || []).filter((e) => e.id !== id);
         saveDatabase(db);
         logActivity('DELETE', 'Experience', `Deleted experience: ${delName}`);
         return sendJson(res, 200, { success: true });
@@ -1102,6 +1104,7 @@ const server = http.createServer(async (req, res) => {
           const del = db.events.splice(idx, 1)[0];
           delName = del.title;
         }
+        db.events = (db.events || []).filter((e) => e.id !== id);
         saveDatabase(db);
         logActivity('DELETE', 'Event', `Deleted event: ${delName}`);
         return sendJson(res, 200, { success: true });
@@ -1194,6 +1197,7 @@ const server = http.createServer(async (req, res) => {
           const del = db.services.splice(idx, 1)[0];
           delName = del.title;
         }
+        db.services = (db.services || []).filter((s) => s.id !== id);
         saveDatabase(db);
         logActivity('DELETE', 'Service', `Deleted service: ${delName}`);
         return sendJson(res, 200, { success: true });
@@ -1334,6 +1338,7 @@ const server = http.createServer(async (req, res) => {
           const del = db.team.splice(idx, 1)[0];
           delName = del.name;
         }
+        db.team = (db.team || []).filter((m) => m.id !== id);
         saveDatabase(db);
         logActivity('DELETE', 'Team', `Removed team member: ${delName}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
