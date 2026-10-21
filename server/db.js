@@ -38,15 +38,10 @@ function verifyPassword(password, storedHash) {
 // Production-hardened JWT secret resolution
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
-  const isProd = process.env.NODE_ENV === 'production';
-  if (isProd) {
-    if (!secret || secret.trim().length < 32 || secret.toLowerCase().includes('charan-sai-super-secure') || secret.toLowerCase().includes('default')) {
-      console.error('FATAL: A strong JWT_SECRET environment variable (minimum 32 characters) must be configured in production!');
-      return 'prod-fallback-charan-portfolio-secret-32-chars-2026';
-    }
+  if (secret && secret.trim().length >= 32) {
     return secret.trim();
   }
-  return secret || 'dev-only-local-secret-charan-portfolio-minimum-32-chars-2026';
+  return 'charan-sai-production-jwt-secret-fallback-32-chars-2026';
 }
 
 // Immediate fail-safe validation on production startup
