@@ -443,6 +443,41 @@
   ],
   "activityLogs": [
     {
+      "id": "log-1792562930852-ayu7",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from Verification Bot (verify@example.com)",
+      "timestamp": "2026-10-21T06:08:50.852Z"
+    },
+    {
+      "id": "log-1792562929904-aisk",
+      "action": "DELETE",
+      "entity": "Project",
+      "details": "Deleted project: Automated E2E Test Project (UPDATED PERMANENTLY)",
+      "timestamp": "2026-10-21T06:08:49.904Z"
+    },
+    {
+      "id": "log-1792562929105-n821",
+      "action": "UPDATE",
+      "entity": "Project",
+      "details": "Updated project: Automated E2E Test Project (UPDATED PERMANENTLY)",
+      "timestamp": "2026-10-21T06:08:49.105Z"
+    },
+    {
+      "id": "log-1792562928015-1jpv",
+      "action": "CREATE",
+      "entity": "Project",
+      "details": "Added project: Automated E2E Test Project",
+      "timestamp": "2026-10-21T06:08:48.016Z"
+    },
+    {
+      "id": "log-1792562927181-udgu",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-21T06:08:47.181Z"
+    },
+    {
       "id": "log-1792513892954-2x5h",
       "action": "UPDATE",
       "entity": "Team",
@@ -756,41 +791,6 @@
       "entity": "Admin",
       "details": "Admin admin@charansai.website signed in",
       "timestamp": "2026-10-20T07:33:30.634Z"
-    },
-    {
-      "id": "log-1792481610591-qh57",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:33:30.591Z"
-    },
-    {
-      "id": "log-1792481605381-assd",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:33:25.381Z"
-    },
-    {
-      "id": "log-1792422229262-pxlh",
-      "action": "DELETE",
-      "entity": "Team",
-      "details": "Removed team member: Cookie Dev",
-      "timestamp": "2026-10-19T15:03:49.262Z"
-    },
-    {
-      "id": "log-1792422229189-ctmn",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Cookie Dev (Backend Architect)",
-      "timestamp": "2026-10-19T15:03:49.189Z"
-    },
-    {
-      "id": "log-1792422229114-35vn",
-      "action": "UPLOAD",
-      "entity": "File",
-      "details": "Admin uploaded asset: test_cookie_avatar_1792422229093_0a5df96a.jpg",
-      "timestamp": "2026-10-19T15:03:49.114Z"
     }
   ],
   "certifications": []

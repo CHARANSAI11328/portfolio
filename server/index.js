@@ -690,15 +690,27 @@ const server = http.createServer(async (req, res) => {
       const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
 
-      const existing = await neon.getProjectById(id);
-      if (!existing) return sendJson(res, 404, { error: 'Project not found' });
+      const db = getDatabase();
+      db.projects = db.projects || [];
+      const idx = db.projects.findIndex((p) => p.id === id);
 
       if (method === 'PUT') {
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getProjectById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.projects[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Project not found' });
+
         const updates = await parseJsonBody(req);
         const updated = { ...existing, ...updates, id, updatedAt: new Date().toISOString() };
-        await neon.upsertProject(updated);
-        const db = getDatabase();
-        const idx = (db.projects || []).findIndex((p) => p.id === id);
+        try {
+          await neon.upsertProject(updated);
+        } catch (err) {
+          console.error('[NEON] Failed to update project in Neon:', err.message);
+        }
         if (idx !== -1) db.projects[idx] = updated;
         saveDatabase(db);
         logActivity('UPDATE', 'Project', `Updated project: ${updated.title}`);
@@ -706,11 +718,20 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (method === 'DELETE') {
-        await neon.deleteProject(id);
-        const db = getDatabase();
-        db.projects = (db.projects || []).filter((p) => p.id !== id);
+        try {
+          await neon.deleteProject(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete project from Neon:', err.message);
+        }
+        let delTitle = id;
+        if (idx !== -1) {
+          const del = db.projects.splice(idx, 1)[0];
+          delTitle = del.title;
+        } else {
+          db.projects = db.projects.filter((p) => p.id !== id);
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Project', `Deleted project: ${id}`);
+        logActivity('DELETE', 'Project', `Deleted project: ${delTitle}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
       }
     }
@@ -766,15 +787,27 @@ const server = http.createServer(async (req, res) => {
       const admin = await getAuthAdmin(req);
       if (!admin) return sendJson(res, 401, { error: 'Unauthorized' });
 
-      const existing = await neon.getCertificationById(id);
-      if (!existing) return sendJson(res, 404, { error: 'Certification not found' });
+      const db = getDatabase();
+      db.certifications = db.certifications || [];
+      const idx = db.certifications.findIndex((c) => c.id === id);
 
       if (method === 'PUT') {
+        let existing = null;
+        if (isNeonConnected()) {
+          try {
+            existing = await neon.getCertificationById(id);
+          } catch {}
+        }
+        if (!existing && idx !== -1) existing = db.certifications[idx];
+        if (!existing) return sendJson(res, 404, { error: 'Certification not found' });
+
         const updates = await parseJsonBody(req);
         const updated = { ...existing, ...updates, id };
-        await neon.upsertCertification(updated);
-        const db = getDatabase();
-        const idx = (db.certifications || []).findIndex((c) => c.id === id);
+        try {
+          await neon.upsertCertification(updated);
+        } catch (err) {
+          console.error('[NEON] Failed to update certification in Neon:', err.message);
+        }
         if (idx !== -1) db.certifications[idx] = updated;
         saveDatabase(db);
         logActivity('UPDATE', 'Certification', `Updated cert: ${updated.title}`);
@@ -782,11 +815,20 @@ const server = http.createServer(async (req, res) => {
       }
 
       if (method === 'DELETE') {
-        await neon.deleteCertification(id);
-        const db = getDatabase();
-        db.certifications = (db.certifications || []).filter((c) => c.id !== id);
+        try {
+          await neon.deleteCertification(id);
+        } catch (err) {
+          console.error('[NEON] Failed to delete certification from Neon:', err.message);
+        }
+        let delTitle = id;
+        if (idx !== -1) {
+          const del = db.certifications.splice(idx, 1)[0];
+          delTitle = del.title;
+        } else {
+          db.certifications = db.certifications.filter((c) => c.id !== id);
+        }
         saveDatabase(db);
-        logActivity('DELETE', 'Certification', `Deleted cert: ${id}`);
+        logActivity('DELETE', 'Certification', `Deleted cert: ${delTitle}`);
         return sendJson(res, 200, { success: true, message: 'Deleted' });
       }
     }

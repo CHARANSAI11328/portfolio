@@ -2360,6 +2360,9 @@
         if (res.ok) {
           showToast(`Deleted ${title}`);
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete project', true);
         }
       } catch {
         showToast('Error deleting project', true);
@@ -2407,6 +2410,9 @@
         if (res.ok) {
           showToast('Certification removed');
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete certification', true);
         }
       } catch {
         showToast('Error deleting certification', true);
@@ -2455,6 +2461,9 @@
         if (res.ok) {
           showToast('Experience removed');
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete experience', true);
         }
       } catch {
         showToast('Error deleting experience', true);
@@ -2502,6 +2511,9 @@
         if (res.ok) {
           showToast('Event removed');
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete event', true);
         }
       } catch {
         showToast('Error deleting event', true);
@@ -2547,6 +2559,9 @@
         if (res.ok) {
           showToast('Skill removed');
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete skill', true);
         }
       } catch {
         showToast('Error deleting skill', true);
@@ -2593,6 +2608,9 @@
         if (res.ok) {
           showToast('Service removed');
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete service', true);
         }
       } catch {
         showToast('Error deleting service', true);
@@ -2751,6 +2769,9 @@
         if (res.ok) {
           showToast(`Inquiry marked as ${newStatus}`);
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to update inquiry status', true);
         }
       } catch {
         showToast('Error updating inquiry status', true);
@@ -2764,6 +2785,9 @@
         if (res.ok) {
           showToast('Inquiry deleted');
           await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete inquiry', true);
         }
       } catch {
         showToast('Error deleting inquiry', true);
