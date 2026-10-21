@@ -29,6 +29,27 @@
       "displayOrder": 1,
       "createdAt": "2026-10-20T17:56:49.160Z",
       "updatedAt": "2026-10-20T17:56:49.160Z"
+    },
+    {
+      "id": "team-1792568967117-vdz9",
+      "name": "P.Bhavani",
+      "role": "TEAM LEADER",
+      "bio": "",
+      "avatarUrl": "",
+      "skills": [],
+      "github": "",
+      "linkedin": "",
+      "email": "",
+      "portfolio": "",
+      "socials": {
+        "github": "",
+        "linkedin": "",
+        "email": "",
+        "portfolio": ""
+      },
+      "displayOrder": 2,
+      "createdAt": "2026-10-21T07:49:27.118Z",
+      "updatedAt": "2026-10-21T07:49:27.118Z"
     }
   ],
   "admins": [
@@ -416,6 +437,41 @@
   ],
   "activityLogs": [
     {
+      "id": "log-1792568967412-wt2w",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: P.Bhavani (TEAM LEADER)",
+      "timestamp": "2026-10-21T07:49:27.412Z"
+    },
+    {
+      "id": "log-1792567304707-zqct",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: P.Bhavani",
+      "timestamp": "2026-10-21T07:21:44.707Z"
+    },
+    {
+      "id": "log-1792566473881-pan6",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: P.Bhavani (TEAM LEADER)",
+      "timestamp": "2026-10-21T07:07:53.881Z"
+    },
+    {
+      "id": "log-1792565642468-k4wh",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: Live Sync Test",
+      "timestamp": "2026-10-21T06:54:02.468Z"
+    },
+    {
+      "id": "log-1792565640512-znkt",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: Live Sync Test (Tester)",
+      "timestamp": "2026-10-21T06:54:00.512Z"
+    },
+    {
       "id": "log-1792562930852-ayu7",
       "action": "INQUIRY",
       "entity": "Contact",
@@ -729,41 +785,6 @@
       "entity": "Admin",
       "details": "Admin admin@charansai.website signed in",
       "timestamp": "2026-10-20T07:50:39.671Z"
-    },
-    {
-      "id": "log-1792482619935-g1t7",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:50:19.935Z"
-    },
-    {
-      "id": "log-1792481610888-dl6q",
-      "action": "INQUIRY",
-      "entity": "Contact",
-      "details": "New message from Test Client (client@example.com)",
-      "timestamp": "2026-10-20T07:33:30.888Z"
-    },
-    {
-      "id": "log-1792481610804-ic70",
-      "action": "DELETE",
-      "entity": "Team",
-      "details": "Removed team member: Ravi Kumar",
-      "timestamp": "2026-10-20T07:33:30.804Z"
-    },
-    {
-      "id": "log-1792481610720-vt0i",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Ravi Kumar (Full-Stack Developer)",
-      "timestamp": "2026-10-20T07:33:30.720Z"
-    },
-    {
-      "id": "log-1792481610634-nm4u",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:33:30.634Z"
     }
   ],
   "certifications": []

@@ -1,11 +1,11 @@
-{
+﻿{
   "name": "freelance_portfolio",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "node server/index.js",
     "start": "node server/index.js",
-    "build": "node -e \"console.log('Production server ready')\"",
+    "build": "npm install",
     "lint": "eslint"
   },
   "dependencies": {
