@@ -42,8 +42,41 @@ function getClient() {
   if (!dbUrl) return null;
 
   try {
-    const { neon } = require('@neondatabase/serverless');
-    sqlClient = neon(dbUrl);
+    const neonPkg = require('@neondatabase/serverless');
+    const { neon, Pool } = neonPkg;
+    const rawSql = neon(dbUrl);
+
+    const client = function (strings, ...values) {
+      return rawSql(strings, ...values);
+    };
+
+    if (typeof rawSql.query === 'function') {
+      client.query = rawSql.query.bind(rawSql);
+    } else {
+      let pool = null;
+      try {
+        pool = new Pool({ connectionString: dbUrl });
+      } catch (pErr) {
+        console.warn('[NEON] Pool fallback warning:', pErr.message);
+      }
+
+      client.query = async function (text, params = []) {
+        if (pool && typeof pool.query === 'function') {
+          const res = await pool.query(text, params);
+          return Array.isArray(res) ? res : (res && res.rows ? res.rows : []);
+        }
+        if (!params || params.length === 0) {
+          const arr = [text];
+          arr.raw = [text];
+          return await rawSql(arr);
+        }
+        const parts = text.split(/\$\d+/);
+        parts.raw = [...parts];
+        return await rawSql(parts, ...params);
+      };
+    }
+
+    sqlClient = client;
     return sqlClient;
   } catch (err) {
     console.error('[NEON] Error initializing @neondatabase/serverless driver:', err.message);
