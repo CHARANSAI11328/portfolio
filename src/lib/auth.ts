@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
-import { getDatabase, logActivity } from './db';
+import { getDatabase, logActivity, getNeon } from './db';
 import { AdminUser } from './types';
 
 const JWT_SECRET_STRING = process.env.ADMIN_JWT_SECRET || 'charan-sai-super-secure-portfolio-jwt-secret-key-2026';
@@ -59,8 +59,29 @@ export async function verifySessionToken(token: string): Promise<AdminUser | nul
     const { payload } = await jwtVerify(token, JWT_SECRET);
     if (!payload || !payload.id) return null;
 
-    const db = getDatabase();
-    const admin = db.admins.find((a) => a.id === payload.id);
+    const n = getNeon();
+    let admin: AdminUser | null = null;
+    if (n && typeof n.getAdminById === 'function') {
+      try {
+        const neonAdmin = await n.getAdminById(payload.id as string);
+        if (neonAdmin) {
+          admin = {
+            id: neonAdmin.id,
+            email: neonAdmin.email,
+            name: neonAdmin.name,
+            role: neonAdmin.role,
+            passwordHash: neonAdmin.password_hash || neonAdmin.passwordHash,
+            tokenVersion: neonAdmin.token_version ?? neonAdmin.tokenVersion ?? 1,
+            createdAt: neonAdmin.created_at || new Date().toISOString(),
+          };
+        }
+      } catch {}
+    }
+
+    if (!admin) {
+      const db = getDatabase();
+      admin = db.admins.find((a) => a.id === payload.id) || null;
+    }
     if (!admin) return null;
 
     // Strict session invalidation check

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase, logActivity } from '@/lib/db';
+import { getDatabase, logActivity, getNeon } from '@/lib/db';
 import { verifyPassword, createSessionToken, COOKIE_NAME } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
@@ -11,19 +11,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    const db = getDatabase();
     const identifier = String(email || '').toLowerCase().trim();
-    const admin = (db.admins || []).find((a) => {
-      const aEmail = String(a.email || '').toLowerCase().trim();
-      const profEmail = String(db.profile?.email || '').toLowerCase().trim();
-      return (
-        aEmail === identifier ||
-        identifier === 'admin' ||
-        identifier === 'charan' ||
-        identifier === 'charansai' ||
-        (profEmail && profEmail === identifier)
-      );
-    });
+    const n = getNeon();
+    let admin: any = null;
+
+    if (n && typeof n.getAdminByEmail === 'function') {
+      try {
+        const neonAdmin = await n.getAdminByEmail(identifier);
+        if (neonAdmin) {
+          admin = {
+            id: neonAdmin.id,
+            email: neonAdmin.email,
+            name: neonAdmin.name,
+            role: neonAdmin.role,
+            passwordHash: neonAdmin.password_hash || neonAdmin.passwordHash,
+            tokenVersion: neonAdmin.token_version ?? neonAdmin.tokenVersion ?? 1,
+            createdAt: neonAdmin.created_at,
+          };
+        }
+      } catch {}
+    }
+
+    if (!admin) {
+      const db = getDatabase();
+      admin = (db.admins || []).find((a) => {
+        const aEmail = String(a.email || '').toLowerCase().trim();
+        const profEmail = String(db.profile?.email || '').toLowerCase().trim();
+        return (
+          aEmail === identifier ||
+          identifier === 'admin' ||
+          identifier === 'charan' ||
+          identifier === 'charansai' ||
+          (profEmail && profEmail === identifier)
+        );
+      });
+    }
 
     if (!admin) {
       return NextResponse.json({ error: 'Invalid admin credentials' }, { status: 401 });

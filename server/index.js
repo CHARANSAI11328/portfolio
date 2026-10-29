@@ -1388,6 +1388,7 @@ const server = http.createServer(async (req, res) => {
             name: newInquiry.name,
             email: newInquiry.email,
             subject: newInquiry.subject,
+            _subject: newInquiry.subject || 'Portfolio Inquiry via Website',
             message: newInquiry.message,
             _replyto: newInquiry.email,
           });
@@ -1398,6 +1399,12 @@ const server = http.createServer(async (req, res) => {
               'Accept': 'application/json',
               'Content-Length': Buffer.byteLength(payload),
             },
+          }, (fRes) => {
+            let resBody = '';
+            fRes.on('data', chunk => resBody += chunk);
+            fRes.on('end', () => {
+              console.log('[FORMSPREE] Server relay status:', fRes.statusCode, resBody);
+            });
           });
           formspreeReq.on('error', (err) => console.warn('[FORMSPREE] Server relay notice:', err.message));
           formspreeReq.write(payload);

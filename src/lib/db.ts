@@ -16,6 +16,7 @@ import {
   AdminUser,
   ActivityLog,
 } from './types';
+import bundledDb from '../../data/portfolio-db.json';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'portfolio-db.json');
@@ -251,61 +252,29 @@ const INITIAL_ADMIN: AdminUser = {
 };
 
 function ensureDataDir(): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+  } catch {}
 }
 
 export function getDatabase(): PortfolioDatabase {
   ensureDataDir();
-  if (!fs.existsSync(DB_FILE)) {
-    const initialDb: PortfolioDatabase = {
-      admins: [INITIAL_ADMIN],
-      profile: INITIAL_PROFILE,
-      projects: INITIAL_PROJECTS,
-      skills: INITIAL_SKILLS,
-      certifications: INITIAL_CERTIFICATIONS,
-      experiences: INITIAL_EXPERIENCE,
-      events: INITIAL_EVENTS,
-      services: INITIAL_SERVICES,
-      inquiries: [],
-      settings: INITIAL_SETTINGS,
-      activityLogs: [
-        {
-          id: 'log-1',
-          action: 'INIT',
-          entity: 'System',
-          details: 'Initialized portfolio CMS database with authentic Charan Sai records',
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    };
-    saveDatabase(initialDb);
-    return initialDb;
+  if (fs.existsSync(DB_FILE)) {
+    try {
+      const content = fs.readFileSync(DB_FILE, 'utf-8');
+      const parsed = JSON.parse(content) as PortfolioDatabase;
+      if (parsed && Array.isArray(parsed.admins)) {
+        return parsed;
+      }
+    } catch (err) {
+      console.warn('Error reading local database file:', err);
+    }
   }
 
-  try {
-    const content = fs.readFileSync(DB_FILE, 'utf-8');
-    const parsed = JSON.parse(content) as PortfolioDatabase;
-    return parsed;
-  } catch (err) {
-    console.error('Error reading database file, repairing...', err);
-    const initialDb: PortfolioDatabase = {
-      admins: [INITIAL_ADMIN],
-      profile: INITIAL_PROFILE,
-      projects: INITIAL_PROJECTS,
-      skills: INITIAL_SKILLS,
-      certifications: INITIAL_CERTIFICATIONS,
-      experiences: INITIAL_EXPERIENCE,
-      events: INITIAL_EVENTS,
-      services: INITIAL_SERVICES,
-      inquiries: [],
-      settings: INITIAL_SETTINGS,
-      activityLogs: [],
-    };
-    saveDatabase(initialDb);
-    return initialDb;
-  }
+  // Authoritative static bundled DB document (ensures high availability in serverless environments)
+  return JSON.parse(JSON.stringify(bundledDb)) as unknown as PortfolioDatabase;
 }
 
 export function getNeonClient() {
@@ -314,15 +283,26 @@ export function getNeonClient() {
   return neon(dbUrl);
 }
 
+// Dynamic Neon module loader with support for serverless runtimes
+let cachedNeonModule: any = null;
+
 export function getNeon() {
+  if (cachedNeonModule) return cachedNeonModule;
   try {
-    const neonPath = path.join(process.cwd(), 'server', 'neon.js');
-    if (fs.existsSync(neonPath)) {
-      // Use dynamic runtime require to prevent build-time static bundler tracing
-      const dynamicRequire = eval('require');
-      return dynamicRequire(neonPath);
-    }
-  } catch {}
+    // 1. Direct relative require within src/lib/ (guaranteed bundling in Vercel Serverless Functions)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    cachedNeonModule = require('./neon');
+    return cachedNeonModule;
+  } catch {
+    try {
+      const neonPath = path.join(process.cwd(), 'server', 'neon.js');
+      if (fs.existsSync(neonPath)) {
+        const dynamicRequire = eval('require');
+        cachedNeonModule = dynamicRequire(neonPath);
+        return cachedNeonModule;
+      }
+    } catch {}
+  }
   return null;
 }
 
@@ -384,11 +364,21 @@ export function saveDatabase(db: PortfolioDatabase): void {
     try {
       fs.renameSync(tempPath, DB_FILE);
     } catch {
-      fs.writeFileSync(DB_FILE, json, 'utf-8');
+      try {
+        fs.writeFileSync(DB_FILE, json, 'utf-8');
+      } catch {}
       try { if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath); } catch {}
     }
   } catch {
-    fs.writeFileSync(DB_FILE, json, 'utf-8');
+    try {
+      fs.writeFileSync(DB_FILE, json, 'utf-8');
+    } catch {
+      // In serverless read-only environments (Vercel, AWS Lambda), write to /tmp
+      try {
+        const tmpDbFile = path.join('/tmp', 'portfolio-db.json');
+        fs.writeFileSync(tmpDbFile, json, 'utf-8');
+      } catch {}
+    }
   }
 
   // Replicate to Neon PostgreSQL asynchronously (atomic state document)

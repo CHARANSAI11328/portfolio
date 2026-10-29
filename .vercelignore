@@ -1,0 +1,11 @@
+node_modules
+nm_old
+nm_corrupt
+.next
+scratch
+data/backups
+*.log
+.git
+.env*
+!.env.example
+

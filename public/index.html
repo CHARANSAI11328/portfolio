@@ -951,20 +951,219 @@
       max-width: 680px;
     }
 
-    /* Contact Section */
+    /* Contact Section & Form Styling */
     .contact-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 3rem; margin-top: 2rem; }
     .contact-input {
       width: 100%;
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1.1rem;
       border-radius: 0.75rem;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       color: var(--text-main);
-      font-size: 0.85rem;
+      font-size: 0.875rem;
       outline: none;
       font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .contact-input:focus { border-color: var(--accent-primary); }
+    .contact-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    .btn-spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: btnSpin 0.7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes btnSpin { to { transform: rotate(360deg); } }
+
+    /* In-Form Success Card */
+    .contact-success-card {
+      text-align: center;
+      padding: 2.25rem 1.25rem;
+      animation: successPop 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes successPop {
+      0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .success-badge-glow {
+      width: 4.5rem;
+      height: 4.5rem;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.35));
+      border: 2px solid rgba(16, 185, 129, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #10B981;
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.35);
+      position: relative;
+    }
+    .success-badge-glow::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px dashed rgba(16, 185, 129, 0.4);
+      animation: rotateRings 20s linear infinite;
+    }
+    .success-pills-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+    .success-pill-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .success-pill-emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10B981;
+    }
+    .success-pill-indigo {
+      background: rgba(79, 70, 229, 0.12);
+      border: 1px solid rgba(79, 70, 229, 0.3);
+      color: var(--accent-primary);
+    }
+    .dark .success-pill-indigo {
+      color: #A5B4FC;
+    }
+
+    /* Floating Toast Notification System */
+    .toast-container {
+      position: fixed;
+      top: 1.75rem;
+      right: 1.75rem;
+      z-index: 100000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      pointer-events: none;
+      max-width: min(440px, calc(100vw - 2.5rem));
+      width: 100%;
+    }
+    .toast-card {
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      border-radius: 1rem;
+      padding: 1.15rem 1.25rem 0.95rem;
+      color: #F8FAFC;
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.25);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(-24px) scale(0.95);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    }
+    .toast-card.show {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .toast-card.hide {
+      transform: translateY(-20px) scale(0.95);
+      opacity: 0;
+    }
+    .toast-card.error {
+      border-color: rgba(239, 68, 68, 0.5);
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(239, 68, 68, 0.25);
+    }
+    .toast-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+    }
+    .toast-icon {
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.75rem;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #10B981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .toast-card.error .toast-icon {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #EF4444;
+    }
+    .toast-content {
+      flex: 1;
+    }
+    .toast-title {
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+    .toast-body {
+      font-size: 0.8rem;
+      color: #CBD5E1;
+      line-height: 1.5;
+    }
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background 0.15s;
+      margin-left: 0.35rem;
+    }
+    .toast-close:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .toast-progress-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #10B981, #34D399);
+      transform-origin: left;
+      animation: toastTimer 5s linear forwards;
+    }
+    .toast-card.error .toast-progress-bar {
+      background: linear-gradient(90deg, #EF4444, #F87171);
+    }
+    @keyframes toastTimer {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
 
     /* Footer Cosmic Banner */
     .cosmic-banner {
@@ -1926,45 +2125,80 @@
       </div>
 
       <!-- Real Contact Submission Form -->
-      <div class="glass-panel" style="padding: 2rem; position: relative;">
-        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-heading); margin-bottom: 1.5rem;">Send a Direct Message</h3>
-
-        <div id="contactSuccessAlert" style="display: none; padding: 0.85rem; border-radius: 0.75rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10B981; font-size: 0.8rem; margin-bottom: 1rem;">
-          Thank you! Your message has been sent directly to Charan Sai.
+      <div class="glass-panel" style="padding: 2.25rem 2rem; position: relative;">
+        <!-- In-Form Success Confirmation State -->
+        <div id="contactSuccessCard" class="contact-success-card" style="display: none;">
+          <div class="success-badge-glow">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h4 style="font-size: 1.35rem; font-weight: 800; color: var(--text-heading); margin-bottom: 0.5rem; letter-spacing: -0.01em;">Message Dispatched!</h4>
+          <p id="contactSuccessMsg" style="font-size: 0.88rem; color: var(--text-muted); max-width: 440px; margin: 0 auto 1.5rem; line-height: 1.6;">
+            Thank you for reaching out! Your message was delivered directly to Charan Sai via Formspree. Expect a personal reply within 24 hours.
+          </p>
+          <div class="success-pills-row">
+            <span class="success-pill-item success-pill-emerald">
+              <i data-lucide="check-circle" style="width: 0.85rem; height: 0.85rem;"></i> Formspree Verified
+            </span>
+            <span class="success-pill-item success-pill-indigo">
+              <i data-lucide="clock" style="width: 0.85rem; height: 0.85rem;"></i> Reply ETA &lt; 24h
+            </span>
+            <span class="success-pill-item success-pill-emerald">
+              <i data-lucide="shield" style="width: 0.85rem; height: 0.85rem;"></i> Direct Inbox
+            </span>
+          </div>
+          <button type="button" id="cResetBtn" class="btn-secondary" style="margin: 0 auto; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; border-radius: 0.75rem; padding: 0.65rem 1.4rem; font-size: 0.82rem; font-weight: 700;">
+            <i data-lucide="refresh-cw" style="width: 0.85rem; height: 0.85rem;"></i>
+            <span>Send Another Message</span>
+          </button>
         </div>
 
-        <div id="contactErrorAlert" style="display: none; padding: 0.85rem; border-radius: 0.75rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #EF4444; font-size: 0.8rem; margin-bottom: 1rem;"></div>
-
-        <form id="contactForm" action="https://formspree.io/f/xpqylowj" method="POST">
-          <!-- Honeypot Field for Spam Protection -->
-          <input type="text" name="_hp" id="cHoneypot" style="display:none !important; opacity:0; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <!-- Submission Form Container -->
+        <div id="contactFormContainer">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
             <div>
-              <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Your Name *</label>
-              <input type="text" id="cName" required class="contact-input" placeholder="e.g. John Doe">
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-heading); margin-bottom: 0.25rem;">Send a Direct Message</h3>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">Delivers straight to Charan Sai's primary inbox via Formspree</p>
             </div>
-            <div>
-              <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Your Email *</label>
-              <input type="email" id="cEmail" required class="contact-input" placeholder="e.g. john@example.com">
+            <div style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem; border-radius: 999px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); color: #10B981; font-size: 0.72rem; font-weight: 700;">
+              <span class="pulse-dot" style="width: 0.45rem; height: 0.45rem;"></span> Formspree Active
             </div>
           </div>
 
-          <div style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Project Scope</label>
-            <input type="text" id="cSubject" class="contact-input" placeholder="e.g. Web Application / Business Website Project">
-          </div>
+          <form id="contactForm" action="https://formspree.io/f/xpqylowj" method="POST">
+            <!-- Formspree Spam & Routing Directives -->
+            <input type="text" name="_hp" id="cHoneypot" style="display:none !important; opacity:0; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
+            <input type="text" name="_gotcha" style="display:none !important; opacity:0; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
+            <input type="hidden" name="_replyto" id="cReplyTo">
 
-          <div style="margin-bottom: 1.25rem;">
-            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Message *</label>
-            <textarea id="cMessage" required rows="4" class="contact-input" placeholder="Tell me about what you are looking to build, requirements, or questions..."></textarea>
-          </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Your Name *</label>
+                <input type="text" id="cName" name="name" required class="contact-input" placeholder="e.g. John Doe">
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Your Email *</label>
+                <input type="email" id="cEmail" name="email" required class="contact-input" placeholder="e.g. john@example.com">
+              </div>
+            </div>
 
-          <button type="submit" id="cBtn" class="btn-primary" style="border: none; cursor: pointer;">
-            <span>Send Message</span>
-            <i data-lucide="send" style="width: 0.9rem; height: 0.9rem;"></i>
-          </button>
-        </form>
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Project Scope</label>
+              <input type="text" id="cSubject" name="_subject" class="contact-input" placeholder="e.g. Web Application / Business Website Project">
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+              <label style="display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem;">Message *</label>
+              <textarea id="cMessage" name="message" required rows="4" class="contact-input" placeholder="Tell me about what you are looking to build, requirements, or questions..."></textarea>
+            </div>
+
+            <button type="submit" id="cBtn" class="btn-primary" style="border: none; cursor: pointer;">
+              <span>Send Message</span>
+              <i data-lucide="send" style="width: 0.9rem; height: 0.9rem;"></i>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </section>
@@ -3026,95 +3260,219 @@
       }
     });
 
-    // 5. Functional Contact Form Submission with Real Validation
-    document.getElementById('contactForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('cBtn');
-      const successBox = document.getElementById('contactSuccessAlert');
-      const errorBox = document.getElementById('contactErrorAlert');
-      const honeypot = document.getElementById('cHoneypot');
+    // Safe HTML escaper for notifications
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-      if (successBox) successBox.style.display = 'none';
-      if (errorBox) errorBox.style.display = 'none';
-
-      // Honeypot spam filtering
-      if (honeypot && honeypot.value.trim().length > 0) {
-        if (successBox) {
-          successBox.textContent = 'Thank you! Your message has been sent directly to Charan Sai.';
-          successBox.style.display = 'block';
-        }
-        document.getElementById('contactForm').reset();
-        return;
+    // World-Class Floating Toast Notification System
+    function showToast(title, message, type = 'success', duration = 5000) {
+      let container = document.getElementById('toastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
       }
 
-      const name = document.getElementById('cName').value.trim();
-      const email = document.getElementById('cEmail').value.trim();
-      const subject = document.getElementById('cSubject').value.trim();
-      const message = document.getElementById('cMessage').value.trim();
+      const toast = document.createElement('div');
+      toast.className = `toast-card ${type === 'error' ? 'error' : ''}`;
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        if (errorBox) {
-          errorBox.textContent = 'Please enter a valid email address.';
-          errorBox.style.display = 'block';
+      const iconSvg = type === 'error'
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+      toast.innerHTML = `
+        <div class="toast-header">
+          <div class="toast-icon">
+            ${iconSvg}
+          </div>
+          <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-body">${message}</div>
+          </div>
+          <button class="toast-close" type="button" title="Dismiss notification" aria-label="Dismiss">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="toast-progress">
+          <div class="toast-progress-bar" style="animation-duration: ${duration}ms;"></div>
+        </div>
+      `;
+
+      container.appendChild(toast);
+
+      // Trigger entrance transition
+      requestAnimationFrame(() => {
+        toast.classList.add('show');
+      });
+
+      let timeoutId = null;
+      const dismiss = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        setTimeout(() => {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 380);
+      };
+
+      const closeBtn = toast.querySelector('.toast-close');
+      if (closeBtn) closeBtn.addEventListener('click', dismiss);
+
+      timeoutId = setTimeout(dismiss, duration);
+      toast.addEventListener('mouseenter', () => {
+        if (timeoutId) clearTimeout(timeoutId);
+      });
+      toast.addEventListener('mouseleave', () => {
+        timeoutId = setTimeout(dismiss, 2000);
+      });
+    }
+
+    // 5. Functional Contact Form Submission with Formspree Integration & Live Confirmation
+    const contactFormEl = document.getElementById('contactForm');
+    if (contactFormEl) {
+      contactFormEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('cBtn');
+        const honeypot = document.getElementById('cHoneypot');
+        const gotcha = document.querySelector('input[name="_gotcha"]');
+
+        // Honeypot spam filtering
+        if ((honeypot && honeypot.value.trim().length > 0) || (gotcha && gotcha.value.trim().length > 0)) {
+          showToast('Message Dispatched', 'Thank you! Your message has been received.', 'success');
+          contactFormEl.reset();
+          return;
         }
-        return;
-      }
 
-      btn.disabled = true;
-      btn.innerHTML = '<span>Sending message...</span>';
+        const nameInput = document.getElementById('cName');
+        const emailInput = document.getElementById('cEmail');
+        const subjectInput = document.getElementById('cSubject');
+        const messageInput = document.getElementById('cMessage');
 
-      try {
-        // Send directly to Formspree endpoint
-        const formspreePromise = fetch('https://formspree.io/f/xpqylowj', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            subject: subject || 'Portfolio Inquiry',
-            message,
-            _replyto: email,
-          }),
-        }).catch(() => null);
+        const name = nameInput ? nameInput.value.trim() : '';
+        const email = emailInput ? emailInput.value.trim() : '';
+        const rawSubject = subjectInput ? subjectInput.value.trim() : '';
+        const message = messageInput ? messageInput.value.trim() : '';
 
-        // Also record to local CMS Inquiries database for admin dashboard
-        const localPromise = fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, subject, message }),
-        }).catch(() => null);
+        if (!name || !email || !message) {
+          showToast('Incomplete Fields', 'Please complete all required fields (Name, Email, Message).', 'error');
+          return;
+        }
 
-        const [fsRes, localRes] = await Promise.all([formspreePromise, localPromise]);
-        const fsOk = fsRes && fsRes.ok;
-        const localOk = localRes && localRes.ok;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          showToast('Invalid Email', 'Please enter a valid email address so Charan can respond.', 'error');
+          return;
+        }
 
-        if (fsOk || localOk) {
-          if (successBox) {
-            successBox.textContent = 'Thank you! Your message has been sent directly to Charan Sai via Formspree.';
-            successBox.style.display = 'block';
+        const subject = rawSubject || 'New Portfolio Project Inquiry';
+        const formattedSubject = `[Portfolio Inquiry] ${subject} - from ${name}`;
+
+        // Populate hidden replyto
+        const replyToEl = document.getElementById('cReplyTo');
+        if (replyToEl) replyToEl.value = email;
+
+        btn.disabled = true;
+        btn.innerHTML = `<span style="display:inline-flex; align-items:center; gap:0.5rem;"><span class="btn-spinner"></span> Sending via Formspree...</span>`;
+
+        const payload = {
+          name,
+          email,
+          _replyto: email,
+          _subject: formattedSubject,
+          subject,
+          message,
+        };
+
+        try {
+          // Direct Formspree submission + Local API dual pipeline
+          // Ensures delivery regardless of browser adblockers or network conditions
+          const [fsRes, localRes] = await Promise.allSettled([
+            fetch('https://formspree.io/f/xpqylowj', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            }),
+            fetch('/api/contact', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            })
+          ]);
+
+          const fsOk = fsRes.status === 'fulfilled' && fsRes.value && fsRes.value.ok;
+          const localOk = localRes.status === 'fulfilled' && localRes.value && localRes.value.ok;
+
+          if (fsOk || localOk) {
+            // World-class floating toast notification
+            showToast(
+              'Message Sent to Charan Sai!',
+              `Thank you, ${name}! Your inquiry has been routed directly to Charan's inbox via Formspree. Expect a personal reply within 24 hours.`,
+              'success',
+              6000
+            );
+
+            // Display in-form success confirmation card
+            const formContainer = document.getElementById('contactFormContainer');
+            const successCard = document.getElementById('contactSuccessCard');
+            const successMsg = document.getElementById('contactSuccessMsg');
+
+            if (successMsg) {
+              successMsg.innerHTML = `Thank you, <strong>${escapeHtml(name)}</strong>! Your inquiry was sent directly to Charan Sai via Formspree. A confirmation copy will be answered at <strong>${escapeHtml(email)}</strong> within 24 hours.`;
+            }
+            if (formContainer) formContainer.style.display = 'none';
+            if (successCard) successCard.style.display = 'block';
+
+            contactFormEl.reset();
+            if (window.lucide) lucide.createIcons();
+          } else {
+            showToast(
+              'Submission Issue',
+              'Formspree could not be reached directly. Please email Charan directly at saikamarajugadda21@gmail.com or contact@charansai.website.',
+              'error',
+              7000
+            );
           }
-          document.getElementById('contactForm').reset();
-        } else {
-          if (errorBox) {
-            errorBox.textContent = 'Failed to send message. Please verify your details or email directly.';
-            errorBox.style.display = 'block';
-          }
+        } catch (err) {
+          showToast(
+            'Network Error',
+            'Connection issue detected. Please check your network or email contact@charansai.website.',
+            'error',
+            7000
+          );
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Send Message</span> <i data-lucide="send" style="width: 0.9rem; height: 0.9rem;"></i>';
+          if (window.lucide) lucide.createIcons();
         }
-      } catch {
-        if (errorBox) {
-          errorBox.textContent = 'Network error submitting inquiry. Please check your connection and retry.';
-          errorBox.style.display = 'block';
-        }
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span>Send Message</span> <i data-lucide="send" style="width: 0.9rem; height: 0.9rem;"></i>';
-        lucide.createIcons();
-      }
-    });
+      });
+    }
+
+    // Reset button to allow sending another message
+    const resetBtn = document.getElementById('cResetBtn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        const formContainer = document.getElementById('contactFormContainer');
+        const successCard = document.getElementById('contactSuccessCard');
+        if (successCard) successCard.style.display = 'none';
+        if (formContainer) formContainer.style.display = 'block';
+        const nameField = document.getElementById('cName');
+        if (nameField) nameField.focus();
+      });
+    }
 
     // Run Data Load & Icon initialization
     loadPortfolioData();
@@ -3968,5 +4326,7 @@
       }
     })();
   </script>
+  <!-- World-Class Floating Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 </body>
 </html>

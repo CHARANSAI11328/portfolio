@@ -31,25 +31,59 @@
       "updatedAt": "2026-10-20T17:56:49.160Z"
     },
     {
-      "id": "team-1792568967117-vdz9",
+      "id": "team-1792572632216-m4v9",
       "name": "P.Bhavani",
       "role": "TEAM LEADER",
+      "bio": "Specializes in interactive UI/UX, responsive layouts, and modern web systems. Dedicated to driving seamless project execution, team collaboration, and delivering exceptional digital experiences.",
+      "avatarUrl": "/uploads/WhatsApp_Image_2026-10-20_at_9_1792582485800_14d1fdc6.jpg",
+      "skills": [
+        "UI/UX Design",
+        "Figma",
+        "React",
+        "Tailwind CSS",
+        "Responsive Design",
+        "Agile Workflows"
+      ],
+      "socials": {
+        "email": "myselfbhavani040@gmail.com",
+        "github": "https://github.com/myselfbhavani",
+        "linkedin": "https://www.linkedin.com/in/bhavani-pabbisetty-663380384/",
+        "portfolio": "https://myselfbhavani.github.io/portfolio/"
+      },
+      "github": "https://github.com/myselfbhavani",
+      "linkedin": "https://www.linkedin.com/in/bhavani-pabbisetty-663380384/",
+      "email": "myselfbhavani040@gmail.com",
+      "portfolio": "https://myselfbhavani.github.io/portfolio/",
+      "displayOrder": 2,
+      "createdAt": "2026-10-21T08:50:32.217Z",
+      "updatedAt": "2026-10-21T11:34:58.899Z"
+    },
+    {
+      "id": "team-1792582688460-ddl9",
+      "name": "D. Sai Durga Bhavani",
+      "role": "QA & Systems Analyst",
       "bio": "",
       "avatarUrl": "",
-      "skills": [],
-      "github": "",
-      "linkedin": "",
-      "email": "",
-      "portfolio": "",
+      "skills": [
+        "Testing Methodologies",
+        "Performance Optimization",
+        "Debugging",
+        "Documentation",
+        "Agile Workflows"
+      ],
       "socials": {
-        "github": "",
-        "linkedin": "",
-        "email": "",
-        "portfolio": ""
+        "email": "dsaidurgabhavani@gmail.com",
+        "github": "https://github.com/dsaidurgabhavani",
+        "linkedin": "https://www.linkedin.com/in/sai-durga-bhavani-d-99b977443/",
+        "portfolio": "https://preeminent-raindrop-2cf481.netlify.app/"
       },
-      "displayOrder": 2,
-      "createdAt": "2026-10-21T07:49:27.118Z",
-      "updatedAt": "2026-10-21T07:49:27.118Z"
+      "github": "https://github.com/dsaidurgabhavani",
+      "linkedin": "https://www.linkedin.com/in/sai-durga-bhavani-d-99b977443/",
+      "email": "dsaidurgabhavani@gmail.com",
+      "portfolio": "https://preeminent-raindrop-2cf481.netlify.app/",
+      "displayOrder": 3,
+      "createdAt": "2026-10-21T11:38:08.462Z",
+      "updatedAt": "2026-10-21T11:38:08.462Z"
     }
   ],
   "admins": [
@@ -396,7 +430,62 @@
       "certifications": true
     }
   },
-  "inquiries": [],
+  "inquiries": [
+    {
+      "id": "inq-1793119303075-kfdb",
+      "name": "KAMARAJU GADDA CHARAN SAI",
+      "email": "saikamarajugadda454@gmail.com",
+      "subject": "bnkk",
+      "message": "jnjkn",
+      "status": "unread",
+      "createdAt": "2026-10-27T16:41:43.075Z"
+    },
+    {
+      "id": "inq-1793119222839-upl5",
+      "name": "Live Internet Tester",
+      "email": "saikamarajugadda21@gmail.com",
+      "subject": "Cloudflare Live Tunnel Test",
+      "message": "Verifying end-to-end delivery through public trycloudflare tunnel.",
+      "status": "unread",
+      "createdAt": "2026-10-27T16:40:22.839Z"
+    },
+    {
+      "id": "inq-1793119165479-jt0q",
+      "name": "Charan Sai Local Test",
+      "email": "saikamarajugadda21@gmail.com",
+      "subject": "Local Server Test",
+      "message": "Testing local endpoint and Formspree server relay.",
+      "status": "unread",
+      "createdAt": "2026-10-27T16:39:25.479Z"
+    },
+    {
+      "id": "inq-1793118876063-6vk3",
+      "name": "System Test",
+      "email": "saikamarajugadda21@gmail.com",
+      "subject": "Server Relay Test",
+      "message": "Verifying Formspree dual-pipeline relay.",
+      "status": "unread",
+      "createdAt": "2026-10-27T16:34:36.063Z"
+    },
+    {
+      "id": "inq-1793118559832-euhi",
+      "name": "Charan Test",
+      "email": "test@example.com",
+      "subject": "Test Scope",
+      "message": "Hello from test",
+      "status": "unread",
+      "createdAt": "2026-10-27T16:29:19.832Z"
+    },
+    {
+      "id": "inq-1793118218185-vwwy",
+      "name": "john",
+      "email": "john@gmail.com",
+      "subject": "app",
+      "message": "hey there",
+      "status": "unread",
+      "createdAt": "2026-10-27T16:23:38.185Z"
+    }
+  ],
   "experiences": [
     {
       "id": "exp-btech",
@@ -428,6 +517,97 @@
     }
   ],
   "activityLogs": [
+    {
+      "id": "log-1793119304568-zjy5",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from KAMARAJU GADDA CHARAN SAI (saikamarajugadda454@gmail.com)",
+      "timestamp": "2026-10-27T16:41:44.568Z"
+    },
+    {
+      "id": "log-1793119225025-p4g6",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from Live Internet Tester (saikamarajugadda21@gmail.com)",
+      "timestamp": "2026-10-27T16:40:25.025Z"
+    },
+    {
+      "id": "log-1793119167423-0zzf",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from Charan Sai Local Test (saikamarajugadda21@gmail.com)",
+      "timestamp": "2026-10-27T16:39:27.423Z"
+    },
+    {
+      "id": "log-1793118876363-k9ib",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from System Test (saikamarajugadda21@gmail.com)",
+      "timestamp": "2026-10-27T16:34:36.363Z"
+    },
+    {
+      "id": "log-1793118562467-und2",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from Charan Test (test@example.com)",
+      "timestamp": "2026-10-27T16:29:22.467Z"
+    },
+    {
+      "id": "log-1793118219552-t7fb",
+      "action": "INQUIRY",
+      "entity": "Contact",
+      "details": "New message from john (john@gmail.com)",
+      "timestamp": "2026-10-27T16:23:39.552Z"
+    },
+    {
+      "id": "log-1792582688465-pzx5",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: D. Sai Durga Bhavani (QA & Systems Analyst)",
+      "timestamp": "2026-10-21T11:38:08.465Z"
+    },
+    {
+      "id": "log-1792582498902-wde6",
+      "action": "UPDATE",
+      "entity": "Team",
+      "details": "Updated team member: P.Bhavani",
+      "timestamp": "2026-10-21T11:34:58.902Z"
+    },
+    {
+      "id": "log-1792582485804-ny9u",
+      "action": "UPLOAD",
+      "entity": "File",
+      "details": "Admin uploaded asset: WhatsApp_Image_2026-10-20_at_9_1792582485800_14d1fdc6.jpg",
+      "timestamp": "2026-10-21T11:34:45.804Z"
+    },
+    {
+      "id": "log-1792572654078-nnf6",
+      "action": "UPDATE",
+      "entity": "Team",
+      "details": "Updated team member: P.Bhavani",
+      "timestamp": "2026-10-21T08:50:54.078Z"
+    },
+    {
+      "id": "log-1792572632221-n4tn",
+      "action": "CREATE",
+      "entity": "Team",
+      "details": "Added team member: P.Bhavani (TEAM LEADER)",
+      "timestamp": "2026-10-21T08:50:32.221Z"
+    },
+    {
+      "id": "log-1792572520334-kkiu",
+      "action": "DELETE",
+      "entity": "Team",
+      "details": "Removed team member: P.Bhavani",
+      "timestamp": "2026-10-21T08:48:40.334Z"
+    },
+    {
+      "id": "log-1792572511546-7dym",
+      "action": "LOGIN",
+      "entity": "Admin",
+      "details": "Admin admin@charansai.website signed in",
+      "timestamp": "2026-10-21T08:48:31.546Z"
+    },
     {
       "id": "log-1792571651142-r2rm",
       "action": "DELETE",
@@ -686,97 +866,6 @@
       "entity": "Team",
       "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
       "timestamp": "2026-10-20T10:44:21.762Z"
-    },
-    {
-      "id": "log-1792493061690-hjm8",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T10:44:21.690Z"
-    },
-    {
-      "id": "log-1792493036784-3cnu",
-      "action": "DELETE",
-      "entity": "Team",
-      "details": "Removed team member: Dr. Neon Database Architect",
-      "timestamp": "2026-10-20T10:43:56.784Z"
-    },
-    {
-      "id": "log-1792493034198-xih3",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
-      "timestamp": "2026-10-20T10:43:54.198Z"
-    },
-    {
-      "id": "log-1792493033462-apco",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T10:43:53.462Z"
-    },
-    {
-      "id": "log-1792492855110-7x81",
-      "action": "CREATE",
-      "entity": "Team",
-      "details": "Added team member: Dr. Neon Database Architect (Cloud Persistence Lead)",
-      "timestamp": "2026-10-20T10:40:55.110Z"
-    },
-    {
-      "id": "log-1792492854901-vctl",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T10:40:54.901Z"
-    },
-    {
-      "id": "log-1792485167876-jkov",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T08:32:47.876Z"
-    },
-    {
-      "id": "log-1792485153504-oymi",
-      "action": "LOGOUT",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website logged out (session revoked)",
-      "timestamp": "2026-10-20T08:32:33.505Z"
-    },
-    {
-      "id": "log-1792482974573-jzm4",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:56:14.573Z"
-    },
-    {
-      "id": "log-1792482676522-wqe0",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:51:16.522Z"
-    },
-    {
-      "id": "log-1792482669805-j1aj",
-      "action": "LOGOUT",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website logged out (session revoked)",
-      "timestamp": "2026-10-20T07:51:09.805Z"
-    },
-    {
-      "id": "log-1792482639762-gm8o",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:50:39.762Z"
-    },
-    {
-      "id": "log-1792482639720-runj",
-      "action": "LOGIN",
-      "entity": "Admin",
-      "details": "Admin admin@charansai.website signed in",
-      "timestamp": "2026-10-20T07:50:39.720Z"
     }
   ],
   "certifications": []

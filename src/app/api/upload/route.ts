@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    try {
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+    } catch {}
 
     const contentType = request.headers.get('content-type') || '';
     let buffer: Buffer;
@@ -68,7 +70,11 @@ export async function POST(request: NextRequest) {
     }
 
     const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, buffer);
+    try {
+      fs.writeFileSync(filePath, buffer);
+    } catch {
+      // In serverless environments, file is persisted into Neon cloud database below
+    }
     const publicUrl = `/uploads/${filename}`;
 
     // Cloud database persistence in Neon
