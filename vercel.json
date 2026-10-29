@@ -1,19 +1,22 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/",
-      "destination": "/index.html"
+      "destination": "/home.html"
     },
     {
       "source": "/admin",
-      "destination": "/admin.html"
+      "destination": "/admin-dashboard.html"
     },
     {
       "source": "/admin-login",
-      "destination": "/admin-login.html"
+      "destination": "/admin-auth.html"
+    },
+    {
+      "source": "/admin/login",
+      "destination": "/admin-auth.html"
     }
   ]
 }

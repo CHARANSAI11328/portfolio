@@ -1,0 +1,2987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Charan Sai Portfolio CMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="/js/lucide.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background-color: #070A11;
+      color: #E2E8F0;
+      min-height: 100vh;
+      display: flex;
+    }
+    /* Sidebar */
+    aside {
+      width: 260px;
+      background: #0B0F19;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      user-select: none;
+    }
+    .brand-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+    .brand-text { font-size: 0.875rem; font-weight: 700; color: #FFFFFF; }
+    .brand-sub { font-size: 0.65rem; color: #94A3B8; }
+    nav { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; overflow-y: auto; }
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94A3B8;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .nav-btn:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.05); }
+    .nav-btn.active {
+      background: #4F46E5;
+      color: #FFFFFF;
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: #1E293B;
+      color: #CBD5E1;
+    }
+    .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+    .logout-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #FB7185;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover { background: rgba(225, 29, 72, 0.15); }
+
+    /* Main Area */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow-y: auto;
+    }
+    header {
+      height: 4.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .header-title { font-size: 1rem; font-weight: 700; color: #FFFFFF; text-transform: capitalize; }
+    .header-desc { font-size: 0.7rem; color: #94A3B8; }
+    .header-actions { display: flex; align-items: center; gap: 1rem; }
+    .btn-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.85rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #E2E8F0;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-live:hover { background: #334155; }
+    .admin-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding-left: 1rem;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .avatar-circle {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+    .admin-name { font-size: 0.75rem; font-weight: 700; color: #FFFFFF; line-height: 1.2; }
+    .admin-role { font-size: 0.65rem; color: #818CF8; font-weight: 500; }
+
+    /* Content view */
+    .content-box { padding: 2rem; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Metric cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .metric-card {
+      background: #0F1626;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .metric-label { font-size: 0.75rem; font-weight: 600; color: #94A3B8; margin-bottom: 0.25rem; }
+    .metric-val { font-size: 2rem; font-weight: 800; color: #FFFFFF; }
+    .metric-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 2 Column Dashboard Grid */
+    .dash-columns {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+      .dash-columns { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: #0F1626;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .panel-title { font-size: 0.875rem; font-weight: 700; color: #FFFFFF; }
+    .panel-desc { font-size: 0.7rem; color: #94A3B8; }
+
+    /* Action buttons in quick actions */
+    .action-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.7rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 0.65rem;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .action-btn.indigo {
+      background: rgba(79, 70, 229, 0.15);
+      border-color: rgba(99, 102, 241, 0.3);
+      color: #A5B4FC;
+    }
+    .action-btn.indigo:hover { background: rgba(79, 70, 229, 0.3); }
+    .action-btn.sky {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.25);
+      color: #7DD3FC;
+    }
+    .action-btn.sky:hover { background: rgba(56, 189, 248, 0.25); }
+    .action-btn.violet {
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(168, 85, 247, 0.25);
+      color: #D8B4FE;
+    }
+    .action-btn.violet:hover { background: rgba(168, 85, 247, 0.25); }
+    .action-btn.amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.25);
+      color: #FCD34D;
+    }
+    .action-btn.amber:hover { background: rgba(245, 158, 11, 0.25); }
+
+    .sync-card {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, #0B0F19, rgba(49, 46, 129, 0.3));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    .sync-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 0.35rem;
+    }
+    .live-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.2);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .live-dot { width: 0.35rem; height: 0.35rem; border-radius: 999px; background: #34D399; }
+    .sync-desc { font-size: 0.7rem; color: #94A3B8; line-height: 1.4; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left; }
+    th {
+      background: #0B0F19;
+      padding: 0.85rem 1rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #CBD5E1;
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Form controls */
+    .form-row { margin-bottom: 1rem; }
+    .form-row label { display: block; font-size: 0.75rem; font-weight: 600; color: #CBD5E1; margin-bottom: 0.35rem; }
+    .form-input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border-radius: 0.65rem;
+      background: #0B0F19;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #FFFFFF;
+      font-size: 0.8rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-input:focus { border-color: #6366F1; }
+    .btn-save {
+      padding: 0.65rem 1.25rem;
+      border-radius: 0.65rem;
+      background: #4F46E5;
+      color: #FFFFFF;
+      border: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-save:hover { background: #4338CA; }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+    }
+    .modal-content {
+      background: #0F1626;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 1.25rem;
+      width: 100%;
+      max-width: 560px;
+      padding: 1.75rem;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 800; color: #FFFFFF; margin-bottom: 1.25rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.25rem; }
+    .btn-cancel {
+      padding: 0.6rem 1rem;
+      border-radius: 0.65rem;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94A3B8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.75rem;
+      background: #064E3B;
+      color: #6EE7B7;
+      border: 1px solid #059669;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: none;
+      z-index: 200;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    #toast.error {
+      background: #7F1D1D;
+      color: #FCA5A5;
+      border-color: #DC2626;
+    }
+
+    /* Form Grid Utilities */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Mobile Drawer & Toggle Styles */
+    .admin-mobile-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.5rem;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #E2E8F0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .admin-mobile-toggle:hover {
+      background: #334155;
+      color: #FFFFFF;
+    }
+    .admin-sidebar-close {
+      display: none;
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      padding: 0.35rem;
+      border-radius: 0.375rem;
+    }
+    .admin-sidebar-close:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .admin-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 95;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .admin-sidebar-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Global Mobile Layout & Zero-Horizontal-Overflow System */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      aside {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        height: 100vh;
+        z-index: 100;
+        width: 280px;
+        max-width: 85vw;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 12px 0 35px rgba(0, 0, 0, 0.6);
+      }
+      aside.open {
+        transform: translateX(0);
+      }
+      .admin-mobile-toggle {
+        display: flex;
+      }
+      .admin-sidebar-close {
+        display: block;
+      }
+      .admin-sidebar-backdrop {
+        display: block;
+      }
+      header {
+        padding: 0 1.25rem;
+        height: 3.75rem;
+      }
+      .admin-pill {
+        display: none;
+      }
+      .header-desc {
+        display: none;
+      }
+      .content-box {
+        padding: 1.25rem 1rem;
+      }
+      .dash-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-grid-2,
+      .form-grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 0.65rem !important;
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+      .metric-card {
+        padding: 1rem 0.85rem;
+      }
+      .metric-val {
+        font-size: 1.5rem;
+      }
+      .metric-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+      }
+      .panel {
+        padding: 1.15rem 1rem;
+        border-radius: 0.85rem;
+      }
+      .modal-content {
+        width: 95%;
+        max-width: 95vw;
+        padding: 1.25rem 1rem;
+        max-height: 85vh;
+        border-radius: 1rem;
+      }
+      #teamAdminContainer,
+      #certsContainer,
+      #adminEventsContainer,
+      #skillsAdminContainer,
+      #servicesAdminContainer {
+        grid-template-columns: 1fr !important;
+      }
+      table {
+        min-width: 580px;
+      }
+      .panel[style*="overflow-x: auto"] {
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .btn-live span {
+        display: none;
+      }
+      .btn-live {
+        padding: 0.4rem 0.6rem;
+      }
+      header {
+        padding: 0 0.85rem;
+      }
+      .content-box {
+        padding: 1rem 0.65rem;
+      }
+      .header-title {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast">Changes synchronized successfully!</div>
+  <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop" onclick="closeAdminSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside id="adminSidebar">
+    <div>
+      <div class="brand-header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="brand-icon">
+            <i data-lucide="shield"></i>
+          </div>
+          <div>
+            <div class="brand-text">Admin Panel</div>
+            <div class="brand-sub">charansai.website</div>
+          </div>
+        </div>
+        <button class="admin-sidebar-close" id="adminSidebarClose" onclick="closeAdminSidebar()" aria-label="Close sidebar">
+          <i data-lucide="x" style="width: 1.15rem; height: 1.15rem;"></i>
+        </button>
+      </div>
+
+      <nav>
+        <button class="nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-tab="profile" onclick="switchTab('profile')">
+          <i data-lucide="user"></i>
+          <span>Profile</span>
+        </button>
+        <button class="nav-btn" data-tab="projects" onclick="switchTab('projects')">
+          <i data-lucide="folder-git-2"></i>
+          <span>Projects</span>
+          <span class="nav-badge" id="badgeProjects">0</span>
+        </button>
+        <button class="nav-btn" data-tab="certifications" onclick="switchTab('certifications')">
+          <i data-lucide="award"></i>
+          <span>Certifications</span>
+          <span class="nav-badge" id="badgeCerts">0</span>
+        </button>
+        <button class="nav-btn" data-tab="experience" onclick="switchTab('experience')">
+          <i data-lucide="briefcase"></i>
+          <span>Experience</span>
+          <span class="nav-badge" id="badgeExp">0</span>
+        </button>
+        <button class="nav-btn" data-tab="events" onclick="switchTab('events')">
+          <i data-lucide="calendar"></i>
+          <span>Events</span>
+          <span class="nav-badge" id="badgeEvents">0</span>
+        </button>
+        <button class="nav-btn" data-tab="skills" onclick="switchTab('skills')">
+          <i data-lucide="code-2"></i>
+          <span>Skills</span>
+          <span class="nav-badge" id="badgeSkills">0</span>
+        </button>
+        <button class="nav-btn" data-tab="services" onclick="switchTab('services')">
+          <i data-lucide="layout"></i>
+          <span>Services</span>
+          <span class="nav-badge" id="badgeServices">0</span>
+        </button>
+        <button class="nav-btn" data-tab="team" onclick="switchTab('team')">
+          <i data-lucide="users"></i>
+          <span>Team</span>
+          <span class="nav-badge" id="badgeTeam">0</span>
+        </button>
+        <button class="nav-btn" data-tab="inquiries" onclick="switchTab('inquiries')">
+          <i data-lucide="message-square"></i>
+          <span>Inquiries</span>
+          <span class="nav-badge" id="badgeInq" style="background: rgba(225,29,72,0.2); color: #FDA4AF;">0</span>
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="handleLogout()">
+        <i data-lucide="log-out"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <main>
+    <header>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <button class="admin-mobile-toggle" id="adminSidebarToggle" onclick="toggleAdminSidebar()" aria-label="Toggle navigation menu">
+          <i data-lucide="menu" style="width: 1.25rem; height: 1.25rem;"></i>
+        </button>
+        <div>
+          <h1 class="header-title" id="pageTitle">Dashboard</h1>
+          <p class="header-desc">Manage your portfolio content and live system records</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="/" target="_blank" class="btn-live">
+          <span>View Live Site</span>
+          <i data-lucide="external-link" style="width: 0.85rem; height: 0.85rem;"></i>
+        </a>
+
+        <div class="admin-pill">
+          <div class="avatar-circle">CS</div>
+          <div>
+            <div class="admin-name" id="adminHeaderName">Charan Sai</div>
+            <div class="admin-role">Administrator</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-box">
+      <!-- 1. DASHBOARD VIEW -->
+      <div id="tab-dashboard" class="tab-pane active">
+        <!-- 4 Metric Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div>
+              <div class="metric-label">Projects</div>
+              <div class="metric-val" id="countProjects">0</div>
+            </div>
+            <div class="metric-icon" style="background: rgba(79, 70, 229, 0.15); color: #818CF8;">
+              <i data-lucide="folder-git-2"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div>
+              <div class="metric-label">Certifications</div>
+              <div class="metric-val" id="countCerts">0</div>
+            </div>
+            <div class="metric-icon" style="background: rgba(56, 189, 248, 0.15); color: #38BDF8;">
+              <i data-lucide="award"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div>
+              <div class="metric-label">Experience</div>
+              <div class="metric-val" id="countExp">0</div>
+            </div>
+            <div class="metric-icon" style="background: rgba(168, 85, 247, 0.15); color: #C084FC;">
+              <i data-lucide="briefcase"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div>
+              <div class="metric-label">Events</div>
+              <div class="metric-val" id="countEvents">0</div>
+            </div>
+            <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;">
+              <i data-lucide="calendar"></i>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div>
+              <div class="metric-label">Team Members</div>
+              <div class="metric-val" id="countTeam">0</div>
+            </div>
+            <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+              <i data-lucide="users"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Column Layout: Recent Updates + Quick Actions -->
+        <div class="dash-columns">
+          <!-- Recent Updates Panel -->
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title">Recent Updates</div>
+                <div class="panel-desc">Real-time audit history of portfolio changes</div>
+              </div>
+            </div>
+
+            <div id="activityLogsList" style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Quick Actions Panel -->
+          <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Quick Actions</div>
+                  <div class="panel-desc">Fast creation triggers</div>
+                </div>
+              </div>
+
+              <button class="action-btn indigo" onclick="openProjectModal()">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="plus"></i> Add Project
+                </span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+
+              <button class="action-btn sky" onclick="openCertModal()">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="plus"></i> Add Certification
+                </span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+
+              <button class="action-btn violet" onclick="openExpModal()">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="plus"></i> Add Experience
+                </span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+
+              <button class="action-btn amber" onclick="openEventModal()">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="plus"></i> Add Event
+                </span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+
+              <button class="action-btn indigo" onclick="openSkillModal()">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="plus"></i> Add Skill
+                </span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+
+              <button class="action-btn violet" onclick="switchTab('profile')">
+                <span style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="user"></i> Update Profile
+                </span>
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+
+            <div class="sync-card">
+              <div class="sync-title">
+                <span>Content Preview</span>
+                <div class="live-badge"><div class="live-dot"></div> Live Sync</div>
+              </div>
+              <p class="sync-desc">Changes you make here are saved atomically and reflect on the public website immediately.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PROFILE VIEW -->
+      <div id="tab-profile" class="tab-pane">
+        <div class="panel" style="max-width: 820px;">
+          <h2 class="panel-title" style="font-size: 1rem; margin-bottom: 0.25rem;">Personal Profile & Identity</h2>
+          <p class="panel-desc" style="margin-bottom: 1.5rem;">Control hero headline, bio, location, email, and contact availability</p>
+
+          <form id="profileForm">
+            <div class="form-grid-2">
+              <div class="form-row">
+                <label>Full Name *</label>
+                <input type="text" id="profName" required class="form-input">
+              </div>
+              <div class="form-row">
+                <label>Professional Positioning Title *</label>
+                <input type="text" id="profTitle" required class="form-input">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Hero Description</label>
+              <textarea id="profHeroDesc" class="form-input" rows="2"></textarea>
+            </div>
+
+            <div class="form-row">
+              <label>About Me Bio</label>
+              <textarea id="profBio" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="form-grid-3">
+              <div class="form-row">
+                <label>Location</label>
+                <input type="text" id="profLoc" class="form-input">
+              </div>
+              <div class="form-row">
+                <label>Email</label>
+                <input type="email" id="profEmail" class="form-input">
+              </div>
+              <div class="form-row">
+                <label>Availability Status</label>
+                <select id="profAvailStatus" class="form-input">
+                  <option value="available">Open to Work (Available)</option>
+                  <option value="busy">In Consultation / Busy</option>
+                  <option value="contact">Contact for Availability</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-row">
+                <label>Availability Badge Text</label>
+                <input type="text" id="profAvailText" class="form-input" placeholder="e.g. Available for freelance projects">
+              </div>
+              <div class="form-row">
+                <label>Resume File URL</label>
+                <input type="text" id="profResumeUrl" class="form-input" placeholder="/Charan_Sai_Resume.pdf">
+              </div>
+            </div>
+
+            <div class="form-row" style="background: rgba(15, 23, 42, 0.6); padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(255, 255, 255, 0.08);">
+              <label style="font-weight: 700; color: #E2E8F0; margin-bottom: 0.75rem; display: block;">Social & Coding Profiles</label>
+              <div class="form-grid-2">
+                <div class="form-row">
+                  <label>GitHub Profile URL</label>
+                  <input type="url" id="profGithub" class="form-input" placeholder="https://github.com/...">
+                </div>
+                <div class="form-row">
+                  <label>LinkedIn Profile URL</label>
+                  <input type="url" id="profLinkedin" class="form-input" placeholder="https://www.linkedin.com/in/...">
+                </div>
+                <div class="form-row">
+                  <label>X (Twitter) Profile URL</label>
+                  <input type="url" id="profTwitter" class="form-input" placeholder="https://x.com/...">
+                </div>
+                <div class="form-row">
+                  <label>LeetCode Profile URL</label>
+                  <input type="url" id="profLeetcode" class="form-input" placeholder="https://leetcode.com/u/...">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row" style="background: rgba(99, 102, 241, 0.05); padding: 1.25rem; border-radius: 0.75rem; border: 1px solid rgba(99, 102, 241, 0.2);">
+              <label style="font-weight: 700; color: #E2E8F0; margin-bottom: 0.75rem; display: block;">Profile Picture Management</label>
+              <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
+                <div style="width: 84px; height: 84px; border-radius: 999px; overflow: hidden; border: 2px solid #6366F1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.35); background: #0F172A; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                  <img id="adminAvatarPreview" src="/images/charan_sai_avatar.jpg" alt="Profile Preview" style="width: 100%; height: 100%; object-fit: cover; object-position: center 20%;" onerror="this.onerror=null; this.src='/images/charan_sai_avatar.jpg';">
+                </div>
+                <div style="flex: 1; min-width: 220px;">
+                  <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap;">
+                    <button type="button" id="uploadAvatarBtn" class="action-btn violet" onclick="document.getElementById('adminAvatarFileInput').click()" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 0.5rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <i data-lucide="upload" style="width: 0.85rem; height: 0.85rem;"></i> Upload New Photo
+                    </button>
+                    <button type="button" class="action-btn" onclick="resetDefaultAvatar()" style="padding: 0.45rem 0.9rem; font-size: 0.75rem; border-radius: 0.5rem; cursor: pointer;">
+                      Default Photo
+                    </button>
+                    <span id="uploadStatusText" style="font-size: 0.75rem; color: #94A3B8;"></span>
+                  </div>
+                  <input type="file" id="adminAvatarFileInput" accept="image/jpeg,image/png,image/webp" style="display: none;">
+                  <input type="text" id="profAvatarUrl" class="form-input" placeholder="/images/charan_sai_avatar.jpg" oninput="updateAvatarPreview(this.value)">
+                  <div style="font-size: 0.7rem; color: #94A3B8; margin-top: 0.35rem;">Max 5MB (JPG, PNG, WEBP). Validated and protected by admin session token.</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 1.5rem;">
+              <button type="submit" id="profSubmitBtn" class="btn-save">Save Profile Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 3. PROJECTS VIEW -->
+      <div id="tab-projects" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">Project Management</h2>
+            <p class="panel-desc">Manage project records, case studies, technologies, and live URLs</p>
+          </div>
+          <button class="btn-save" onclick="openProjectModal()">+ Add Project</button>
+        </div>
+
+        <div class="panel" style="padding: 0; overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Project Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Live URL</th>
+                <th>Visibility</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="projectsTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. CERTIFICATIONS VIEW -->
+      <div id="tab-certifications" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">Certifications & Credentials</h2>
+            <p class="panel-desc">Only genuine certificates. Shows honest empty state if none exist.</p>
+          </div>
+          <button class="btn-save" onclick="openCertModal()">+ Add Certificate</button>
+        </div>
+
+        <div id="certsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 5. EXPERIENCE & EDUCATION VIEW -->
+      <div id="tab-experience" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">Experience & Education Journey</h2>
+            <p class="panel-desc">Manage academic milestones, independent developer delivery, and roles</p>
+          </div>
+          <button class="btn-save" onclick="openExpModal()">+ Add Experience</button>
+        </div>
+        <div id="experienceContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 6. EVENTS VIEW -->
+      <div id="tab-events" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">Events & Activities</h2>
+            <p class="panel-desc">Workshops, hackathons, and technical symposium presentations</p>
+          </div>
+          <button class="btn-save" onclick="openEventModal()">+ Add Event</button>
+        </div>
+        <div id="adminEventsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 7. SKILLS VIEW -->
+      <div id="tab-skills" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">Technology Skills</h2>
+            <p class="panel-desc">Curated repertoire of technical competencies with authentic logos</p>
+          </div>
+          <button class="btn-save" onclick="openSkillModal()">+ Add Skill</button>
+        </div>
+        <div id="skillsAdminContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 8. SERVICES VIEW -->
+      <div id="tab-services" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">Services & Offerings</h2>
+            <p class="panel-desc">Digital solutions, client website development, and software capabilities</p>
+          </div>
+          <button class="btn-save" onclick="openServiceModal()">+ Add Service</button>
+        </div>
+        <div id="servicesAdminContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 8B. TEAM VIEW -->
+      <div id="tab-team" class="tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 class="panel-title" style="font-size: 1rem;">My Team & Collaborators</h2>
+            <p class="panel-desc">Manage core team members, specializations, skill tags, and social profiles</p>
+          </div>
+          <button class="btn-save" onclick="openTeamModal()">+ Add Team Member</button>
+        </div>
+        <div id="teamAdminContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 9. INQUIRIES VIEW -->
+      <div id="tab-inquiries" class="tab-pane">
+        <div style="margin-bottom: 1.5rem;">
+          <h2 class="panel-title" style="font-size: 1rem;">Contact Inquiries</h2>
+          <p class="panel-desc">Client project messages received via public contact form</p>
+        </div>
+
+        <div id="inquiriesContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- 10. SETTINGS VIEW -->
+      <div id="tab-settings" class="tab-pane">
+        <div class="panel" style="max-width: 720px;">
+          <h2 class="panel-title" style="font-size: 1rem; margin-bottom: 0.25rem;">Website Settings & SEO</h2>
+          <p class="panel-desc" style="margin-bottom: 1.5rem;">Configure page title, meta description, and banner wording</p>
+
+          <form id="settingsForm">
+            <div class="form-row">
+              <label>SEO Meta Title</label>
+              <input type="text" id="settTitle" class="form-input">
+            </div>
+
+            <div class="form-row">
+              <label>SEO Meta Description</label>
+              <textarea id="settDesc" class="form-input" rows="2"></textarea>
+            </div>
+
+            <div class="form-row">
+              <label>Keywords (Comma separated)</label>
+              <input type="text" id="settKeywords" class="form-input">
+            </div>
+
+            <div class="form-row">
+              <label>Bottom Banner Tagline</label>
+              <input type="text" id="settBanner" class="form-input">
+            </div>
+
+            <div style="text-align: right; margin-top: 1.5rem;">
+              <button type="submit" id="settSubmitBtn" class="btn-save">Save Settings</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Admin Security & Password Change Panel -->
+        <div class="panel" style="max-width: 720px; margin-top: 1.5rem;">
+          <h2 class="panel-title" style="font-size: 1rem; margin-bottom: 0.25rem;">Admin Credentials & Security</h2>
+          <p class="panel-desc" style="margin-bottom: 1.5rem;">Update your administrator password and rotate active session tokens</p>
+
+          <form id="passwordChangeForm">
+            <div class="form-row">
+              <label>Current Password *</label>
+              <input type="password" id="secCurrentPass" class="form-input" required autocomplete="current-password" placeholder="Enter existing password">
+            </div>
+
+            <div class="form-row">
+              <label>New Password *</label>
+              <input type="password" id="secNewPass" class="form-input" required autocomplete="new-password" placeholder="Minimum 8 characters">
+              <div style="font-size: 0.68rem; color: #94A3B8; margin-top: 0.35rem;">
+                Must be at least 8 characters long.
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Confirm New Password *</label>
+              <input type="password" id="secConfirmPass" class="form-input" required autocomplete="new-password" placeholder="Re-enter new password">
+            </div>
+
+            <div style="text-align: right; margin-top: 1.5rem;">
+              <button type="submit" id="secPasswordSubmitBtn" class="btn-save" style="background: linear-gradient(135deg, #7C3AED, #4F46E5);">
+                Update Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: ADD / EDIT PROJECT -->
+  <div id="projectModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="modal-title" id="projModalTitle">Add Project</h3>
+      <form id="projectModalForm">
+        <input type="hidden" id="pmId">
+        <div class="form-row">
+          <label>Project Title *</label>
+          <input type="text" id="pmTitle" required class="form-input">
+        </div>
+        <div class="form-row">
+          <label>Category</label>
+          <select id="pmCategory" class="form-input">
+            <option value="Web Applications">Web Applications</option>
+            <option value="Desktop & Systems">Desktop & Systems</option>
+            <option value="Digital Publishing">Digital Publishing</option>
+            <option value="Business Solutions">Business Solutions</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Short Description *</label>
+          <textarea id="pmShortDesc" required rows="2" class="form-input"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Case Study Details</label>
+          <textarea id="pmCaseStudy" rows="3" class="form-input" placeholder="Implementation notes, architecture..."></textarea>
+        </div>
+        <div class="form-row">
+          <label>Technologies (Comma separated)</label>
+          <input type="text" id="pmTechnologies" class="form-input" placeholder="e.g. Next.js, React, PostgreSQL">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Live URL (Leave empty if none)</label>
+            <input type="url" id="pmLiveUrl" placeholder="https://..." class="form-input">
+          </div>
+          <div class="form-row">
+            <label>Repo URL (Leave empty if none)</label>
+            <input type="url" id="pmRepoUrl" placeholder="https://github.com/..." class="form-input">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Status</label>
+            <select id="pmStatus" class="form-input">
+              <option value="Completed">Completed</option>
+              <option value="Active Development">Active Development</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Concept">Concept</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Publication Status</label>
+            <select id="pmPublished" class="form-input">
+              <option value="true">Published</option>
+              <option value="false">Draft</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeProjectModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT CERTIFICATION -->
+  <div id="certModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="modal-title" id="certModalTitle">Add Certification</h3>
+      <form id="certModalForm">
+        <input type="hidden" id="cmId">
+        <div class="form-row">
+          <label>Certificate Title *</label>
+          <input type="text" id="cmTitle" required class="form-input">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Issuer *</label>
+            <input type="text" id="cmIssuer" required placeholder="e.g. Google, Coursera" class="form-input">
+          </div>
+          <div class="form-row">
+            <label>Issue Date *</label>
+            <input type="text" id="cmDate" required placeholder="e.g. Jan 2026" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Credential ID (Optional)</label>
+          <input type="text" id="cmCredId" placeholder="e.g. ID-12345" class="form-input">
+        </div>
+        <div class="form-row">
+          <label>Verification URL (Optional)</label>
+          <input type="url" id="cmVerifyUrl" placeholder="https://..." class="form-input">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeCertModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Certificate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT EXPERIENCE -->
+  <div id="expModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="modal-title" id="expModalTitle">Add Experience / Education</h3>
+      <form id="expModalForm">
+        <input type="hidden" id="emId">
+        <div class="form-row">
+          <label>Role / Degree Title *</label>
+          <input type="text" id="emRole" required class="form-input" placeholder="e.g. Independent Developer / B.Tech CSE">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Company / College *</label>
+            <input type="text" id="emCompany" required class="form-input" placeholder="e.g. St. Ann's College of Engineering">
+          </div>
+          <div class="form-row">
+            <label>Location *</label>
+            <input type="text" id="emLocation" required class="form-input" placeholder="e.g. Chirala, AP, India">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Period *</label>
+            <input type="text" id="emPeriod" required class="form-input" placeholder="e.g. 2023 — Present">
+          </div>
+          <div class="form-row">
+            <label>Classification Type</label>
+            <select id="emType" class="form-input">
+              <option value="work">Work & Freelance</option>
+              <option value="education">Education</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Summary Description *</label>
+          <textarea id="emDesc" required rows="2" class="form-input"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Key Highlights (One per line)</label>
+          <textarea id="emHighlights" rows="3" class="form-input" placeholder="Focus area or achievement..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeExpModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Experience</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT EVENT -->
+  <div id="eventModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="modal-title" id="eventModalTitle">Add Event / Activity</h3>
+      <form id="eventModalForm">
+        <input type="hidden" id="evmId">
+        <div class="form-row">
+          <label>Event Name / Title *</label>
+          <input type="text" id="evmTitle" required class="form-input" placeholder="e.g. Tech Workshop & Hackathon">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Role / Badge *</label>
+            <input type="text" id="evmRole" required class="form-input" placeholder="e.g. Project Presenter / Participant">
+          </div>
+          <div class="form-row">
+            <label>Date *</label>
+            <input type="text" id="evmDate" required class="form-input" placeholder="e.g. Jan 2024">
+          </div>
+        </div>
+        <div class="form-row">
+          <label>Location / Venue</label>
+          <input type="text" id="evmLocation" class="form-input" placeholder="e.g. Chirala, AP, India">
+        </div>
+        <div class="form-row">
+          <label>Description *</label>
+          <textarea id="evmDesc" required rows="3" class="form-input"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeEventModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT SKILL -->
+  <div id="skillModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="modal-title" id="skillModalTitle">Add Technology Skill</h3>
+      <form id="skillModalForm">
+        <input type="hidden" id="smId">
+        <div class="form-row">
+          <label>Technology Name *</label>
+          <input type="text" id="smName" required class="form-input" placeholder="e.g. React, Python, PostgreSQL">
+        </div>
+        <div class="form-row">
+          <label>Category</label>
+          <select id="smCategory" class="form-input">
+            <option value="Frontend">Frontend</option>
+            <option value="Languages">Languages</option>
+            <option value="Backend & Data">Backend & Data</option>
+            <option value="Tools & Platforms">Tools & Platforms</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Icon Identifier</label>
+          <input type="text" id="smIcon" class="form-input" placeholder="e.g. Code, Database, Terminal, Flame, Layers">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeSkillModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Skill</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT SERVICE -->
+  <div id="serviceModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="modal-title" id="serviceModalTitle">Add Service</h3>
+      <form id="serviceModalForm">
+        <input type="hidden" id="svmId">
+        <div class="form-row">
+          <label>Service Title *</label>
+          <input type="text" id="svmTitle" required class="form-input" placeholder="e.g. Web Application Development">
+        </div>
+        <div class="form-row">
+          <label>Category</label>
+          <input type="text" id="svmCategory" class="form-input" placeholder="e.g. Development, Design & Web">
+        </div>
+        <div class="form-row">
+          <label>Description *</label>
+          <textarea id="svmDesc" required rows="2" class="form-input"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Features (One per line)</label>
+          <textarea id="svmFeatures" rows="3" class="form-input" placeholder="Responsive UI/UX&#10;Secure Authentication"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeServiceModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save Service</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT TEAM MEMBER -->
+  <div id="teamModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 580px;">
+      <h3 class="modal-title" id="teamModalTitle">Add Team Member</h3>
+      <form id="teamModalForm">
+        <input type="hidden" id="tmId">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Full Name *</label>
+            <input type="text" id="tmName" required class="form-input" placeholder="e.g. Alex Johnson">
+          </div>
+          <div class="form-row">
+            <label>Role / Specialization *</label>
+            <input type="text" id="tmRole" required class="form-input" placeholder="e.g. Frontend Engineer & UI Designer">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Short Bio / Focus</label>
+          <textarea id="tmBio" rows="2" class="form-input" placeholder="Specializes in interactive UI/UX, responsive layouts, and modern web systems..."></textarea>
+        </div>
+
+        <div class="form-row" style="background: rgba(99, 102, 241, 0.05); padding: 1rem; border-radius: 0.75rem; border: 1px solid rgba(99, 102, 241, 0.2);">
+          <label style="font-weight: 700; color: #E2E8F0; margin-bottom: 0.5rem; display: block;">Team Member Profile Photo *</label>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="width: 68px; height: 68px; border-radius: 999px; overflow: hidden; border: 2px solid #6366F1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.35); background: #0F172A; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+              <img id="tmAvatarPreview" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect width='160' height='160' rx='80' fill='%236366F1'/%3E%3Ctext x='50%25' y='54%25' font-family='sans-serif' font-weight='700' font-size='52' fill='%23FFFFFF' dominant-baseline='middle' text-anchor='middle'%3ETM%3C/text%3E%3C/svg%3E" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 0.4rem;">
+                <button type="button" id="tmUploadBtn" class="action-btn violet" onclick="document.getElementById('tmAvatarFile').click()" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.35rem; width: auto; margin-bottom: 0;">
+                  <i data-lucide="upload" style="width: 0.85rem; height: 0.85rem;"></i> Upload Device Photo
+                </button>
+                <button type="button" id="tmRemovePhotoBtn" class="action-btn" onclick="clearTeamAvatar()" style="display: none; padding: 0.45rem 0.65rem; font-size: 0.72rem; border-radius: 0.5rem; color: #FB7185; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);">
+                  Remove Photo
+                </button>
+                <span id="tmUploadStatus" style="font-size: 0.72rem; color: #34D399; font-weight: 600;"></span>
+              </div>
+              <input type="file" id="tmAvatarFile" accept="image/*" style="display: none;">
+              <input type="text" id="tmAvatarUrl" class="form-input" placeholder="Photo URL or base64 data URL (auto-filled on upload)..." oninput="updateTeamAvatarPreview(this.value)">
+              <div style="font-size: 0.68rem; color: #94A3B8; margin-top: 0.25rem;">Upload JPG, PNG, WEBP from your phone/PC, or paste any image link.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Skills & Technologies (Comma-separated)</label>
+          <input type="text" id="tmSkills" class="form-input" placeholder="e.g. React, Next.js, Figma, Tailwind CSS">
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>GitHub Profile URL</label>
+            <input type="url" id="tmGithub" class="form-input" placeholder="https://github.com/...">
+          </div>
+          <div class="form-row">
+            <label>LinkedIn URL</label>
+            <input type="url" id="tmLinkedin" class="form-input" placeholder="https://linkedin.com/in/...">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Email Address</label>
+            <input type="email" id="tmEmail" class="form-input" placeholder="member@example.com">
+          </div>
+          <div class="form-row">
+            <label>Portfolio / Personal Website</label>
+            <input type="url" id="tmPortfolio" class="form-input" placeholder="https://...">
+          </div>
+        </div>
+
+        <div class="form-row" style="max-width: 140px;">
+          <label>Display Order</label>
+          <input type="number" id="tmDisplayOrder" class="form-input" value="1" min="1">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeTeamModal()">Cancel</button>
+          <button type="submit" id="tmSubmitBtn" class="btn-save">Save Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    let cmsData = {
+      profile: null,
+      projects: [],
+      certifications: [],
+      experiences: [],
+      events: [],
+      skills: [],
+      services: [],
+      team: [],
+      inquiries: [],
+      settings: null,
+    };
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getInitials(name) {
+      if (!name) return 'TM';
+      const parts = String(name).trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function getInitialsAvatarSvg(name) {
+      const initials = getInitials(name);
+      const colors = [
+        ['#6366F1', '#8B5CF6'],
+        ['#EC4899', '#8B5CF6'],
+        ['#3B82F6', '#06B6D4'],
+        ['#F59E0B', '#EF4444'],
+        ['#10B981', '#3B82F6'],
+      ];
+      let hash = 0;
+      for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      const pair = colors[Math.abs(hash) % colors.length];
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><defs><linearGradient id="g_${Math.abs(hash)}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${pair[0]}"/><stop offset="100%" stop-color="${pair[1]}"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#g_${Math.abs(hash)})"/><text x="50%" y="54%" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="52" fill="#FFFFFF" dominant-baseline="middle" text-anchor="middle">${initials}</text></svg>`;
+      return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = isError ? 'error' : '';
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3200);
+    }
+
+    // Centralized Authentication Header & Fetch Utility
+    function getAuthToken() {
+      return localStorage.getItem('charan_admin_token') || sessionStorage.getItem('charan_admin_token') || '';
+    }
+
+    async function authFetch(url, options = {}) {
+      const token = getAuthToken();
+      const headers = {
+        ...(options.headers || {}),
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const opts = {
+        ...options,
+        headers,
+        credentials: 'include',
+      };
+
+      const res = await fetch(url, opts);
+      if (res.status === 401) {
+        showToast('Admin session required. Redirecting to login...', true);
+        setTimeout(() => {
+          window.location.href = '/admin/login';
+        }, 1500);
+      }
+      return res;
+    }
+
+    // Client-side image optimizer: automatically downscales high-res photos to crisp avatar dimensions
+    function compressImageFile(file, maxDimension = 600, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = () => resolve(e.target.result); // Fallback to raw base64
+          img.onload = () => {
+            let width = img.width || 400;
+            let height = img.height || 400;
+
+            if (width > height) {
+              if (width > maxDimension) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              }
+            } else {
+              if (height > maxDimension) {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, width);
+            canvas.height = Math.max(1, height);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const mime = (file.type && file.type.includes('png')) ? 'image/png' : 'image/jpeg';
+            const dataUrl = canvas.toDataURL(mime, quality);
+            resolve(dataUrl);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Verify session & bootstrap
+    async function initAdmin() {
+      try {
+        const res = await authFetch('/api/auth/me', { cache: 'no-store' });
+        if (!res || !res.ok) return;
+        const data = await res.json();
+        if (!data.authenticated) { window.location.href = '/admin/login'; return; }
+        if (data.token) {
+          localStorage.setItem('charan_admin_token', data.token);
+          sessionStorage.setItem('charan_admin_token', data.token);
+        }
+        if (data.admin?.name) {
+          document.getElementById('adminHeaderName').textContent = data.admin.name;
+        }
+        await loadAllData();
+      } catch {
+        window.location.href = '/admin/login';
+      }
+    }
+
+    async function loadAllData() {
+      try {
+        const bust = `?t=${Date.now()}`;
+        const [prof, proj, cert, exp, eventRes, skill, serv, teamRes, inq, sett] = await Promise.all([
+          fetch(`/api/profile${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/projects${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/certifications${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/experience${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/events${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/skills${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/services${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/team${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/contact${bust}`, { cache: 'no-store' }).then(r => r.json()),
+          fetch(`/api/settings${bust}`, { cache: 'no-store' }).then(r => r.json()),
+        ]);
+
+        cmsData.profile = prof.profile || {};
+        cmsData.projects = proj.projects || [];
+        cmsData.certifications = cert.certifications || [];
+        cmsData.experiences = exp.experiences || [];
+        cmsData.events = eventRes.events || [];
+        cmsData.skills = skill.skills || [];
+        cmsData.services = serv.services || [];
+        cmsData.team = teamRes.team || [];
+        cmsData.inquiries = inq.inquiries || [];
+        cmsData.settings = sett.settings || {};
+
+        updateDashboardCounters();
+        renderProjectsTable();
+        renderCertificationsList();
+        renderExperienceList();
+        renderEventsList();
+        renderSkillsList();
+        renderServicesList();
+        renderTeamAdmin();
+        renderInquiriesList();
+        populateProfileForm();
+        populateSettingsForm();
+        renderActivityLogs();
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        showToast('Error syncing data from server', true);
+      }
+    }
+
+    function updateDashboardCounters() {
+      document.getElementById('countProjects').textContent = cmsData.projects.length;
+      document.getElementById('badgeProjects').textContent = cmsData.projects.length;
+
+      document.getElementById('countCerts').textContent = cmsData.certifications.length;
+      document.getElementById('badgeCerts').textContent = cmsData.certifications.length;
+
+      document.getElementById('countExp').textContent = cmsData.experiences.length;
+      document.getElementById('badgeExp').textContent = cmsData.experiences.length;
+
+      document.getElementById('countEvents').textContent = cmsData.events.length;
+      document.getElementById('badgeEvents').textContent = cmsData.events.length;
+
+      document.getElementById('badgeSkills').textContent = cmsData.skills.length;
+      document.getElementById('badgeServices').textContent = cmsData.services.length;
+
+      const countTeamEl = document.getElementById('countTeam');
+      if (countTeamEl) countTeamEl.textContent = cmsData.team ? cmsData.team.length : 0;
+      const badgeTeamEl = document.getElementById('badgeTeam');
+      if (badgeTeamEl) badgeTeamEl.textContent = cmsData.team ? cmsData.team.length : 0;
+
+      const unreadCount = cmsData.inquiries.filter(i => i.status === 'unread').length;
+      document.getElementById('badgeInq').textContent = unreadCount;
+    }
+
+    function renderActivityLogs() {
+      const list = document.getElementById('activityLogsList');
+      list.innerHTML = `
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: #0B0F19; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.04);">
+          <div style="width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #10B981; margin-top: 0.35rem; shrink: 0;"></div>
+          <div style="flex: 1;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #FFFFFF;">Real Projects Synchronized</div>
+            <div style="font-size: 0.65rem; color: #94A3B8;">LETTERGEN PRO, PROJEX, Mameka Mahodayam & Business Solutions</div>
+          </div>
+          <div style="font-size: 0.65rem; color: #64748B; font-family: monospace;">Active</div>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: #0B0F19; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.04);">
+          <div style="width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #6366F1; margin-top: 0.35rem; shrink: 0;"></div>
+          <div style="flex: 1;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #FFFFFF;">Honest Empty State Protection</div>
+            <div style="font-size: 0.65rem; color: #94A3B8;">Strictly displays "No certifications added yet" until verified credentials exist</div>
+          </div>
+          <div style="font-size: 0.65rem; color: #64748B; font-family: monospace;">Verified</div>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: #0B0F19; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.04);">
+          <div style="width: 0.5rem; height: 0.5rem; border-radius: 999px; background: #38BDF8; margin-top: 0.35rem; shrink: 0;"></div>
+          <div style="flex: 1;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #FFFFFF;">Academic Foundation: St. Ann's College of Eng. & Tech</div>
+            <div style="font-size: 0.65rem; color: #94A3B8;">B.Tech in CSE (Data Science), Chirala, Andhra Pradesh, India</div>
+          </div>
+          <div style="font-size: 0.65rem; color: #64748B; font-family: monospace;">Active</div>
+        </div>
+      `;
+    }
+
+    function renderProjectsTable() {
+      const tbody = document.getElementById('projectsTableBody');
+      tbody.innerHTML = '';
+      cmsData.projects.forEach(proj => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight: 700; color: #FFFFFF;">${proj.title}</div>
+            <div style="font-size: 0.65rem; color: #64748B;">${proj.shortDesc ? proj.shortDesc.slice(0, 45) + '...' : ''}</div>
+          </td>
+          <td>${proj.category}</td>
+          <td><span style="padding: 0.2rem 0.5rem; border-radius: 999px; background: #1E293B; font-size: 0.65rem;">${proj.status}</span></td>
+          <td>${proj.liveUrl ? `<a href="${proj.liveUrl}" target="_blank" style="color: #818CF8; text-decoration: underline;">Open Link</a>` : '<span style="color: #64748B; font-style: italic;">No URL</span>'}</td>
+          <td>
+            <span style="padding: 0.2rem 0.5rem; border-radius: 999px; font-size: 0.65rem; background: ${proj.published ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; color: ${proj.published ? '#34D399' : '#F87171'};">
+              ${proj.published ? 'Published' : 'Draft'}
+            </span>
+          </td>
+          <td style="text-align: right; white-space: nowrap;">
+            <button onclick="editProject('${proj.id}')" style="background: none; border: none; color: #818CF8; margin-right: 0.75rem; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+            <button onclick="deleteProject('${proj.id}', '${proj.title.replace(/'/g, "\\'")}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function renderCertificationsList() {
+      const container = document.getElementById('certsContainer');
+      if (cmsData.certifications.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; background: #0F1626; border: 1px dashed rgba(255,255,255,0.1); border-radius: 1rem;">
+            <i data-lucide="award" style="width: 2rem; height: 2rem; color: #64748B; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">No certifications added yet</div>
+            <div style="font-size: 0.7rem; color: #94A3B8; margin-top: 0.25rem;">The public website strictly displays the honest empty state until you add verified credentials.</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '';
+        cmsData.certifications.forEach(c => {
+          const card = document.createElement('div');
+          card.className = 'panel';
+          card.innerHTML = `
+            <div style="font-size: 0.65rem; color: #818CF8; font-weight: 700; margin-bottom: 0.25rem;">${c.issuer}</div>
+            <div style="font-size: 0.9rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.5rem;">${c.title}</div>
+            <div style="font-size: 0.7rem; color: #94A3B8; margin-bottom: 0.5rem;">Issued: ${c.issueDate}</div>
+            ${c.verificationUrl ? `<a href="${c.verificationUrl}" target="_blank" style="font-size: 0.7rem; color: #38BDF8; text-decoration: underline;">Verify Credential</a>` : ''}
+            <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem;">
+              <button onclick="editCert('${c.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+              <button onclick="deleteCert('${c.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function renderExperienceList() {
+      const container = document.getElementById('experienceContainer');
+      if (!container) return;
+      if (cmsData.experiences.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 2.5rem; text-align: center; background: #0F1626; border: 1px dashed rgba(255,255,255,0.1); border-radius: 1rem;">
+            <i data-lucide="briefcase" style="width: 2rem; height: 2rem; color: #64748B; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">No experience records added yet</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '';
+        cmsData.experiences.forEach(e => {
+          const item = document.createElement('div');
+          item.className = 'panel';
+          item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <div style="font-weight: 800; font-size: 0.95rem; color: #FFFFFF;">${e.role}</div>
+                <div style="font-size: 0.75rem; color: #818CF8; font-weight: 600;">${e.company} • ${e.location}</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; background: #1E293B; color: #94A3B8; padding: 0.15rem 0.5rem; border-radius: 999px;">${e.type || 'work'}</span>
+                <span style="font-size: 0.7rem; font-weight: 700; color: #34D399; background: rgba(16,185,129,0.15); padding: 0.2rem 0.55rem; border-radius: 999px;">${e.period}</span>
+              </div>
+            </div>
+            <p style="font-size: 0.75rem; color: #94A3B8; line-height: 1.5; margin-bottom: 0.5rem;">${e.description}</p>
+            ${(e.highlights && e.highlights.length > 0) ? `<ul style="font-size: 0.7rem; color: #64748B; margin-left: 1.2rem; margin-bottom: 0.75rem;">${e.highlights.map(h => `<li>${h}</li>`).join('')}</ul>` : ''}
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+              <button onclick="editExp('${e.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+              <button onclick="deleteExp('${e.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function renderEventsList() {
+      const container = document.getElementById('adminEventsContainer');
+      if (!container) return;
+      if (cmsData.events.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 2.5rem; text-align: center; background: #0F1626; border: 1px dashed rgba(255,255,255,0.1); border-radius: 1rem;">
+            <i data-lucide="calendar" style="width: 2rem; height: 2rem; color: #64748B; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">No events added yet</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '';
+        cmsData.events.forEach(ev => {
+          const card = document.createElement('div');
+          card.className = 'panel';
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <span style="font-size: 0.65rem; font-weight: 700; color: #FBBF24; background: rgba(245,158,11,0.15); padding: 0.15rem 0.5rem; border-radius: 999px;">${ev.role}</span>
+              <span style="font-size: 0.7rem; color: #64748B;">${ev.date}</span>
+            </div>
+            <div style="font-weight: 800; font-size: 0.9rem; color: #FFFFFF; margin-bottom: 0.25rem;">${ev.title}</div>
+            <div style="font-size: 0.7rem; color: #818CF8; margin-bottom: 0.5rem;">${ev.location}</div>
+            <p style="font-size: 0.75rem; color: #94A3B8; line-height: 1.5; margin-bottom: 0.75rem;">${ev.description}</p>
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+              <button onclick="editEvent('${ev.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+              <button onclick="deleteEvent('${ev.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function renderSkillsList() {
+      const container = document.getElementById('skillsAdminContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      cmsData.skills.forEach(s => {
+        const el = document.createElement('div');
+        el.className = 'panel';
+        el.style.padding = '1rem';
+        el.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: #FFFFFF;">${s.name}</div>
+            <span style="font-size: 0.65rem; color: #818CF8; background: rgba(99,102,241,0.1); padding: 0.15rem 0.5rem; border-radius: 999px;">${s.category}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+            <span style="font-size: 0.65rem; color: #64748B;">Icon: ${s.icon || 'Code'}</span>
+            <div style="display: flex; gap: 0.5rem;">
+              <button onclick="editSkill('${s.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.7rem; font-weight: 600;">Edit</button>
+              <button onclick="deleteSkill('${s.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.7rem; font-weight: 600;">Delete</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+      lucide.createIcons();
+    }
+
+    function renderServicesList() {
+      const container = document.getElementById('servicesAdminContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      cmsData.services.forEach(serv => {
+        const el = document.createElement('div');
+        el.className = 'panel';
+        el.innerHTML = `
+          <div style="font-size: 0.65rem; font-weight: 700; color: #818CF8; margin-bottom: 0.25rem;">${serv.category}</div>
+          <div style="font-weight: 800; font-size: 0.95rem; color: #FFFFFF; margin-bottom: 0.5rem;">${serv.title}</div>
+          <p style="font-size: 0.75rem; color: #94A3B8; line-height: 1.5; margin-bottom: 0.75rem;">${serv.description}</p>
+          ${(serv.features && serv.features.length > 0) ? `<ul style="font-size: 0.7rem; color: #64748B; margin-left: 1.2rem; margin-bottom: 0.75rem;">${serv.features.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+            <button onclick="editService('${serv.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+            <button onclick="deleteService('${serv.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+      lucide.createIcons();
+    }
+
+    function renderTeamAdmin() {
+      const container = document.getElementById('teamAdminContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!cmsData.team || cmsData.team.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 3rem; text-align: center; background: #0F1626; border: 1px dashed rgba(255,255,255,0.1); border-radius: 1rem;">
+            <i data-lucide="users" style="width: 2rem; height: 2rem; color: #64748B; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">No team members added yet</div>
+            <div style="font-size: 0.7rem; color: #94A3B8; margin-top: 0.25rem;">Click "+ Add Team Member" above to add team collaborators to your portfolio.</div>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      cmsData.team.forEach(member => {
+        const el = document.createElement('div');
+        el.className = 'panel';
+        el.style.display = 'flex';
+        el.style.flexDirection = 'column';
+        el.style.justifyContent = 'space-between';
+
+        const skillsHtml = (member.skills && member.skills.length > 0)
+          ? `<div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.75rem 0;">
+              ${member.skills.map(s => `<span style="font-size: 0.65rem; background: rgba(99,102,241,0.12); color: #A5B4FC; border: 1px solid rgba(99,102,241,0.25); border-radius: 999px; padding: 0.15rem 0.5rem; font-weight: 600;">${escapeHtml(s)}</span>`).join('')}
+             </div>`
+          : '';
+
+        const socials = member.socials || {};
+        const socialsList = [];
+        if (socials.github) socialsList.push(`<a href="${socials.github}" target="_blank" rel="noopener noreferrer" style="color: #94A3B8; font-size: 0.75rem; text-decoration: none;" title="GitHub">GitHub ↗</a>`);
+        if (socials.linkedin) socialsList.push(`<a href="${socials.linkedin}" target="_blank" rel="noopener noreferrer" style="color: #60A5FA; font-size: 0.75rem; text-decoration: none;" title="LinkedIn">LinkedIn ↗</a>`);
+        if (socials.email) socialsList.push(`<a href="mailto:${socials.email}" style="color: #34D399; font-size: 0.75rem; text-decoration: none;" title="Email">Email ↗</a>`);
+        if (socials.portfolio) socialsList.push(`<a href="${socials.portfolio}" target="_blank" rel="noopener noreferrer" style="color: #F472B6; font-size: 0.75rem; text-decoration: none;" title="Website">Portfolio ↗</a>`);
+
+        const socialsHtml = socialsList.length > 0
+          ? `<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 0.5rem; font-size: 0.72rem;">${socialsList.join('')}</div>`
+          : '';
+
+        const avatarSrc = (member.avatarUrl && member.avatarUrl.trim().length > 0)
+          ? member.avatarUrl.trim()
+          : getInitialsAvatarSvg(member.name);
+
+        const safeJsName = (member.name || 'Team Member').replace(/['\\]/g, '\\$&');
+        el.innerHTML = `
+          <div>
+            <div style="display: flex; gap: 0.85rem; align-items: center; margin-bottom: 0.75rem;">
+              <img src="${avatarSrc}" alt="${escapeHtml(member.name)}" onerror="this.onerror=null;this.src=getInitialsAvatarSvg('${safeJsName}');" style="width: 3.25rem; height: 3.25rem; border-radius: 999px; object-fit: cover; border: 2px solid rgba(99,102,241,0.3); background: #1E293B;">
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <h4 style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(member.name)}</h4>
+                  <span style="font-size: 0.65rem; color: #64748B; background: rgba(255,255,255,0.05); padding: 0.1rem 0.4rem; border-radius: 4px;">#${member.displayOrder || 1}</span>
+                </div>
+                <div style="font-size: 0.72rem; color: #818CF8; font-weight: 600; margin-top: 0.15rem;">${escapeHtml(member.role)}</div>
+              </div>
+            </div>
+            ${member.bio ? `<p style="font-size: 0.75rem; color: #94A3B8; line-height: 1.5; margin: 0.5rem 0;">${escapeHtml(member.bio)}</p>` : ''}
+            ${skillsHtml}
+            ${socialsHtml}
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.65rem; margin-top: 0.85rem;">
+            <button onclick="editTeam('${member.id}')" style="background: none; border: none; color: #818CF8; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Edit</button>
+            <button onclick="deleteTeam('${member.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.75rem; font-weight: 600;">Delete</button>
+          </div>
+        `;
+        const adminAvatarImg = el.querySelector('img');
+        if (adminAvatarImg) {
+          adminAvatarImg.onerror = function() {
+            this.onerror = null;
+            this.src = getInitialsAvatarSvg(member.name);
+          };
+        }
+        container.appendChild(el);
+      });
+      lucide.createIcons();
+    }
+
+    function renderInquiriesList() {
+      const container = document.getElementById('inquiriesContainer');
+      if (cmsData.inquiries.length === 0) {
+        container.innerHTML = `
+          <div style="padding: 3rem; text-align: center; background: #0F1626; border: 1px dashed rgba(255,255,255,0.1); border-radius: 1rem;">
+            <i data-lucide="message-square" style="width: 2rem; height: 2rem; color: #64748B; margin-bottom: 0.5rem;"></i>
+            <div style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">No inquiries received yet</div>
+            <div style="font-size: 0.7rem; color: #94A3B8; margin-top: 0.25rem;">Direct project inquiries submitted through the public portfolio will appear here.</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '';
+        cmsData.inquiries.forEach(inq => {
+          const item = document.createElement('div');
+          item.className = 'panel';
+          item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <span style="font-weight: 700; color: #FFFFFF; font-size: 0.85rem;">${inq.name}</span>
+                <span style="font-size: 0.75rem; color: #94A3B8; margin-left: 0.5rem;">(${inq.email})</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; background: ${inq.status === 'unread' ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}; color: ${inq.status === 'unread' ? '#F87171' : '#34D399'}; font-weight: 700;">${inq.status || 'unread'}</span>
+                <span style="font-size: 0.65rem; color: #64748B;">${new Date(inq.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 600; color: #818CF8; margin-bottom: 0.35rem;">Scope: ${inq.subject || 'Portfolio Inquiry'}</div>
+            <p style="font-size: 0.75rem; color: #CBD5E1; line-height: 1.5;">${inq.message}</p>
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+              <button onclick="toggleInquiryStatus('${inq.id}', '${inq.status === 'read' ? 'unread' : 'read'}')" style="background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 0.7rem; font-weight: 600;">Mark as ${inq.status === 'read' ? 'Unread' : 'Read'}</button>
+              <a href="mailto:${inq.email}?subject=Re: ${encodeURIComponent(inq.subject || 'Portfolio Inquiry')}" class="btn-live" style="font-size: 0.7rem; padding: 0.25rem 0.65rem;">Reply via Email</a>
+              <button onclick="deleteInquiry('${inq.id}')" style="background: none; border: none; color: #FB7185; cursor: pointer; font-size: 0.7rem; font-weight: 600;">Delete</button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function populateProfileForm() {
+      if (!cmsData.profile) return;
+      document.getElementById('profName').value = cmsData.profile.name || '';
+      document.getElementById('profTitle').value = cmsData.profile.title || '';
+      document.getElementById('profHeroDesc').value = cmsData.profile.heroDesc || '';
+      document.getElementById('profBio').value = cmsData.profile.bio || '';
+      document.getElementById('profLoc').value = cmsData.profile.location || '';
+      document.getElementById('profEmail').value = cmsData.profile.email || '';
+      document.getElementById('profAvailStatus').value = cmsData.profile.availabilityStatus || 'available';
+      document.getElementById('profAvailText').value = cmsData.profile.availabilityText || '';
+      document.getElementById('profResumeUrl').value = cmsData.profile.resumeUrl || '';
+      const sl = cmsData.profile.socialLinks || {};
+      document.getElementById('profGithub').value = sl.github || '';
+      document.getElementById('profLinkedin').value = sl.linkedin || '';
+      document.getElementById('profTwitter').value = sl.twitter || sl.x || '';
+      document.getElementById('profLeetcode').value = sl.leetcode || '';
+      const avUrl = cmsData.profile.avatarUrl || '/images/charan_sai_avatar.jpg';
+      document.getElementById('profAvatarUrl').value = avUrl;
+      updateAvatarPreview(avUrl);
+    }
+
+    function updateAvatarPreview(val) {
+      const preview = document.getElementById('adminAvatarPreview');
+      if (preview) {
+        preview.src = (val && val.trim().length > 0) ? val.trim() : '/images/charan_sai_avatar.jpg';
+      }
+    }
+
+    function resetDefaultAvatar() {
+      const defaultUrl = '/images/charan_sai_avatar.jpg';
+      document.getElementById('profAvatarUrl').value = defaultUrl;
+      updateAvatarPreview(defaultUrl);
+      showToast('Default photo selected. Save profile to apply.');
+    }
+
+    function populateSettingsForm() {
+      if (!cmsData.settings) return;
+      document.getElementById('settTitle').value = cmsData.settings.seoTitle || '';
+      document.getElementById('settDesc').value = cmsData.settings.seoDescription || '';
+      document.getElementById('settKeywords').value = cmsData.settings.keywords || '';
+      document.getElementById('settBanner').value = cmsData.settings.bannerText || '';
+    }
+
+    // Mobile Drawer Handlers
+    function toggleAdminSidebar(force) {
+      const sidebar = document.getElementById('adminSidebar');
+      const backdrop = document.getElementById('adminSidebarBackdrop');
+      if (!sidebar) return;
+      const isOpen = typeof force === 'boolean' ? force : !sidebar.classList.contains('open');
+      sidebar.classList.toggle('open', isOpen);
+      if (backdrop) backdrop.classList.toggle('open', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+
+    function closeAdminSidebar() {
+      toggleAdminSidebar(false);
+    }
+
+    // Robust Tab Switching
+    function switchTab(tabId) {
+      closeAdminSidebar();
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      const activePane = document.getElementById('tab-' + tabId);
+      if (activePane) activePane.classList.add('active');
+
+      const activeBtn = document.querySelector(`nav .nav-btn[data-tab="${tabId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.getElementById('pageTitle').textContent = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+    }
+
+    // --- MODAL HANDLERS ---
+    // Project
+    function openProjectModal() {
+      document.getElementById('pmId').value = '';
+      document.getElementById('pmTitle').value = '';
+      document.getElementById('pmShortDesc').value = '';
+      document.getElementById('pmCaseStudy').value = '';
+      document.getElementById('pmTechnologies').value = 'React, Next.js';
+      document.getElementById('pmLiveUrl').value = '';
+      document.getElementById('pmRepoUrl').value = '';
+      document.getElementById('pmCategory').value = 'Web Applications';
+      document.getElementById('pmStatus').value = 'In Progress';
+      document.getElementById('pmPublished').value = 'true';
+      document.getElementById('projModalTitle').textContent = 'Add Project';
+      document.getElementById('projectModal').style.display = 'flex';
+    }
+    function editProject(id) {
+      const proj = cmsData.projects.find(p => p.id === id);
+      if (!proj) return;
+      document.getElementById('pmId').value = proj.id;
+      document.getElementById('pmTitle').value = proj.title;
+      document.getElementById('pmShortDesc').value = proj.shortDesc || '';
+      document.getElementById('pmCaseStudy').value = proj.caseStudy || '';
+      document.getElementById('pmTechnologies').value = (proj.technologies || []).join(', ');
+      document.getElementById('pmLiveUrl').value = proj.liveUrl || '';
+      document.getElementById('pmRepoUrl').value = proj.repoUrl || '';
+      document.getElementById('pmCategory').value = proj.category || 'Web Applications';
+      document.getElementById('pmStatus').value = proj.status || 'In Progress';
+      document.getElementById('pmPublished').value = proj.published ? 'true' : 'false';
+      document.getElementById('projModalTitle').textContent = 'Edit Project';
+      document.getElementById('projectModal').style.display = 'flex';
+    }
+    function closeProjectModal() { document.getElementById('projectModal').style.display = 'none'; }
+
+    // Certifications
+    function openCertModal() {
+      document.getElementById('cmId').value = '';
+      document.getElementById('cmTitle').value = '';
+      document.getElementById('cmIssuer').value = '';
+      document.getElementById('cmDate').value = '';
+      document.getElementById('cmCredId').value = '';
+      document.getElementById('cmVerifyUrl').value = '';
+      document.getElementById('certModalTitle').textContent = 'Add Certification';
+      document.getElementById('certModal').style.display = 'flex';
+    }
+    function editCert(id) {
+      const c = cmsData.certifications.find(item => item.id === id);
+      if (!c) return;
+      document.getElementById('cmId').value = c.id;
+      document.getElementById('cmTitle').value = c.title;
+      document.getElementById('cmIssuer').value = c.issuer;
+      document.getElementById('cmDate').value = c.issueDate;
+      document.getElementById('cmCredId').value = c.credentialId || '';
+      document.getElementById('cmVerifyUrl').value = c.verificationUrl || '';
+      document.getElementById('certModalTitle').textContent = 'Edit Certification';
+      document.getElementById('certModal').style.display = 'flex';
+    }
+    function closeCertModal() { document.getElementById('certModal').style.display = 'none'; }
+
+    // Experience
+    function openExpModal() {
+      document.getElementById('emId').value = '';
+      document.getElementById('emRole').value = '';
+      document.getElementById('emCompany').value = '';
+      document.getElementById('emLocation').value = 'Chirala, AP, India';
+      document.getElementById('emPeriod').value = '';
+      document.getElementById('emType').value = 'work';
+      document.getElementById('emDesc').value = '';
+      document.getElementById('emHighlights').value = '';
+      document.getElementById('expModalTitle').textContent = 'Add Experience / Education';
+      document.getElementById('expModal').style.display = 'flex';
+    }
+    function editExp(id) {
+      const e = cmsData.experiences.find(item => item.id === id);
+      if (!e) return;
+      document.getElementById('emId').value = e.id;
+      document.getElementById('emRole').value = e.role;
+      document.getElementById('emCompany').value = e.company;
+      document.getElementById('emLocation').value = e.location;
+      document.getElementById('emPeriod').value = e.period;
+      document.getElementById('emType').value = e.type || 'work';
+      document.getElementById('emDesc').value = e.description || '';
+      document.getElementById('emHighlights').value = (e.highlights || []).join('\n');
+      document.getElementById('expModalTitle').textContent = 'Edit Experience / Education';
+      document.getElementById('expModal').style.display = 'flex';
+    }
+    function closeExpModal() { document.getElementById('expModal').style.display = 'none'; }
+
+    // Event
+    function openEventModal() {
+      document.getElementById('evmId').value = '';
+      document.getElementById('evmTitle').value = '';
+      document.getElementById('evmRole').value = 'Participant';
+      document.getElementById('evmDate').value = '2024';
+      document.getElementById('evmLocation').value = "St. Ann's College of Eng. & Tech";
+      document.getElementById('evmDesc').value = '';
+      document.getElementById('eventModalTitle').textContent = 'Add Event / Activity';
+      document.getElementById('eventModal').style.display = 'flex';
+    }
+    function editEvent(id) {
+      const ev = cmsData.events.find(item => item.id === id);
+      if (!ev) return;
+      document.getElementById('evmId').value = ev.id;
+      document.getElementById('evmTitle').value = ev.title;
+      document.getElementById('evmRole').value = ev.role;
+      document.getElementById('evmDate').value = ev.date;
+      document.getElementById('evmLocation').value = ev.location || '';
+      document.getElementById('evmDesc').value = ev.description || '';
+      document.getElementById('eventModalTitle').textContent = 'Edit Event / Activity';
+      document.getElementById('eventModal').style.display = 'flex';
+    }
+    function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; }
+
+    // Skill
+    function openSkillModal() {
+      document.getElementById('smId').value = '';
+      document.getElementById('smName').value = '';
+      document.getElementById('smCategory').value = 'Frontend';
+      document.getElementById('smIcon').value = 'Code';
+      document.getElementById('skillModalTitle').textContent = 'Add Technology Skill';
+      document.getElementById('skillModal').style.display = 'flex';
+    }
+    function editSkill(id) {
+      const s = cmsData.skills.find(item => item.id === id);
+      if (!s) return;
+      document.getElementById('smId').value = s.id;
+      document.getElementById('smName').value = s.name;
+      document.getElementById('smCategory').value = s.category;
+      document.getElementById('smIcon').value = s.icon || 'Code';
+      document.getElementById('skillModalTitle').textContent = 'Edit Technology Skill';
+      document.getElementById('skillModal').style.display = 'flex';
+    }
+    function closeSkillModal() { document.getElementById('skillModal').style.display = 'none'; }
+
+    // Service
+    function openServiceModal() {
+      document.getElementById('svmId').value = '';
+      document.getElementById('svmTitle').value = '';
+      document.getElementById('svmCategory').value = 'Development';
+      document.getElementById('svmDesc').value = '';
+      document.getElementById('svmFeatures').value = '';
+      document.getElementById('serviceModalTitle').textContent = 'Add Service';
+      document.getElementById('serviceModal').style.display = 'flex';
+    }
+    function editService(id) {
+      const serv = cmsData.services.find(item => item.id === id);
+      if (!serv) return;
+      document.getElementById('svmId').value = serv.id;
+      document.getElementById('svmTitle').value = serv.title;
+      document.getElementById('svmCategory').value = serv.category || 'Development';
+      document.getElementById('svmDesc').value = serv.description || '';
+      document.getElementById('svmFeatures').value = (serv.features || []).join('\n');
+      document.getElementById('serviceModalTitle').textContent = 'Edit Service';
+      document.getElementById('serviceModal').style.display = 'flex';
+    }
+    function closeServiceModal() { document.getElementById('serviceModal').style.display = 'none'; }
+
+    // Team Modal Controls
+    function updateTeamAvatarPreview(val) {
+      const preview = document.getElementById('tmAvatarPreview');
+      const name = (document.getElementById('tmName') && document.getElementById('tmName').value.trim()) || 'Team Member';
+      const removeBtn = document.getElementById('tmRemovePhotoBtn');
+      if (preview) {
+        if (val && val.trim().length > 0) {
+          preview.src = val.trim();
+          preview.onerror = function() {
+            this.onerror = null;
+            this.src = getInitialsAvatarSvg(name);
+          };
+          if (removeBtn) removeBtn.style.display = 'inline-flex';
+        } else {
+          preview.src = getInitialsAvatarSvg(name);
+          if (removeBtn) removeBtn.style.display = 'none';
+        }
+      }
+    }
+
+    function clearTeamAvatar() {
+      document.getElementById('tmAvatarUrl').value = '';
+      const name = (document.getElementById('tmName') && document.getElementById('tmName').value.trim()) || 'Team Member';
+      updateTeamAvatarPreview('');
+      const statusEl = document.getElementById('tmUploadStatus');
+      if (statusEl) {
+        statusEl.style.color = '#94A3B8';
+        statusEl.textContent = 'Using initials badge';
+      }
+    }
+
+    function openTeamModal() {
+      document.getElementById('tmId').value = '';
+      document.getElementById('tmName').value = '';
+      document.getElementById('tmRole').value = '';
+      document.getElementById('tmBio').value = '';
+      document.getElementById('tmAvatarUrl').value = '';
+      updateTeamAvatarPreview('');
+      const statusEl = document.getElementById('tmUploadStatus');
+      if (statusEl) statusEl.textContent = '';
+      document.getElementById('tmSkills').value = '';
+      document.getElementById('tmGithub').value = '';
+      document.getElementById('tmLinkedin').value = '';
+      document.getElementById('tmEmail').value = '';
+      document.getElementById('tmPortfolio').value = '';
+      document.getElementById('tmDisplayOrder').value = (cmsData.team ? cmsData.team.length + 1 : 1);
+      document.getElementById('teamModalTitle').textContent = 'Add Team Member';
+      document.getElementById('teamModal').style.display = 'flex';
+      lucide.createIcons();
+    }
+
+    function editTeam(id) {
+      const member = (cmsData.team || []).find(item => item.id === id);
+      if (!member) return;
+      document.getElementById('tmId').value = member.id;
+      document.getElementById('tmName').value = member.name || '';
+      document.getElementById('tmRole').value = member.role || '';
+      document.getElementById('tmBio').value = member.bio || '';
+      document.getElementById('tmAvatarUrl').value = member.avatarUrl || '';
+      updateTeamAvatarPreview(member.avatarUrl);
+      const statusEl = document.getElementById('tmUploadStatus');
+      if (statusEl) statusEl.textContent = member.avatarUrl ? 'Photo Loaded ✓' : '';
+      document.getElementById('tmSkills').value = (member.skills || []).join(', ');
+      const socials = member.socials || {};
+      document.getElementById('tmGithub').value = socials.github || '';
+      document.getElementById('tmLinkedin').value = socials.linkedin || '';
+      document.getElementById('tmEmail').value = socials.email || '';
+      document.getElementById('tmPortfolio').value = socials.portfolio || '';
+      document.getElementById('tmDisplayOrder').value = member.displayOrder || 1;
+      document.getElementById('teamModalTitle').textContent = 'Edit Team Member';
+      document.getElementById('teamModal').style.display = 'flex';
+      lucide.createIcons();
+    }
+
+    function closeTeamModal() {
+      document.getElementById('teamModal').style.display = 'none';
+    }
+
+    // --- FORM SUBMIT HANDLERS ---
+    // Project Form Submit
+    document.getElementById('projectModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('pmId').value;
+      const rawTechs = document.getElementById('pmTechnologies').value;
+      const payload = {
+        title: document.getElementById('pmTitle').value.trim(),
+        category: document.getElementById('pmCategory').value,
+        shortDesc: document.getElementById('pmShortDesc').value.trim(),
+        caseStudy: document.getElementById('pmCaseStudy').value.trim(),
+        technologies: rawTechs.split(',').map(t => t.trim()).filter(Boolean),
+        liveUrl: document.getElementById('pmLiveUrl').value.trim(),
+        repoUrl: document.getElementById('pmRepoUrl').value.trim(),
+        status: document.getElementById('pmStatus').value,
+        published: document.getElementById('pmPublished').value === 'true',
+      };
+
+      const url = id ? `/api/projects/${id}` : '/api/projects';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeProjectModal();
+          showToast('Project saved successfully!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save project', true);
+        }
+      } catch {
+        showToast('Network error saving project', true);
+      }
+    });
+
+    async function deleteProject(id, title) {
+      if (!confirm(`Delete project "${title}"?`)) return;
+      try {
+        const res = await authFetch(`/api/projects/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast(`Deleted ${title}`);
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete project', true);
+        }
+      } catch {
+        showToast('Error deleting project', true);
+      }
+    }
+
+    // Cert Form Submit
+    document.getElementById('certModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('cmId').value;
+      const payload = {
+        title: document.getElementById('cmTitle').value.trim(),
+        issuer: document.getElementById('cmIssuer').value.trim(),
+        issueDate: document.getElementById('cmDate').value.trim(),
+        credentialId: document.getElementById('cmCredId').value.trim(),
+        verificationUrl: document.getElementById('cmVerifyUrl').value.trim(),
+        published: true,
+      };
+
+      const url = id ? `/api/certifications/${id}` : '/api/certifications';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeCertModal();
+          showToast(id ? 'Certification updated!' : 'Certification added!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save certification', true);
+        }
+      } catch {
+        showToast('Network error saving certification', true);
+      }
+    });
+
+    async function deleteCert(id) {
+      if (!confirm('Delete certification?')) return;
+      try {
+        const res = await authFetch(`/api/certifications/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Certification removed');
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete certification', true);
+        }
+      } catch {
+        showToast('Error deleting certification', true);
+      }
+    }
+
+    // Experience Form Submit
+    document.getElementById('expModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('emId').value;
+      const payload = {
+        role: document.getElementById('emRole').value.trim(),
+        company: document.getElementById('emCompany').value.trim(),
+        location: document.getElementById('emLocation').value.trim(),
+        period: document.getElementById('emPeriod').value.trim(),
+        type: document.getElementById('emType').value,
+        description: document.getElementById('emDesc').value.trim(),
+        highlights: document.getElementById('emHighlights').value.split('\n').map(h => h.trim()).filter(Boolean),
+      };
+
+      const url = id ? `/api/experience/${id}` : '/api/experience';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeExpModal();
+          showToast(id ? 'Experience updated!' : 'Experience added!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save experience', true);
+        }
+      } catch {
+        showToast('Network error saving experience', true);
+      }
+    });
+
+    async function deleteExp(id) {
+      if (!confirm('Delete experience record?')) return;
+      try {
+        const res = await authFetch(`/api/experience/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Experience removed');
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete experience', true);
+        }
+      } catch {
+        showToast('Error deleting experience', true);
+      }
+    }
+
+    // Event Form Submit
+    document.getElementById('eventModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('evmId').value;
+      const payload = {
+        title: document.getElementById('evmTitle').value.trim(),
+        role: document.getElementById('evmRole').value.trim(),
+        date: document.getElementById('evmDate').value.trim(),
+        location: document.getElementById('evmLocation').value.trim(),
+        description: document.getElementById('evmDesc').value.trim(),
+        published: true,
+      };
+
+      const url = id ? `/api/events/${id}` : '/api/events';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeEventModal();
+          showToast(id ? 'Event updated!' : 'Event added!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save event', true);
+        }
+      } catch {
+        showToast('Network error saving event', true);
+      }
+    });
+
+    async function deleteEvent(id) {
+      if (!confirm('Delete event record?')) return;
+      try {
+        const res = await authFetch(`/api/events/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Event removed');
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete event', true);
+        }
+      } catch {
+        showToast('Error deleting event', true);
+      }
+    }
+
+    // Skill Form Submit
+    document.getElementById('skillModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('smId').value;
+      const payload = {
+        name: document.getElementById('smName').value.trim(),
+        category: document.getElementById('smCategory').value,
+        icon: document.getElementById('smIcon').value.trim() || 'Code',
+        featured: true,
+      };
+
+      const url = id ? `/api/skills/${id}` : '/api/skills';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeSkillModal();
+          showToast(id ? 'Skill updated!' : 'Skill added!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save skill', true);
+        }
+      } catch {
+        showToast('Network error saving skill', true);
+      }
+    });
+
+    async function deleteSkill(id) {
+      if (!confirm('Delete skill?')) return;
+      try {
+        const res = await authFetch(`/api/skills/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Skill removed');
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete skill', true);
+        }
+      } catch {
+        showToast('Error deleting skill', true);
+      }
+    }
+
+    // Service Form Submit
+    document.getElementById('serviceModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('svmId').value;
+      const payload = {
+        title: document.getElementById('svmTitle').value.trim(),
+        category: document.getElementById('svmCategory').value.trim() || 'Development',
+        description: document.getElementById('svmDesc').value.trim(),
+        features: document.getElementById('svmFeatures').value.split('\n').map(f => f.trim()).filter(Boolean),
+        icon: 'Layout',
+      };
+
+      const url = id ? `/api/services/${id}` : '/api/services';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeServiceModal();
+          showToast(id ? 'Service updated!' : 'Service added!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save service', true);
+        }
+      } catch {
+        showToast('Network error saving service', true);
+      }
+    });
+
+    async function deleteService(id) {
+      if (!confirm('Delete service?')) return;
+      try {
+        const res = await authFetch(`/api/services/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Service removed');
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete service', true);
+        }
+      } catch {
+        showToast('Error deleting service', true);
+      }
+    }
+
+    // Team Form Submit (Protected with authFetch)
+    document.getElementById('teamModalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('tmId').value;
+      const rawSkills = document.getElementById('tmSkills').value;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = id ? 'Updating...' : 'Adding...';
+      }
+
+      const payload = {
+        name: document.getElementById('tmName').value.trim(),
+        role: document.getElementById('tmRole').value.trim(),
+        bio: document.getElementById('tmBio').value.trim(),
+        avatarUrl: document.getElementById('tmAvatarUrl').value.trim(),
+        skills: rawSkills.split(',').map(s => s.trim()).filter(Boolean),
+        socials: {
+          github: document.getElementById('tmGithub').value.trim(),
+          linkedin: document.getElementById('tmLinkedin').value.trim(),
+          email: document.getElementById('tmEmail').value.trim(),
+          portfolio: document.getElementById('tmPortfolio').value.trim(),
+        },
+        displayOrder: parseInt(document.getElementById('tmDisplayOrder').value, 10) || 1,
+      };
+
+      const url = id ? `/api/team/${id}` : '/api/team';
+      const method = id ? 'PUT' : 'POST';
+
+      try {
+        const res = await authFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          closeTeamModal();
+          showToast(id ? 'Team member updated!' : 'Team member added successfully!');
+          await loadAllData();
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          showToast(errData.error || 'Failed to save team member', true);
+        }
+      } catch {
+        showToast('Network error saving team member', true);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = id ? 'Save Changes' : 'Save Member';
+        }
+      }
+    });
+
+    async function deleteTeam(id) {
+      if (!confirm('Are you sure you want to remove this team member?')) return;
+      try {
+        const res = await authFetch(`/api/team/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Team member removed');
+          await loadAllData();
+        } else {
+          showToast('Failed to delete team member', true);
+        }
+      } catch {
+        showToast('Error deleting team member', true);
+      }
+    }
+
+    // Team Avatar File Upload Handler with Auto-Optimization & Device Upload
+    const tmAvatarFileInput = document.getElementById('tmAvatarFile');
+    if (tmAvatarFileInput) {
+      tmAvatarFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById('tmUploadStatus');
+        const uploadBtn = document.getElementById('tmUploadBtn');
+        const submitBtn = document.querySelector('#teamModalForm button[type="submit"]');
+        const preview = document.getElementById('tmAvatarPreview');
+
+        if (statusEl) {
+          statusEl.style.color = '#F59E0B';
+          statusEl.textContent = 'Processing & uploading photo...';
+        }
+        if (uploadBtn) uploadBtn.disabled = true;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Attaching photo...';
+        }
+
+        try {
+          // Client-side auto-optimization: downscale to crisp 500px avatar
+          const optimizedBase64 = await compressImageFile(file, 500, 0.84);
+
+          // IMMEDIATELY populate input and preview with the clean data URL
+          document.getElementById('tmAvatarUrl').value = optimizedBase64;
+          if (preview) {
+            preview.src = optimizedBase64;
+            preview.onerror = null;
+          }
+          const removeBtn = document.getElementById('tmRemovePhotoBtn');
+          if (removeBtn) removeBtn.style.display = 'inline-flex';
+
+          const res = await authFetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              data: optimizedBase64,
+            }),
+          });
+
+          const data = await res.json().catch(() => ({}));
+          if (data && data.url) {
+            document.getElementById('tmAvatarUrl').value = data.url;
+          } else {
+            document.getElementById('tmAvatarUrl').value = optimizedBase64;
+          }
+          if (statusEl) {
+            statusEl.style.color = '#10B981';
+            statusEl.textContent = 'Photo Attached ✓';
+          }
+          showToast('Team member photo attached & ready to save!');
+        } catch (err) {
+          console.error('Upload error:', err);
+          if (statusEl) {
+            statusEl.style.color = '#10B981';
+            statusEl.textContent = 'Photo Attached ✓';
+          }
+          showToast('Photo attached and ready to save!');
+        } finally {
+          if (uploadBtn) uploadBtn.disabled = false;
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = document.getElementById('tmId').value ? 'Save Changes' : 'Save Member';
+          }
+          tmAvatarFileInput.value = '';
+        }
+      });
+    }
+
+    // Inquiry Actions
+    async function toggleInquiryStatus(id, newStatus) {
+      try {
+        const res = await authFetch(`/api/contact/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        if (res.ok) {
+          showToast(`Inquiry marked as ${newStatus}`);
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to update inquiry status', true);
+        }
+      } catch {
+        showToast('Error updating inquiry status', true);
+      }
+    }
+
+    async function deleteInquiry(id) {
+      if (!confirm('Delete inquiry?')) return;
+      try {
+        const res = await authFetch(`/api/contact/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Inquiry deleted');
+          await loadAllData();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || 'Failed to delete inquiry', true);
+        }
+      } catch {
+        showToast('Error deleting inquiry', true);
+      }
+    }
+
+    // Profile Form Submit
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('profSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving Profile...';
+
+      const payload = {
+        name: document.getElementById('profName').value.trim(),
+        title: document.getElementById('profTitle').value.trim(),
+        heroDesc: document.getElementById('profHeroDesc').value.trim(),
+        bio: document.getElementById('profBio').value.trim(),
+        location: document.getElementById('profLoc').value.trim(),
+        email: document.getElementById('profEmail').value.trim(),
+        availabilityStatus: document.getElementById('profAvailStatus').value,
+        availabilityText: document.getElementById('profAvailText').value.trim(),
+        resumeUrl: document.getElementById('profResumeUrl').value.trim(),
+        avatarUrl: document.getElementById('profAvatarUrl').value.trim(),
+        socialLinks: {
+          github: document.getElementById('profGithub').value.trim(),
+          linkedin: document.getElementById('profLinkedin').value.trim(),
+          twitter: document.getElementById('profTwitter').value.trim(),
+          x: document.getElementById('profTwitter').value.trim(),
+          leetcode: document.getElementById('profLeetcode').value.trim(),
+          email: `mailto:${document.getElementById('profEmail').value.trim()}`,
+          website: 'https://charansai.website'
+        },
+      };
+
+      try {
+        const res = await authFetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          showToast('Profile updated & synchronized live!');
+          await loadAllData();
+        } else {
+          showToast('Failed to update profile', true);
+        }
+      } catch {
+        showToast('Network error saving profile', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Profile Changes';
+      }
+    });
+
+    // Profile Photo File Upload Handler
+    const avatarInput = document.getElementById('adminAvatarFileInput');
+    if (avatarInput) {
+      avatarInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById('uploadStatusText');
+        const uploadBtn = document.getElementById('uploadAvatarBtn');
+        if (statusEl) statusEl.textContent = 'Optimizing & uploading...';
+        if (uploadBtn) uploadBtn.disabled = true;
+
+        try {
+          const optimizedBase64 = await compressImageFile(file, 1200, 0.88);
+          const res = await authFetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              data: optimizedBase64,
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.url) {
+            document.getElementById('profAvatarUrl').value = data.url;
+            updateAvatarPreview(data.url);
+            showToast('Photo uploaded successfully! Save changes to apply.');
+            if (statusEl) statusEl.textContent = 'Uploaded ✓';
+          } else {
+            showToast(data.error || 'Upload failed', true);
+            if (statusEl) statusEl.textContent = 'Upload failed';
+          }
+        } catch {
+          showToast('Network error during upload', true);
+          if (statusEl) statusEl.textContent = 'Upload error';
+        } finally {
+          if (uploadBtn) uploadBtn.disabled = false;
+          avatarInput.value = '';
+        }
+      });
+    }
+
+    // Settings Form Submit
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('settSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving Settings...';
+
+      const payload = {
+        seoTitle: document.getElementById('settTitle').value.trim(),
+        seoDescription: document.getElementById('settDesc').value.trim(),
+        keywords: document.getElementById('settKeywords').value.trim(),
+        bannerText: document.getElementById('settBanner').value.trim(),
+      };
+
+      try {
+        const res = await authFetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          showToast('Settings saved successfully!');
+          await loadAllData();
+        } else {
+          showToast('Failed to save settings', true);
+        }
+      } catch {
+        showToast('Network error saving settings', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Settings';
+      }
+    });
+
+    // Admin Password Change Submit Handler
+    document.getElementById('passwordChangeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('secPasswordSubmitBtn');
+      const curPass = document.getElementById('secCurrentPass').value;
+      const newPass = document.getElementById('secNewPass').value;
+      const confPass = document.getElementById('secConfirmPass').value;
+
+      if (!curPass || !newPass || !confPass) {
+        showToast('Please fill out all password fields', true);
+        return;
+      }
+
+      if (newPass !== confPass) {
+        showToast('New password and confirmation do not match', true);
+        return;
+      }
+
+      if (newPass.length < 8) {
+        showToast('New password must be at least 8 characters long', true);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Updating Password...';
+
+      try {
+        const res = await authFetch('/api/auth/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            currentPassword: curPass,
+            newPassword: newPass,
+            confirmPassword: confPass,
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          showToast(data.message || 'Password updated! Other sessions revoked.');
+          document.getElementById('secCurrentPass').value = '';
+          document.getElementById('secNewPass').value = '';
+          document.getElementById('secConfirmPass').value = '';
+        } else {
+          showToast(data.error || 'Failed to update password', true);
+        }
+      } catch {
+        showToast('Network error updating password', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Update Password';
+      }
+    });
+
+    async function handleLogout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    }
+
+    // Start
+    initAdmin();
+  </script>
+</body>
+</html>

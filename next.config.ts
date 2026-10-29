@@ -17,15 +17,19 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         {
           source: '/',
-          destination: '/index.html',
+          destination: '/home.html',
         },
         {
           source: '/admin',
-          destination: '/admin.html',
+          destination: '/admin-dashboard.html',
         },
         {
           source: '/admin-login',
-          destination: '/admin-login.html',
+          destination: '/admin-auth.html',
+        },
+        {
+          source: '/admin/login',
+          destination: '/admin-auth.html',
         },
       ],
       afterFiles: [],
