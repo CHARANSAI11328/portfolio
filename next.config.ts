@@ -12,6 +12,26 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/',
+          destination: '/index.html',
+        },
+        {
+          source: '/admin',
+          destination: '/admin.html',
+        },
+        {
+          source: '/admin-login',
+          destination: '/admin-login.html',
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
 };
 
 export default nextConfig;
